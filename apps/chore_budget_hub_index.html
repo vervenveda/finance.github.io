@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Chore & Budget Hub — Parent-Locked</title>
+<style>
+  :root{
+    --bg:#3B8A34; --panel:#ffffff; --ink:#2b241d; --muted:#7b6b59;
+    --accent:#c98c2e; --accent-2:#7a5a3b; --outline:rgba(0,0,0,.08);
+    --r-lg:18px; --r-md:12px; --shadow:0 10px 30px rgba(50,40,30,.08);
+    --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:99%;font-family:Inter,system-ui,Segoe UI,Arial;background:linear-gradient(180deg,#45D907,#efe7d9);color:#FDFFFC}
+  a{color:#FDFFFC}
+  .app{max-width:888px;margin:14px auto;padding:16px}
+  header{display:flex;justify-content:space-between;align-items:center;gap:11px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .logo{width:66px;height:55px;border-radius:7px;display:grid;place-items:center;color:#fff;font-weight:777;background:linear-gradient(180deg,var(--accent),var(--accent-2));box-shadow:0 7px 14px rgba(122,90,59,.18)}
+  h1{margin:0;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+  .small{font-size:14px;color:var(--muted)}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:11px;padding:11px 14px;font-weight:666;cursor:pointer}
+  .ghost{background:transparent;color:var(--accent-2);border:1px solid var(--outline)}
+  .ok{background:var(--ok);color:#06230f}
+  .warn{background:var(--warn);color:#1a1208}
+  .danger{background:transparent;color:var(--bad);border:1px solid var(--bad)}
+  .grid{display:grid;grid-template-columns:250px 1fr;gap:14px;margin-top:14px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border-radius:var(--r-lg);padding:12px;box-shadow:var(--shadow)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .avatar{width:56px;height:56px;border-radius:12px;background:#fffefc;border:2px solid transparent;display:grid;place-items:center;font-weight:800;color:var(--accent-2);cursor:pointer}
+  .avatar.active{outline:3px solid rgba(201,140,46,.18)}
+  input,select{width:100%;padding:10px;border-radius:10px;border:1px solid var(--outline);background:#fff}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:12px;background:linear-gradient(180deg,#fff,#fffefc)}
+  .muted{color:var(--muted)}
+  .pill{padding:4px 8px;border-radius:999px;background:#fff;border:1px solid var(--outline);font-size:12px}
+  .wallet{display:flex;gap:10px;flex-wrap:wrap}
+  .jar{flex:1;min-width:140px;padding:12px;border-radius:12px;background:#fffefc}
+  .amount{font-weight:800;font-size:18px;color:var(--accent-2)}
+  .progress{height:10px;background:rgba(0,0,0,.06);border-radius:8px;overflow:hidden;margin-top:6px}
+  .fill{height:100%;background:linear-gradient(90deg,var(--accent),#e0b46a)}
+  .divider{border:0;border-top:1px dashed var(--outline);margin:10px 0}
+  footer{margin-top:18px;text-align:center}
+  /* modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:20}
+  .show{display:flex}
+  .box{max-width:520px;width:92%;background:#fff;border-radius:14px;padding:14px;color:#1b120a}
+  .box h3{margin:4px 0 8px}
+  .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+  .audit{max-height:170px;overflow:auto;background:#fffefb;border:1px solid var(--outline);border-radius:10px;padding:8px}
+  /* print area for stubs */
+  @media print{
+    body{background:#fff}
+    .no-print{display:none!important}
+    #stubPrint{display:block!important}
+  }
+  #stubPrint{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="no-print">
+    <div class="brand">
+      <div class="logo">CB</div>
+      <div>
+        <h1>Chore & Budget Hub</h1>
+        <div class="small">Multi-wallet • Parent-locked • Allowance • Pay Stubs</div>
+      </div>
+    </div>
+    <div class="row">
+      <span id="modeBadge" class="pill">🔒 Parent mode</span>
+      <button id="toggleMode" class="btn ghost">Switch to Kid view</button>
+      <button id="stubBtn" class="btn ghost">Pay Stubs</button>
+      <button id="exportBtn" class="btn ghost">Export</button>
+      <button id="importBtn" class="btn ghost">Import</button>
+      <button id="resetBtn" class="btn danger">Reset</button>
+    </div>
+  </header>
+
+  <div class="grid no-print">
+    <!-- LEFT -->
+    <aside class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="small">Active Profile</div>
+          <div id="activeName" style="font-weight:800">Parent</div>
+        </div>
+        <div style="text-align:right">
+          <div class="small">Total Coins</div>
+          <div id="familyCoins" style="font-weight:800">0</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="small" style="margin-bottom:6px">Profiles</div>
+      <div id="profiles" class="row"></div>
+      <div class="row" style="margin-top:8px">
+        <input id="newProfileName" placeholder="Add child name"/>
+        <button id="addProfileBtn" class="btn">Add</button>
+      </div>
+
+      <div class="divider"></div>
+      <div class="small">Jar Split (Parent)</div>
+      <div class="row">
+        <input id="splitSave" type="number" min="0" max="100" step="1" style="width:90px" placeholder="Save %">
+        <input id="splitSpend" type="number" min="0" max="100" step="1" style="width:90px" placeholder="Spend %">
+        <input id="splitGive" type="number" min="0" max="100" step="1" style="width:90px" placeholder="Give %">
+        <button id="applySplit" class="btn">Apply</button>
+      </div>
+      <div class="small muted" id="splitNote"></div>
+
+      <div class="divider"></div>
+      <div class="small">Weekly Allowance (per kid)</div>
+      <div id="allowBox" class="list" style="margin-top:8px"></div>
+      <div class="row" style="margin-top:8px">
+        <button id="runAllowanceBtn" class="btn ok">Run This Week</button>
+        <span class="small muted" id="lastAllowanceNote"></span>
+      </div>
+
+      <div class="divider"></div>
+      <div class="small">Stats (all kids)</div>
+      <div class="row" style="justify-content:space-between"><div>Chores Completed</div><div id="statCompleted">0</div></div>
+      <div class="row" style="justify-content:space-between"><div>Total Paid</div><div id="statPaid">$0</div></div>
+    </aside>
+
+    <!-- RIGHT -->
+    <main class="card">
+      <!-- Wallet (active kid or summary) -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><div class="small">Wallet</div><div style="font-weight:800" id="walletOwner">—</div></div>
+          <div class="small muted">Split: <span id="splitSummary">40/55/5</span></div>
+        </div>
+        <div id="walletWrap" class="wallet" style="margin-top:8px"></div>
+      </div>
+
+      <!-- Upcoming + Actions -->
+      <div class="row" style="margin-top:12px">
+        <div class="card" style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div class="small">Upcoming</div><div style="font-weight:800">Next Chores</div></div>
+            <button id="newChoreBtn" class="btn">+ Chore</button>
+          </div>
+          <div id="upcomingList" class="list" style="margin-top:8px"></div>
+        </div>
+
+        <div class="card" style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div class="small">Chores</div><div style="font-weight:800">Assigned Tasks</div></div>
+            <div class="row">
+              <button id="templatesBtn" class="btn ghost">Templates</button>
+              <button id="paydayBtn" class="btn ok">Pay Day</button>
+            </div>
+          </div>
+          <div id="choreList" class="list" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <div class="card" style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div class="small">Approval Queue</div><div style="font-weight:800">Awaiting Parent</div></div>
+          </div>
+          <div id="approvalQueue" class="list" style="margin-top:8px"></div>
+        </div>
+
+        <div class="card" style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div class="small">Rewards Store</div><div style="font-weight:800">Redeem Coins</div></div>
+            <button id="addStoreBtn" class="btn ghost">+ Item</button>
+          </div>
+          <div id="storeList" class="list" style="margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <div><div class="small">Audit Log</div><div style="font-weight:800">Recent Activity</div></div>
+        <div id="auditLog" class="audit" style="margin-top:8px"></div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="small muted no-print">@ Local only • Nothing leaves your browser</footer>
+</div>
+
+<!-- Pay Stub Print Surface -->
+<div id="stubPrint">
+  <div style="max-width:800px;margin:0 auto;padding:12px;font-family:Inter,system-ui,Arial;color:#111">
+    <h2 style="margin:0 0 8px 0">Pay Stubs</h2>
+    <div id="stubInfo" style="font-size:13px;color:#555;margin-bottom:8px"></div>
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead>
+        <tr>
+          <th style="text-align:left;border-bottom:1px solid #ddd;padding:6px">Date</th>
+          <th style="text-align:left;border-bottom:1px solid #ddd;padding:6px">Type</th>
+          <th style="text-align:left;border-bottom:1px solid #ddd;padding:6px">Description</th>
+          <th style="text-align:right;border-bottom:1px solid #ddd;padding:6px">Amount</th>
+          <th style="text-align:right;border-bottom:1px solid #ddd;padding:6px">Save/Spend/Give</th>
+        </tr>
+      </thead>
+      <tbody id="stubRows"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="padding:6px;text-align:right;border-top:1px solid #ddd"><strong>Total</strong></td>
+          <td id="stubTotal" style="padding:6px;text-align:right;border-top:1px solid #ddd">$0.00</td>
+          <td style="padding:6px;text-align:right;border-top:1px solid #ddd"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+
+<!-- Modals -->
+<div id="pinModal" class="modal no-print"><div class="box">
+  <h3>Parent PIN</h3>
+  <div class="small muted" id="pinHint"></div>
+  <div class="row" style="margin-top:8px">
+    <input id="pinInput" placeholder="Enter 4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric"/>
+    <button id="pinSubmit" class="btn">Unlock</button>
+    <button id="pinCancel" class="btn ghost">Cancel</button>
+  </div>
+</div></div>
+
+<div id="choreModal" class="modal no-print"><div class="box">
+  <h3 id="choreTitle">New Chore</h3>
+  <div class="row">
+    <div style="flex:1"><label class="small">Chore</label><input id="choreName" placeholder="Make bed"/></div>
+    <div style="flex:1"><label class="small">Assign to</label><select id="choreAssignee"></select></div>
+  </div>
+  <div class="row">
+    <div style="flex:1"><label class="small">Payout ($)</label><input id="choreAmount" type="number" min="0" step="0.25" placeholder="1.00"/></div>
+    <div style="flex:1"><label class="small">When</label><select id="choreWhen"><option>morning</option><option>afternoon</option><option>evening</option></select></div>
+    <div style="flex:1"><label class="small">Recurring</label><select id="choreEvery"><option value="">one-time</option><option value="daily">daily</option><option value="weekly">weekly</option></select></div>
+  </div>
+  <div class="actions">
+    <button id="choreSave" class="btn">Save</button>
+    <button id="choreCancel" class="btn ghost">Cancel</button>
+  </div>
+</div></div>
+
+<div id="storeModal" class="modal no-print"><div class="box">
+  <h3>Add Store Item</h3>
+  <div class="row">
+    <div style="flex:1"><label class="small">Title</label><input id="storeTitle" placeholder="Movie Night"/></div>
+    <div style="flex:1"><label class="small">Cost (coins)</label><input id="storeCost" type="number" min="1" step="1" placeholder="150"/></div>
+  </div>
+  <div class="actions">
+    <button id="storeSave" class="btn">Save</button>
+    <button id="storeCancel" class="btn ghost">Cancel</button>
+  </div>
+</div></div>
+
+<div id="stubModal" class="modal no-print"><div class="box">
+  <h3>Pay Stubs</h3>
+  <div class="row">
+    <div style="flex:1">
+      <label class="small">Kid</label>
+      <select id="stubKid"></select>
+    </div>
+    <div style="flex:1">
+      <label class="small">From (yyyy-mm-dd)</label>
+      <input id="stubFrom" placeholder="2026-01-01"/>
+    </div>
+    <div style="flex:1">
+      <label class="small">To (yyyy-mm-dd)</label>
+      <input id="stubTo" placeholder="2026-12-31"/>
+    </div>
+  </div>
+  <div class="actions">
+    <button id="stubGen" class="btn">Generate</button>
+    <button id="stubPrintBtn" class="btn ghost">Print</button>
+    <button id="stubClose" class="btn ghost">Close</button>
+  </div>
+  <div class="small muted" style="margin-top:6px">Stubs include **chore payments** and **weekly allowances**.</div>
+</div></div>
+
+<input id="importFile" type="file" accept="application/json" style="display:none"/>
+
+<script>
+/* =========================
+   Local data & helpers
+   ========================= */
+const KEY = 'cb_hub_v3_multi';
+const DEF = {
+  pinHash:'', pinInit:false, mode:'parent',
+  profiles:[
+    {id:'parent', name:'Parent', role:'parent', color:'#70543b'},
+    // kid example with own wallet/coins
+    {id:'kid_olivia', name:'Olivia', role:'kid', color:'#9b6f4a', wallet:{save:0,spend:0,give:0}, coins:0, weeklyAllowance:0, lastAllowance:''}
+  ],
+  activeId:'parent',
+  split:{save:40, spend:55, give:5},
+  chores:[], approvals:[], store:[{id:'sticker', title:'Sticker Pack', cost:30}],
+  audit:[], stats:{completed:0, paid:0},
+  payments:[] // [{id,type:'chore'|'allowance', kidId, kidName, amount, save,spend,give, dateISO, desc}]
+};
+// state
+let S = load();
+const $ = id => document.getElementById(id);
+const money = n => '$' + Number(n||0).toFixed(2);
+const todayISO = () => new Date().toISOString().slice(0,10);
+function hashPIN(pin){ let h=0; for(let i=0;i<pin.length;i++){h=(h<<5)-h+pin.charCodeAt(i);h|=0;} return String(h); }
+function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+function load(){
+  try{ const raw = localStorage.getItem(KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  const fresh = JSON.parse(JSON.stringify(DEF));
+  fresh.pinHash = hashPIN('1234');
+  return fresh;
+}
+function isParent(){ return S.mode === 'parent'; }
+function kids(){ return S.profiles.filter(p=>p.role==='kid'); }
+function parent(){ return S.profiles.find(p=>p.role==='parent'); }
+function active(){ return S.profiles.find(p=>p.id===S.activeId); }
+function ensureKidWallet(k){ if(!k.wallet) k.wallet={save:0,spend:0,give:0}; if(typeof k.coins!=='number') k.coins=0; if(typeof k.weeklyAllowance!=='number') k.weeklyAllowance=0; }
+
+/* =========================
+   Renderers
+   ========================= */
+function renderAll(){
+  renderProfiles();
+  renderSplit();
+  renderAllowanceList();
+  renderStats();
+  renderWalletArea();
+  renderUpcoming();
+  renderChores();
+  renderApprovals();
+  renderStore();
+  renderAudit();
+  $('modeBadge').textContent = isParent()? '🔒 Parent mode':'👦 Kid view';
+  $('toggleMode').textContent = isParent()? 'Switch to Kid view':'Switch to Parent';
+  $('activeName').textContent = active()?.name || '—';
+  $('familyCoins').textContent = kids().reduce((a,k)=>a+(k.coins||0),0);
+}
+function renderProfiles(){
+  const wrap = $('profiles'); wrap.innerHTML='';
+  S.profiles.forEach(p=>{
+    const a=document.createElement('div');
+    a.className='avatar'+(p.id===S.activeId?' active':''); a.style.borderColor=p.color;
+    a.textContent= p.name.split(' ').map(s=>s[0]).slice(0,2).join('');
+    a.title = `${p.name} (${p.role})`;
+    a.onclick = ()=>{ if(p.role==='parent' && !isParent()) return askPIN(); S.activeId=p.id; save(); renderAll(); };
+    wrap.appendChild(a);
+  });
+  $('newProfileName').value='';
+}
+function renderSplit(){
+  const s=S.split;
+  $('splitSave').value = s.save; $('splitSpend').value=s.spend; $('splitGive').value=s.give;
+  $('splitSummary').textContent = `${s.save}/${s.spend}/${s.give}`;
+  const total = s.save + s.spend + s.give;
+  $('splitNote').textContent = total===100 ? 'Split totals 100%.' : `Totals ${total}% — must equal 100%.`;
+  ['splitSave','splitSpend','splitGive','applySplit'].forEach(id=>$(id).disabled=!isParent());
+}
+function renderAllowanceList(){
+  const box = $('allowBox'); box.innerHTML='';
+  kids().forEach(k=>{
+    ensureKidWallet(k);
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `<div>
+      <div style="font-weight:800">${k.name}</div>
+      <div class="small muted">Weekly allowance • Last run: ${k.lastAllowance||'—'}</div>
+    </div>`;
+    const right = document.createElement('div'); right.className='row';
+    const inp = document.createElement('input'); inp.type='number'; inp.min='0'; inp.step='0.50'; inp.style.width='120px'; inp.value= k.weeklyAllowance || 0;
+    inp.onchange = ()=>{ if(!isParent()) return askPIN(); k.weeklyAllowance = parseFloat(inp.value||0); save(); log(`Set allowance for ${k.name}: ${money(k.weeklyAllowance)}`); };
+    right.appendChild(inp);
+    row.appendChild(right); box.appendChild(row);
+  });
+  $('lastAllowanceNote').textContent = 'Click “Run This Week” to post allowances to each kid wallet.';
+}
+function renderStats(){
+  $('statCompleted').textContent = S.stats.completed;
+  $('statPaid').textContent = money(S.stats.paid);
+}
+function renderWalletArea(){
+  const a = active();
+  const wrap = $('walletWrap'); wrap.innerHTML='';
+  if(!a || a.role!=='kid'){
+    // parent or no kid: show summary (each kid box)
+    $('walletOwner').textContent = 'All Kid Wallets';
+    kids().forEach(k=>{
+      ensureKidWallet(k);
+      wrap.appendChild(walletCard(k));
+    });
+  }else{
+    $('walletOwner').textContent = `${a.name}'s Wallet`;
+    ensureKidWallet(a);
+    wrap.appendChild(walletCard(a,true));
+  }
+}
+function walletCard(k,highlight=false){
+  const card = document.createElement('div');
+  card.className='jar'; card.style.flex='1 1 240px';
+  if(highlight) card.style.outline='2px solid rgba(201,140,46,.25)';
+  const tot = k.wallet.save + k.wallet.spend + k.wallet.give;
+  card.innerHTML = `
+    <div class="small" style="display:flex;justify-content:space-between">
+      <span>${k.name}</span><span class="muted">Coins: ${k.coins||0}</span>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <div style="flex:1">
+        <div class="small">Save</div>
+        <div class="amount">${money(k.wallet.save)}</div>
+        <div class="progress"><div class="fill" style="width:${tot?Math.round(k.wallet.save/tot*100):0}%"></div></div>
+      </div>
+      <div style="flex:1">
+        <div class="small">Spend</div>
+        <div class="amount">${money(k.wallet.spend)}</div>
+        <div class="progress"><div class="fill" style="width:${tot?Math.round(k.wallet.spend/tot*100):0}%"></div></div>
+      </div>
+      <div style="flex:1">
+        <div class="small">Give</div>
+        <div class="amount">${money(k.wallet.give)}</div>
+        <div class="progress"><div class="fill" style="width:${tot?Math.round(k.wallet.give/tot*100):0}%"></div></div>
+      </div>
+    </div>
+  `;
+  return card;
+}
+function renderUpcoming(){
+  const list = $('upcomingList'); list.innerHTML='';
+  const next = S.chores.filter(c=>!c.paid).slice(0,5);
+  if(!next.length){ list.innerHTML='<div class="muted">No chores yet.</div>'; return; }
+  next.forEach(c=>{
+    const el = document.createElement('div'); el.className='small';
+    el.textContent = `${c.name} • ${c.assignedTo} • ${c.recurring||'one-time'} • ${c.when} • ${money(c.amount)}`;
+    list.appendChild(el);
+  });
+}
+function renderChores(){
+  const list = $('choreList'); list.innerHTML='';
+  if(!S.chores.length){ list.innerHTML='<div class="muted">No chores. Add one.</div>'; return; }
+  S.chores.forEach(c=>{
+    const row = document.createElement('div'); row.className='item';
+    const left = document.createElement('div');
+    left.innerHTML = `<div style="font-weight:800">${c.name}</div>
+      <div class="small muted">${c.assignedTo} • ${c.recurring||'one-time'} • ${c.when} • ${money(c.amount)}</div>`;
+    const actions = document.createElement('div'); actions.className='row';
+    const act = active();
+    // kid "I did it"
+    if(act?.role==='kid' && act.name===c.assignedTo && !c.awaiting && !c.approved && !c.paid){
+      const doneBtn = document.createElement('button'); doneBtn.className='btn ghost'; doneBtn.textContent='I did it';
+      doneBtn.onclick = ()=>{ c.awaiting=true; if(!S.approvals.includes(c.id)) S.approvals.push(c.id); save(); renderAll(); log(`${act.name} submitted: ${c.name}`); };
+      actions.appendChild(doneBtn);
+    }
+    // edit/delete (parent)
+    const edit = document.createElement('button'); edit.className='btn ghost'; edit.textContent='Edit';
+    edit.onclick = ()=>{ if(!isParent()) return askPIN(); openChoreModal(c); };
+    const del = document.createElement('button'); del.className='btn ghost danger'; del.textContent='Delete';
+    del.onclick = ()=>{ if(!isParent()) return askPIN(); if(confirm('Delete chore?')){ S.chores=S.chores.filter(x=>x.id!==c.id); S.approvals=S.approvals.filter(id=>id!==c.id); save(); renderAll(); log(`Deleted chore: ${c.name}`);} };
+    actions.appendChild(edit); actions.appendChild(del);
+    // flags
+    if(c.paid){ const b=document.createElement('span'); b.className='pill'; b.textContent='Paid'; actions.appendChild(b); }
+    if(c.awaiting && !c.paid){ const b=document.createElement('span'); b.className='pill'; b.textContent='Awaiting'; actions.appendChild(b); }
+    row.appendChild(left); row.appendChild(actions); list.appendChild(row);
+  });
+}
+function renderApprovals(){
+  const q = $('approvalQueue'); q.innerHTML='';
+  if(!S.approvals.length){ q.innerHTML='<div class="muted">No pending approvals</div>'; return; }
+  S.approvals.forEach(id=>{
+    const c = S.chores.find(x=>x.id===id); if(!c) return;
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `<div><div style="font-weight:800">${c.name}</div><div class="small muted">${c.assignedTo} • ${money(c.amount)}</div></div>`;
+    const act = document.createElement('div'); act.className='row';
+    const approve=document.createElement('button'); approve.className='btn ok'; approve.textContent='Approve';
+    const deny=document.createElement('button'); deny.className='btn warn'; deny.textContent='Deny';
+    approve.onclick = ()=>{ if(!isParent()) return askPIN(); c.awaiting=false; c.approved=true; S.approvals=S.approvals.filter(x=>x!==id); save(); renderAll(); log(`Approved: ${c.name} (${money(c.amount)})`); };
+    deny.onclick = ()=>{ if(!isParent()) return askPIN(); c.awaiting=false; c.approved=false; S.approvals=S.approvals.filter(x=>x!==id); save(); renderAll(); log(`Denied: ${c.name}`); };
+    act.appendChild(approve); act.appendChild(deny); row.appendChild(act); q.appendChild(row);
+  });
+}
+function renderStore(){
+  const list = $('storeList'); list.innerHTML='';
+  if(!S.store.length){ list.innerHTML='<div class="muted">No rewards yet.</div>'; return; }
+  S.store.forEach(s=>{
+    const row = document.createElement('div'); row.className='item';
+    row.innerHTML = `<div><div style="font-weight:800">${s.title}</div><div class="small muted">${s.cost} coins</div></div>`;
+    const act = document.createElement('div'); act.className='row';
+    const buy = document.createElement('button'); buy.className='btn'; buy.textContent='Redeem';
+    buy.onclick = ()=>{
+      if(!isParent()) return askPIN();
+      const kid = active()?.role==='kid' ? active() : kids()[0];
+      if(!kid) return alert('Select a kid.');
+      ensureKidWallet(kid);
+      if((kid.coins||0) < s.cost) return alert('Not enough coins');
+      if(confirm(`Redeem "${s.title}" for ${s.cost} coins from ${kid.name}?`)){
+        kid.coins -= s.cost; save(); renderAll(); log(`Redeemed: ${s.title} for ${kid.name}`);
+      }
+    };
+    const del = document.createElement('button'); del.className='btn ghost danger'; del.textContent='Remove';
+    del.onclick = ()=>{ if(!isParent()) return askPIN(); S.store=S.store.filter(x=>x.id!==s.id); save(); renderStore(); log(`Removed reward: ${s.title}`); };
+    act.appendChild(buy); act.appendChild(del); row.appendChild(act); list.appendChild(row);
+  });
+}
+function renderAudit(){
+  $('auditLog').innerHTML = S.audit.map(a=>`<div>• <strong>${a.t}</strong> — ${a.msg}</div>`).join('') || '<div class="muted">No activity yet.</div>';
+}
+function log(msg){ S.audit.unshift({t:new Date().toLocaleString(), msg}); if(S.audit.length>400) S.audit.pop(); save(); }
+
+/* =========================
+   Modal helpers
+   ========================= */
+function show(id){ $(id).classList.add('show'); }
+function hide(id){ $(id).classList.remove('show'); }
+
+/* =========================
+   PIN flow
+   ========================= */
+function askPIN(){ $('pinHint').textContent=''; $('pinInput').value=''; show('pinModal'); }
+$('pinCancel').onclick = ()=> hide('pinModal');
+$('pinSubmit').onclick = ()=>{
+  const pin = $('pinInput').value.trim();
+  if(pin.length!==4) return $('pinHint').textContent='PIN must be 4 digits';
+  if(hashPIN(pin)===S.pinHash){ S.mode='parent'; save(); hide('pinModal'); renderAll(); } else { $('pinHint').textContent='Incorrect PIN'; }
+};
+// first run: set PIN
+if(!S.pinInit){
+  S.pinInit=true; save();
+  setTimeout(()=>{
+    alert('Default Parent PIN is 1234. Set your own now.');
+    const np = prompt('New 4-digit Parent PIN','1234') || '1234';
+    if(np.length===4){ S.pinHash=hashPIN(np); save(); log('Parent PIN updated'); }
+  }, 400);
+}
+
+/* =========================
+   Actions
+   ========================= */
+$('toggleMode').onclick = ()=>{ if(isParent()) S.mode='kid'; else askPIN(); save(); renderAll(); };
+$('addProfileBtn').onclick = ()=>{
+  if(!isParent()) return askPIN();
+  const name=$('newProfileName').value.trim(); if(!name) return;
+  const k={id:'kid_'+Math.random().toString(36).slice(2,8), name, role:'kid', color:'#'+Math.floor(Math.random()*16777215).toString(16), wallet:{save:0,spend:0,give:0}, coins:0, weeklyAllowance:0, lastAllowance:''};
+  S.profiles.push(k); save(); renderAll(); log(`Added kid: ${name}`);
+};
+$('applySplit').onclick = ()=>{
+  if(!isParent()) return askPIN();
+  const a=parseInt($('splitSave').value||0,10), b=parseInt($('splitSpend').value||0,10), c=parseInt($('splitGive').value||0,10);
+  if(a+b+c!==100) return alert('Split must total 100%');
+  S.split={save:a,spend:b,give:c}; save(); renderAll(); log(`Split set to ${a}/${b}/${c}`);
+};
+
+/* Chores */
+$('newChoreBtn').onclick = ()=>{ if(!isParent()) return askPIN(); openChoreModal(); };
+$('templatesBtn').onclick = ()=>{
+  if(!isParent()) return askPIN();
+  const kid = kids()[0]; if(!kid) return alert('Add a kid first.');
+  [{name:'Make Bed',when:'morning',recurring:'daily',amount:0.5},
+   {name:'Dishes',when:'evening',recurring:'daily',amount:1.0},
+   {name:'Vacuum Room',when:'afternoon',recurring:'weekly',amount:2.0},
+   {name:'Trash Out',when:'evening',recurring:'weekly',amount:1.0}]
+  .forEach(x=> S.chores.push({id:'c_'+Math.random().toString(36).slice(2,8), name:x.name, assignedTo:kid.name, amount:x.amount, when:x.when, recurring:x.recurring, awaiting:false, approved:false, paid:false}));
+  save(); renderAll(); log('Added template chores');
+};
+function openChoreModal(existing){
+  const sel=$('choreAssignee'); sel.innerHTML='';
+  kids().forEach(k=>{ const o=document.createElement('option'); o.value=k.name; o.textContent=k.name; sel.appendChild(o); });
+  $('choreTitle').textContent = existing? 'Edit Chore' : 'New Chore';
+  $('choreName').value = existing?.name||'';
+  $('choreAssignee').value = existing?.assignedTo || kids()[0]?.name || '';
+  $('choreAmount').value = existing?.amount ?? '';
+  $('choreWhen').value = existing?.when || 'morning';
+  $('choreEvery').value = existing?.recurring || '';
+  show('choreModal');
+  $('choreCancel').onclick = ()=> hide('choreModal');
+  $('choreSave').onclick = ()=>{
+    const name=$('choreName').value.trim(), kidName=$('choreAssignee').value;
+    const amount=parseFloat($('choreAmount').value||'0'), when=$('choreWhen').value, recurring=$('choreEvery').value||'';
+    if(!name||!kidName||amount<0) return;
+    if(existing){ Object.assign(existing,{name,assignedTo:kidName,amount,when,recurring}); }
+    else { S.chores.push({id:'c_'+Math.random().toString(36).slice(2,8), name, assignedTo:kidName, amount, when, recurring, awaiting:false, approved:false, paid:false}); }
+    save(); renderAll(); hide('choreModal'); log(`${existing?'Updated':'Added'} chore: ${name} (${money(amount)})`);
+  };
+}
+
+/* Approvals + Pay Day */
+$('paydayBtn').onclick = ()=>{
+  if(!isParent()) return askPIN();
+  const payList = S.chores.filter(c=>c.approved && !c.paid);
+  if(!payList.length) return alert('No approved chores to pay.');
+  let total=0, count=0;
+  payList.forEach(c=>{
+    const kid = kids().find(k=>k.name===c.assignedTo); if(!kid) return;
+    ensureKidWallet(kid);
+    const amt=Number(c.amount||0); const s=S.split;
+    const saveAmt=+(amt*(s.save/100)).toFixed(2), spendAmt=+(amt*(s.spend/100)).toFixed(2), giveAmt=+(amt*(s.give/100)).toFixed(2);
+    kid.wallet.save += saveAmt; kid.wallet.spend += spendAmt; kid.wallet.give += giveAmt;
+    const coins = Math.round(amt*10); kid.coins += coins;
+    c.paid=true; c.approved=true; c.awaiting=false;
+    S.stats.completed += 1; S.stats.paid += amt; total+=amt; count++;
+    S.payments.unshift({id:'p_'+Math.random().toString(36).slice(2,8), type:'chore', kidId:kid.id, kidName:kid.name, amount:amt, save:saveAmt, spend:spendAmt, give:giveAmt, dateISO:todayISO(), desc:`Chore: ${c.name}`});
+    if(c.recurring){ c.paid=false; c.approved=false; c.awaiting=false; } // reset for next cycle
+  });
+  save(); renderAll(); log(`Pay Day: ${count} chore(s), ${money(total)}`);
+  alert(`Pay Day complete.\nPaid: ${count} chores\nTotal: ${money(total)}`);
+};
+
+/* Weekly Allowance */
+$('runAllowanceBtn').onclick = ()=>{
+  if(!isParent()) return askPIN();
+  const s=S.split; let total=0, count=0;
+  kids().forEach(k=>{
+    ensureKidWallet(k);
+    const amt=+k.weeklyAllowance||0; if(amt<=0) return;
+    // simple last-run guard: allow once per calendar week (ISO week not needed; we store date)
+    if(k.lastAllowance === todayISO()){ return; }
+    const saveAmt=+(amt*(s.save/100)).toFixed(2), spendAmt=+(amt*(s.spend/100)).toFixed(2), giveAmt=+(amt*(s.give/100)).toFixed(2);
+    k.wallet.save += saveAmt; k.wallet.spend += spendAmt; k.wallet.give += giveAmt;
+    const coins = Math.round(amt*10); k.coins += coins;
+    k.lastAllowance = todayISO();
+    S.payments.unshift({id:'p_'+Math.random().toString(36).slice(2,8), type:'allowance', kidId:k.id, kidName:k.name, amount:amt, save:saveAmt, spend:spendAmt, give:giveAmt, dateISO:todayISO(), desc:'Weekly Allowance'});
+    total += amt; count++;
+  });
+  save(); renderAll(); log(`Weekly allowance posted for ${count} kid(s): ${money(total)}`);
+  alert(`Allowance posted for ${count} kid(s), total ${money(total)}.`);
+};
+
+/* Store */
+$('addStoreBtn').onclick = ()=>{ if(!isParent()) return askPIN(); show('storeModal'); };
+$('storeCancel').onclick = ()=> hide('storeModal');
+$('storeSave').onclick = ()=>{
+  const t=$('storeTitle').value.trim(), c=parseInt($('storeCost').value||'0',10);
+  if(!t||c<=0) return;
+  S.store.push({id:'s_'+Math.random().toString(36).slice(2,8), title:t, cost:c});
+  save(); hide('storeModal'); renderStore(); log(`Added reward: ${t} (${c} coins)`);
+};
+
+/* Export/Import/Reset */
+$('exportBtn').onclick = ()=>{
+  const data=JSON.stringify(S,null,2); const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='chore_budget_backup.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+};
+$('importBtn').onclick = ()=> $('importFile').click();
+$('importFile').onchange = e=>{
+  const f=e.target.files[0]; if(!f) return; const r=new FileReader();
+  r.onload=()=>{ try{ const obj=JSON.parse(r.result); obj.pinHash=S.pinHash; S=obj; save(); renderAll(); log('Imported backup'); }catch{ alert('Invalid file'); } };
+  r.readAsText(f);
+};
+$('resetBtn').onclick = ()=>{
+  if(!isParent()) return askPIN();
+  if(confirm('Reset all data?')){ localStorage.removeItem(KEY); S=load(); save(); renderAll(); log('Data reset'); }
+};
+
+/* Pay Stubs */
+$('stubBtn').onclick = ()=>{
+  if(!isParent()) return askPIN();
+  const sel=$('stubKid'); sel.innerHTML='';
+  kids().forEach(k=>{ const o=document.createElement('option'); o.value=k.id; o.textContent=k.name; sel.appendChild(o); });
+  $('stubFrom').value = todayISO();
+  $('stubTo').value = todayISO();
+  show('stubModal');
+};
+$('stubClose').onclick = ()=> hide('stubModal');
+$('stubGen').onclick = ()=>{
+  const kidId=$('stubKid').value, from=$('stubFrom').value, to=$('stubTo').value;
+  const start = from? new Date(from+'T00:00:00Z'):new Date('1970-01-01T00:00:00Z');
+  const end = to? new Date(to+'T23:59:59Z'):new Date('2999-12-31T23:59:59Z');
+  const rowsEl = $('stubRows'); rowsEl.innerHTML='';
+  const kid = S.profiles.find(p=>p.id===kidId);
+  let total=0;
+  S.payments.filter(p=>p.kidId===kidId).forEach(p=>{
+    const d=new Date(p.dateISO+'T00:00:00Z');
+    if(d>=start && d<=end){
+      total += p.amount;
+      const tr=document.createElement('tr');
+      tr.innerHTML = `
+        <td style="padding:6px;border-bottom:1px solid #eee">${p.dateISO}</td>
+        <td style="padding:6px;border-bottom:1px solid #eee">${p.type}</td>
+        <td style="padding:6px;border-bottom:1px solid #eee">${p.desc||''}</td>
+        <td style="padding:6px;border-bottom:1px solid #eee;text-align:right">${money(p.amount)}</td>
+        <td style="padding:6px;border-bottom:1px solid #eee;text-align:right">${money(p.save)}/${money(p.spend)}/${money(p.give)}</td>`;
+      rowsEl.appendChild(tr);
+    }
+  });
+  $('stubTotal').textContent = money(total);
+  $('stubInfo').textContent = `Kid: ${kid?.name||'—'} • Range: ${from||'—'} → ${to||'—'} • Generated: ${new Date().toLocaleString()}`;
+  // reveal printable area only when printing
+  hide('stubModal');
+  window.scrollTo({top:0, behavior:'smooth'});
+  setTimeout(()=>{ window.print(); }, 50);
+};
+$('stubPrintBtn').onclick = ()=>{ hide('stubModal'); window.print(); };
+
+/* Pin modal wires */
+$('pinInput').addEventListener('keydown', e=>{ if(e.key==='Enter') $('pinSubmit').click(); });
+
+/* Auto-save on unload */
+window.addEventListener('beforeunload', save);
+
+/* Initial render */
+renderAll();
+</script>
+</body>
+</html>
