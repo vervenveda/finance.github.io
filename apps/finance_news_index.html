@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>🌐 Global Employment & Finance News</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+:root {
+  --bg: #0697A1;
+  --text: #222;
+  --card: #fff;
+  --accent: #2EC1CC;
+}
+body {
+  margin: 7px;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s, color 0.3s;
+}
+.dark {
+  --bg: #111;
+  --text: #e8e8e8;
+  --card: #1c1c1c;
+  --accent: #2EC1CC;
+}
+header {
+  padding: 77px;
+  background: var(--accent);
+  color: white;
+  text-align: center;
+  font-size: 1.4em;
+  font-weight: bold;
+}
+#newsCard {
+  margin: 33px;
+  padding: 33px;
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: 0 11px 14px rgba(0,0,0,0.15);
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  min-height: 222px;
+}
+#title {
+  font-size: 2em;
+  font-weight: Fine;
+  margin-bottom: 24px;
+  cursor:pointer;
+}
+#desc {
+  opacity: 0.88;
+}
+.controls {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap:8px;
+}
+button {
+  padding: 10px 14px;
+  border-radius: 7px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+}
+.tabs {
+  display: flex;
+  overflow-x: auto;
+  padding: 14px;
+  background: var(--card);
+  gap: 14px;
+}
+.tab {
+  padding: 7px 14px;
+  border-radius: 20px;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.9em;
+}
+#favoritesPanel {
+  margin: 20px;
+  padding: 15px;
+  border-radius: 12px;
+  background: var(--card);
+  display: none;
+}
+#feedCounts {
+  margin:14px 24px;
+  font-size:0.9em;
+  color:#fff;
+  overflow-x:auto;
+  white-space:nowrap;
+}
+input, select {
+  font-size:1em;
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>🌐 Global Employment & Finance News</header>
+
+  <!-- Search -->
+  <div style="margin:14px 24px;">
+    <input type="text" id="searchInput" placeholder="🔍 Search articles..." style="width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;">
+  </div>
+
+  <!-- Region Filter -->
+  <div style="margin:14px 24px;">
+    <select id="regionFilter" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;">
+      <option value="all">🌎 All Regions</option>
+      <option value="us">🇺🇸 USA</option>
+      <option value="uk">🇬🇧 UK</option>
+      <option value="eu">🇪🇺 Europe</option>
+      <option value="ca">🇨🇦 Canada</option>
+      <option value="au">🇦🇺 Australia</option>
+      <option value="global">🌐 Global</option>
+    </select>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" data-cat="all">All</button>
+    <button class="tab" data-cat="finance">Finance</button>
+    <button class="tab" data-cat="markets">Markets</button>
+    <button class="tab" data-cat="business">Business</button>
+    <button class="tab" data-cat="economy">Economy</button>
+    <button class="tab" data-cat="employment">Employment</button>
+    <button class="tab" data-cat="labour">Labour</button>
+    <button class="tab" type="button" onclick="toggleFavorites()">⭐ Favorites</button>
+    <button class="tab" type="button" onclick="toggleDark()">🌙/☀️</button>
+    <button class="tab" type="button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+
+  <!-- Feed counts -->
+  <div id="feedCounts"></div>
+
+  <div id="newsCard">
+    <div id="title">Loading news…</div>
+    <div id="metaLine"></div>
+    <div id="desc"></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button type="button" onclick="prev()">⬅ Prev</button>
+    <button type="button" onclick="next()">Next ➡</button>
+    <button type="button" onclick="readAloud()">🔊 Read</button>
+    <button type="button" onclick="saveFavorite()">⭐ Save</button>
+    <button type="button" onclick="toggleSummary()">📝 Summaries</button>
+    <button type="button" onclick="openArticle()">🔗 Open</button>
+  </div>
+
+  <div id="statusLine"></div>
+  <div id="favoritesPanel"></div>
+</div>
+
+<script>
+// --- RSS SOURCES (Finance + Employment, worldwide) ---
+const FEEDS = [
+  "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+  "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+  "https://www.cnbc.com/id/20910258/device/rss/rss.html",
+  "https://www.cnbc.com/id/10000664/device/rss/rss.html",
+  "https://www.cnbc.com/id/10001147/device/rss/rss.html",
+  "https://www.marketwatch.com/rss/topstories",
+  "https://feeds.a.dj.com/rss/RSSMarketsMain.xml",
+  "https://feeds.a.dj.com/rss/RSSWorldNews.xml",
+  "https://www.investing.com/rss/news_25.rss",
+  "https://www.economist.com/business/rss.xml",
+  "https://www.thestreet.com/.rss/full/",
+  "https://finance.yahoo.com/news/rssindex",
+  "https://www.shrm.org/about-shrm/press-room/press-releases/pages/rss.aspx",
+  "https://www.ilo.org/global/news.rss",
+  "https://www.labourstart.org/news/atom.php?langcode=en",
+  "https://www.hiringlab.org/feed/",
+  "https://www.ziprecruiter.com/blog/feed/",
+  "https://ec.europa.eu/social/main.jsp?catId=89&langId=en&rss=1",
+  "https://www.jobbank.gc.ca/content_pieces.rss?cid=25652",
+  "https://www.fairwork.gov.au/rss-feeds/news.rss",
+  "https://www.oecd.org/newsroom/feeds/rss.xml",
+  "https://www.weforum.org/agenda/feed/",
+  "https://www.bls.gov/feed/news.rss",
+  "https://www.gov.uk/government/organisations/department-for-work-pensions.atom"
+];
+
+let articles = [];
+let index = 0;
+let currentCategory = "all";
+let isLoading = false;
+let summariesOnly = false;
+
+// --- Load cached offline first ---
+if (localStorage.newsCache) {
+  try { articles = JSON.parse(localStorage.newsCache) || []; } catch(e){ articles=[]; }
+}
+
+// --- Category Detection ---
+function normalizeCategory(title, desc, rawCat, link) {
+  const text = (title + " " + desc + " " + (rawCat || "") + " " + (link || "")).toLowerCase();
+  if (/employment|job|labour|hiring|workforce|career/.test(text)) return "employment";
+  if (/finance|financial|stock|investment|bank|fund|money/.test(text)) return "finance";
+  if (/market|trading|index|shares|bonds/.test(text)) return "markets";
+  if (/business|company|corporate|entrepreneur|startup/.test(text)) return "business";
+  if (/economy|economic|gdp|inflation|recession|growth/.test(text)) return "economy";
+  if (/labour|union|strike|wage|workers/.test(text)) return "labour";
+  return "all";
+}
+
+// --- Fetch RSS ---
+async function fetchRSS(url) {
+  const res = await fetch("https://api.allorigins.win/get?url=" + encodeURIComponent(url));
+  if(!res.ok) throw new Error("Feed error");
+  const data = await res.json();
+  const xml = new DOMParser().parseFromString(data.contents,"text/xml");
+  return [...xml.querySelectorAll("item")].map(item => {
+    const title = item.querySelector("title")?.textContent || "Untitled";
+    const desc = item.querySelector("description")?.textContent || "";
+    const link = item.querySelector("link")?.textContent || "";
+    const rawCat = item.querySelector("category")?.textContent || "";
+    const category = normalizeCategory(title, desc, rawCat, link);
+    return {title, desc, link, category};
+  });
+}
+
+// --- Load & cache feeds ---
+async function loadNews() {
+  if(isLoading) return;
+  isLoading = true;
+  let temp=[];
+  for(let feed of FEEDS){
+    try{ const items=await fetchRSS(feed); temp.push(...items); } catch(e){ console.warn("RSS error",feed,e);}
+  }
+  if(temp.length){
+    localStorage.newsCache = JSON.stringify(temp);
+    articles = temp;
+    applyCategoryFilter();
+    updateFeedCounts();
+  } else if(!articles.length){
+    document.getElementById("title").textContent = "Unable to load news.";
+    document.getElementById("desc").textContent = "Check connection or try later.";
+  }
+  isLoading=false;
+}
+
+// --- Apply category filter ---
+function applyCategoryFilter(){
+  let cache=[];
+  if(localStorage.newsCache){
+    try{ cache=JSON.parse(localStorage.newsCache)||[];} catch(e){ cache=articles||[]; }
+  } else cache = articles || [];
+  
+  if(currentCategory==="all"){ articles=cache; } 
+  else { articles=cache.filter(a=>a.category===currentCategory); if(!articles.length){ articles=cache; currentCategory="all"; } }
+  index=0;
+  updateActiveTabs();
+  showArticle();
+}
+
+// --- Update active tab ---
+function updateActiveTabs(){
+  document.querySelectorAll(".tab[data-cat]").forEach(tab=>tab.classList.toggle("active",tab.dataset.cat===currentCategory));
+}
+
+// --- Sanitize HTML ---
+function sanitizeHtml(html){
+  const div=document.createElement("div");
+  div.innerHTML=html;
+  div.querySelectorAll("script,style,iframe").forEach(el=>el.remove());
+  return div.innerHTML;
+}
+
+// --- Show Article ---
+function showArticle(direction=1){
+  if(!articles.length) return;
+  const card = document.getElementById("newsCard");
+  card.style.opacity=0; card.style.transform=`translateX(${direction*40}px)`;
+  setTimeout(()=>{
+    const a = articles[index];
+    document.getElementById("title").textContent = a.title;
+    document.getElementById("title").onclick = openArticle;
+    document.getElementById("metaLine").textContent = a.link ? new URL(a.link).hostname.replace(/^www\./,"") + " · "+(a.category.charAt(0).toUpperCase()+a.category.slice(1)) : a.category;
+    const descEl = document.getElementById("desc");
+    descEl.innerHTML = summariesOnly ? stripHtml(a.desc).slice(0,150)+"…" : sanitizeHtml(a.desc);
+    card.style.opacity=1; card.style.transform="translateX(0)";
+    document.getElementById("statusLine").textContent = `${index+1} of ${articles.length} stories`;
+  },220);
+}
+
+function next(){ if(!articles.length) return; index=(index+1)%articles.length; showArticle(+1);}
+function prev(){ if(!articles.length) return; index=(index-1+articles.length)%articles.length; showArticle(-1);}
+function openArticle(){ if(!articles.length) return; const link=articles[index].link; if(link) window.open(link,"_blank","noopener,noreferrer"); else alert("No link available.");}
+
+// --- Voice ---
+function readAloud(){
+  if(!articles.length || !("speechSynthesis" in window)) return;
+  const a=articles[index];
+  speechSynthesis.speak(new SpeechSynthesisUtterance(`${a.title}. ${stripHtml(a.desc)}`));
+}
+function stripHtml(html){ const div=document.createElement("div"); div.innerHTML=html; return div.textContent||div.innerText||"";}
+
+// --- Favorites ---
+function saveFavorite(){
+  if(!articles.length) return;
+  let favs=[];
+  try{ favs=JSON.parse(localStorage.newsFavs||"[]"); } catch(e){ favs=[]; }
+  favs.push(articles[index]);
+  localStorage.newsFavs = JSON.stringify(favs);
+  alert("Saved to favorites.");
+}
+function toggleFavorites(){
+  const panel=document.getElementById("favoritesPanel");
+  if(panel.style.display==="block"){ panel.style.display="none"; return; }
+  let favs=[];
+  try{ favs=JSON.parse(localStorage.newsFavs||"[]"); } catch(e){ favs=[];}
+  panel.style.display="block";
+  if(!favs.length){ panel.innerHTML="<p>No favorites yet.</p>"; return; }
+  panel.innerHTML = favs.map(f=>`<p><b>${f.title}</b><br><small>${stripHtml(f.desc).slice(0,180)}${stripHtml(f.desc).length>180?"…":""}</small></p>`).join("");
+}
+
+// --- Dark mode ---
+function toggleDark(){ document.body.classList.toggle("dark"); }
+
+// --- Fullscreen ---
+function toggleFullscreen(){ if(!document.fullscreenElement){ document.documentElement.requestFullscreen?.(); } else { document.exitFullscreen?.(); } }
+
+// --- Swipe for mobile ---
+let touchStartX=0;
+document.addEventListener("touchstart",e=>{ if(!e.touches[0]) return; touchStartX=e.touches[0].clientX; });
+document.addEventListener("touchend",e=>{ if(!e.changedTouches[0]) return; const dx=e.changedTouches[0].clientX-touchStartX; if(dx>40) prev(); if(dx<-40) next(); });
+
+// --- Category tabs ---
+document.querySelectorAll(".tab[data-cat]").forEach(tab=>tab.addEventListener("click",()=>{ currentCategory=tab.dataset.cat; applyCategoryFilter(); }));
+
+// --- Search ---
+document.getElementById("searchInput").addEventListener("input",e=>{
+  const term=e.target.value.toLowerCase();
+  if(!term){ applyCategoryFilter(); return; }
+  const cache=JSON.parse(localStorage.newsCache||"[]");
+  articles=cache.filter(a=>(a.title+" "+a.desc).toLowerCase().includes(term));
+  index=0; showArticle();
+});
+
+// --- Region filter ---
+document.getElementById("regionFilter").addEventListener("change",e=>{
+  const region=e.target.value;
+  const cache=JSON.parse(localStorage.newsCache||"[]");
+  if(region==="all"){ applyCategoryFilter(); return; }
+  const regionMap={
+    us:["nytimes.com","cnbc.com","bls.gov"],
+    uk:["gov.uk","bbc.co.uk"],
+    eu:["europa.eu","oecd.org","weforum.org"],
+    ca:["jobbank.gc.ca"],
+    au:["fairwork.gov.au"],
+    global:["shrm.org","ilo.org","hiringlab.org","ziprecruiter.com"]
+  };
+  const hosts=regionMap[region]||[];
+  articles=cache.filter(a=>hosts.some(h=>a.link.includes(h)));
+  index=0; showArticle();
+});
+
+// --- Summaries ---
+function toggleSummary(){ summariesOnly=!summariesOnly; showArticle(); }
+
+// --- Feed counts ---
+function updateFeedCounts(){
+  const cache=JSON.parse(localStorage.newsCache||"[]");
+  const counts={};
+  FEEDS.forEach(feed=>counts[feed]=0);
+  cache.forEach(a=>{
+    const feed=FEEDS.find(f=>a.link.includes(new URL(f).hostname.replace(/^www\./,"")));
+    if(feed) counts[feed]++;
+  });
+  const panel=document.getElementById("feedCounts");
+  panel.innerHTML = Object.entries(counts).map(([feed,count])=>{
+    let host=""; try{ host=new URL(feed).hostname.replace(/^www\./,""); } catch(e){ host=feed;}
+    return `${host}: ${count}`;
+  }).join(" | ");
+}
+
+// --- Start app ---
+if(articles.length){ applyCategoryFilter(); } else { showArticle(); }
+loadNews();
+setInterval(loadNews,3*60*60*1000);
+</script>
+</body>
+</html>
