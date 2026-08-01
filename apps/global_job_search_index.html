@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Global Job Search Widget</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    padding: 20px;
+  }
+  #widget {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 900px;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  h2 { margin-top: 0; }
+  .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+  .search-box input, .search-box select {
+    padding: 10px;
+    font-size: 16px;
+    flex: 1;
+  }
+  .portal {
+    padding: 10px;
+    background: #fafafa;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border-left: 4px solid #0077cc;
+  }
+  .portal a {
+    font-size: 17px;
+    font-weight: bold;
+    color: #0077cc;
+    text-decoration: none;
+  }
+  .portal small {
+    display: block;
+    margin-top: 5px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div id="widget">
+    <h2>Global Job Search Directory</h2>
+
+    <!-- Search + Region Filter -->
+    <div class="search-box">
+        <input type="text" id="zipSearch" placeholder="Enter ZIP / Postal Code">
+        <select id="regionFilter">
+            <option value="All">All Regions</option>
+            <option value="Global">Global</option>
+            <option value="US">United States</option>
+            <option value="Europe">Europe</option>
+            <option value="Asia">Asia</option>
+            <option value="Africa">Africa</option>
+            <option value="Australia">Australia / Oceania</option>
+        </select>
+        <button onclick="renderPortals()">Search</button>
+    </div>
+
+    <!-- Results -->
+    <div id="portalList"></div>
+</div>
+
+<script>
+/* -----------------------------
+   FULL JOB PORTALS JSON LIST
+   (Expandable anytime)
+--------------------------------*/
+const jobPortals = [
+  {
+    "name": "Indeed",
+    "url": "https://www.indeed.com",
+    "regions_served": ["Global", "60+ countries"],
+    "niche": "General"
+  },
+  {
+    "name": "LinkedIn Jobs",
+    "url": "https://www.linkedin.com/jobs",
+    "regions_served": ["Global"],
+    "niche": "Professional / General"
+  },
+  {
+    "name": "Glassdoor",
+    "url": "https://www.glassdoor.com",
+    "regions_served": ["Global"],
+    "niche": "General / Salaries / Company Reviews"
+  },
+  {
+    "name": "Monster",
+    "url": "https://www.monster.com",
+    "regions_served": ["Global"],
+    "niche": "General"
+  },
+  {
+    "name": "Adzuna",
+    "url": "https://www.adzuna.com",
+    "regions_served": ["Global", "UK", "Europe"],
+    "niche": "General / Aggregator"
+  },
+  {
+    "name": "WhatJobs",
+    "url": "https://www.whatjobs.com",
+    "regions_served": ["Global"],
+    "niche": "General"
+  },
+  {
+    "name": "Dice",
+    "url": "https://www.dice.com",
+    "regions_served": ["US"],
+    "niche": "Tech / Engineering"
+  },
+  {
+    "name": "Kalibrr",
+    "url": "https://www.kalibrr.com",
+    "regions_served": ["Asia", "Global (remote)"],
+    "niche": "General / Asia / Remote"
+  },
+  {
+    "name": "HiringCafe",
+    "url": "https://hiring.cafe",
+    "regions_served": ["Global"],
+    "niche": "Direct employer job aggregation"
+  },
+  {
+    "name": "We Work Remotely",
+    "url": "https://weworkremotely.com",
+    "regions_served": ["Global"],
+    "niche": "Remote"
+  },
+  {
+    "name": "RemoteOK",
+    "url": "https://remoteok.com",
+    "regions_served": ["Global"],
+    "niche": "Remote"
+  },
+  {
+    "name": "FlexJobs",
+    "url": "https://www.flexjobs.com",
+    "regions_served": ["Global"],
+    "niche": "Remote / Flexible"
+  },
+  {
+    "name": "Upwork",
+    "url": "https://www.upwork.com",
+    "regions_served": ["Global"],
+    "niche": "Freelance"
+  },
+  {
+    "name": "Toptal",
+    "url": "https://www.toptal.com",
+    "regions_served": ["Global"],
+    "niche": "Elite freelance talent"
+  },
+  {
+    "name": "XING Jobs",
+    "url": "https://www.xing.com/jobs",
+    "regions_served": ["Europe"],
+    "niche": "Professional / European"
+  }
+  // <-- Continue adding your expanded list here
+];
+
+/* -----------------------------
+   RENDERING FUNCTION
+--------------------------------*/
+function renderPortals() {
+    const region = document.getElementById("regionFilter").value;
+    const list = document.getElementById("portalList");
+    list.innerHTML = "";
+
+    jobPortals.forEach(portal => {
+        // Region Filter Logic
+        if (region !== "All" && !portal.regions_served.some(r => r.includes(region))) {
+            return;
+        }
+
+        // Create Portal Card
+        const div = document.createElement("div");
+        div.className = "portal";
+
+        div.innerHTML = `
+            <a href="${portal.url}" target="_blank">${portal.name}</a>
+            <small><strong>Regions:</strong> ${portal.regions_served.join(", ")}</small>
+            <small><strong>Niche:</strong> ${portal.niche}</small>
+        `;
+
+        list.appendChild(div);
+    });
+}
+
+// Initial Render
+renderPortals();
+</script>
+
+</body>
+</html>
