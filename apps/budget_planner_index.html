@@ -1,0 +1,1629 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Khaemenes Budget + Debt Freedom Planner</title>
+<style>
+  :root{
+    --bg:#0b1220;
+    --panel:#0f1a2f;
+    --card:#101c33;
+    --card2:#0d1730;
+    --text:#eef2ff;
+    --muted:rgba(238,242,255,.72);
+    --muted2:rgba(238,242,255,.56);
+    --line:rgba(255,255,255,.08);
+    --accent:#7dd3fc;
+    --accent2:#a78bfa;
+    --good:#34d399;
+    --warn:#fbbf24;
+    --bad:#fb7185;
+    --radius:16px;
+    --radius2:22px;
+    --shadow:0 18px 55px rgba(0,0,0,.48);
+    --max:1120px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 700px at 10% 0%, rgba(125,211,252,.16), transparent 60%),
+      radial-gradient(900px 600px at 85% 20%, rgba(167,139,250,.14), transparent 55%),
+      linear-gradient(180deg,#050713 0%, #0b1220 60%, #060814 100%);
+    color:var(--text);
+    padding:18px;
+  }
+
+  a{color:inherit}
+  .app{max-width:var(--max); margin:0 auto}
+  header{
+    background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border:1px solid var(--line);
+    border-radius:var(--radius2);
+    padding:16px 16px 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .top{
+    display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+  }
+  .title{
+    display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;
+  }
+  h1{
+    margin:0;
+    font-size: clamp(22px, 2.2vw, 30px);
+    letter-spacing:.02em;
+    line-height:1.15;
+  }
+  .sub{
+    margin:6px 0 0;
+    color:var(--muted);
+    font-size:16px;
+    max-width:860px;
+  }
+
+  .badge-row{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:8px}
+  .badge{
+    font-size:12px;
+    padding:8px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.03);
+    color:var(--muted);
+    display:inline-flex; align-items:center; gap:8px;
+    letter-spacing:.02em;
+  }
+  .dot{width:8px;height:8px;border-radius:999px;background:var(--accent)}
+  .dot.good{background:var(--good)}
+  .dot.warn{background:var(--warn)}
+  .dot.bad{background:var(--bad)}
+
+  .actions{
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:flex-end;
+  }
+
+  .btn{
+    appearance:none;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.03);
+    color:var(--text);
+    font-weight:700;
+    font-size:14px;
+    padding:10px 12px;
+    border-radius:999px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition: transform .06s ease, background .15s ease, border-color .15s ease;
+    text-decoration:none;
+    user-select:none;
+    white-space:nowrap;
+  }
+  .btn:hover{background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.14)}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{
+    background:linear-gradient(180deg, rgba(125,211,252,.22), rgba(125,211,252,.10));
+    border-color:rgba(125,211,252,.40);
+  }
+  .btn.purple{
+    background:linear-gradient(180deg, rgba(167,139,250,.22), rgba(167,139,250,.10));
+    border-color:rgba(167,139,250,.42);
+  }
+  .btn.danger{
+    background:linear-gradient(180deg, rgba(251,113,133,.22), rgba(251,113,133,.10));
+    border-color:rgba(251,113,133,.42);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 270px 1fr;
+    gap:14px;
+    margin-top:14px;
+    align-items:start;
+  }
+  @media (max-width: 920px){
+    .grid{grid-template-columns:1fr}
+  }
+
+  nav{
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--line);
+    border-radius:var(--radius2);
+    padding:12px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 12px;
+  }
+  @media (max-width: 920px){
+    nav{position:static}
+  }
+  .nav-title{
+    font-size:13px;
+    color:var(--muted);
+    letter-spacing:.10em;
+    text-transform:uppercase;
+    margin:2px 6px 10px;
+  }
+  .navbtn{
+    width:100%;
+    justify-content:space-between;
+    padding:11px 12px;
+    border-radius:14px;
+    border:1px solid transparent;
+    background:transparent;
+    color:var(--text);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:800;
+    font-size:15px;
+    text-align:left;
+  }
+  .navbtn small{font-weight:700;color:var(--muted)}
+  .navbtn:hover{background:rgba(255,255,255,.05)}
+  .navbtn.active{
+    background:linear-gradient(180deg, rgba(125,211,252,.18), rgba(125,211,252,.08));
+    border-color: rgba(125,211,252,.26);
+  }
+
+  main{
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--line);
+    border-radius:var(--radius2);
+    padding:14px;
+    box-shadow: var(--shadow);
+    min-height: 520px;
+  }
+
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+    border:1px solid var(--line);
+    border-radius:var(--radius2);
+    padding:14px;
+    margin-bottom:14px;
+  }
+  .card h2{
+    margin:0 0 6px;
+    font-size:20px;
+    letter-spacing:.01em;
+  }
+  .card p{margin:6px 0;color:var(--muted); font-size:15px; line-height:1.45}
+
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end}
+  .field{min-width:190px; flex:1}
+  .field label{
+    display:block;
+    font-size:12px;
+    color:var(--muted2);
+    margin:0 0 6px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  input,select,textarea{
+    width:100%;
+    padding:11px 12px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.12);
+    background:#071025;
+    color:var(--text);
+    font-size:15px;
+    outline:none;
+  }
+  textarea{min-height:96px; resize:vertical}
+  input[type="number"]{appearance:textfield}
+  input::placeholder, textarea::placeholder{color:rgba(238,242,255,.45)}
+  .mini{min-width:120px; flex:0 0 160px}
+  .tiny{min-width:120px; flex:0 0 120px}
+
+  .hint{font-size:13px;color:var(--muted2); margin-top:8px}
+  .hr{height:1px;background:var(--line); margin:12px 0}
+
+  table{width:100%; border-collapse:collapse}
+  th,td{
+    border-bottom:1px solid rgba(255,255,255,.08);
+    padding:10px 8px;
+    text-align:left;
+    vertical-align:top;
+    font-size:14px;
+  }
+  th{
+    font-size:12px;
+    color:var(--muted2);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  td small{color:var(--muted2)}
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:7px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(0,0,0,.12);
+    font-size:13px;
+    color:var(--muted);
+    margin:6px 6px 0 0;
+    white-space:nowrap;
+  }
+  .pill strong{color:var(--text)}
+  .kpi{
+    display:grid; grid-template-columns: repeat(4, minmax(0,1fr));
+    gap:10px;
+  }
+  @media (max-width: 920px){
+    .kpi{grid-template-columns: repeat(2, minmax(0,1fr))}
+  }
+  .kpi .box{
+    background:rgba(0,0,0,.16);
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:18px;
+    padding:12px;
+  }
+  .kpi .lbl{font-size:12px;color:var(--muted2);letter-spacing:.08em;text-transform:uppercase}
+  .kpi .val{font-size:20px;font-weight:900;margin-top:6px}
+
+  .notice{
+    border:1px solid rgba(251,191,36,.28);
+    background:rgba(251,191,36,.08);
+    color:rgba(255,245,214,.92);
+    padding:12px 12px;
+    border-radius:18px;
+    font-size:14px;
+    line-height:1.4;
+  }
+  .ok{
+    border:1px solid rgba(52,211,153,.28);
+    background:rgba(52,211,153,.08);
+    color:rgba(219,255,245,.94);
+  }
+
+  /* Calendar */
+  .cal-head{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
+  .cal-title{font-weight:900; font-size:18px}
+  .calendar{
+    margin-top:10px;
+    display:grid;
+    grid-template-columns: repeat(7, minmax(0,1fr));
+    gap:8px;
+  }
+  .dow{font-size:12px; color:var(--muted2); text-transform:uppercase; letter-spacing:.08em; padding:2px 6px}
+  .day{
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:14px;
+    background:rgba(0,0,0,.14);
+    min-height:86px;
+    padding:8px;
+    overflow:hidden;
+  }
+  .day .n{font-size:12px;color:var(--muted2)}
+  .chip{
+    margin-top:6px;
+    display:block;
+    font-size:12px;
+    padding:6px 8px;
+    border-radius:12px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);
+    color:var(--text);
+    cursor:pointer;
+  }
+  .chip.paid{
+    border-color: rgba(52,211,153,.35);
+    background: rgba(52,211,153,.12);
+  }
+  .chip strong{display:block;font-size:12px}
+  .chip small{color:var(--muted2)}
+
+  /* Print report */
+  #printReport{display:none}
+  @media print{
+    body{background:white !important; color:#111 !important; padding:0}
+    .app, header, nav, main{display:none !important}
+    #printReport{display:block !important; padding:22px; font-family: Arial, sans-serif}
+    #printReport h1{font-size:20px; margin:0 0 8px}
+    #printReport h2{font-size:16px; margin:14px 0 6px}
+    #printReport p, #printReport li{font-size:12px; line-height:1.35}
+    #printReport table{width:100%; border-collapse:collapse}
+    #printReport th,#printReport td{border:1px solid #ddd; padding:6px; font-size:11px; vertical-align:top}
+    #printReport .muted{color:#444}
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div class="top">
+      <div class="title">
+        <div>
+          <h1>💠 Adult Budget + Debt Freedom Planner</h1>
+          <div class="sub">
+            Free, local-first budgeting and debt payoff companion — no subscriptions, no accounts, your data stays on this device.
+          </div>
+          <div class="badge-row" id="badgeRow"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="printBtn">🧾 Print Roadmap (PDF)</button>
+        <button class="btn danger" id="resetBtn" title="Resets local data">Reset</button>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+    <div class="notice" id="disclaimer">
+      <b>Note:</b> This tool is for education and planning. It does not provide financial advice. Always verify calculations and consult a qualified professional for major decisions.
+    </div>
+  </header>
+
+  <div class="grid">
+    <nav>
+      <div class="nav-title">Navigation</div>
+      <button class="navbtn active" data-tab="dashboard">Dashboard <small id="navMini1"></small></button>
+      <button class="navbtn" data-tab="budget">Budget</button>
+      <button class="navbtn" data-tab="debts">Debts</button>
+      <button class="navbtn" data-tab="payoff">Payoff Simulator</button>
+      <button class="navbtn" data-tab="bills">Bills Calendar</button>
+      <button class="navbtn" data-tab="checkins">Monthly Check-Ins</button>
+      <button class="navbtn" data-tab="roadmap">Roadmap</button>
+      <button class="navbtn" data-tab="data">Data</button>
+    </nav>
+
+    <main>
+      <div id="view"></div>
+    </main>
+  </div>
+</div>
+
+<!-- Print report container (only visible when printing) -->
+<div id="printReport"></div>
+
+<script>
+/* =========================
+   CONFIG
+   ========================= */
+const CONFIG = {
+  STORAGE_KEY: "khae_budget_debt_planner_free_v1"
+};
+
+/* =========================
+   STATE
+   ========================= */
+const $ = (s, el=document)=> el.querySelector(s);
+const $$ = (s, el=document)=> Array.from(el.querySelectorAll(s));
+
+const fmtMoney = new Intl.NumberFormat(undefined, {style:"currency", currency:"USD"});
+const fmtNum = new Intl.NumberFormat(undefined);
+
+function money(n){
+  const v = Number.isFinite(n) ? n : 0;
+  return fmtMoney.format(v);
+}
+function num(v){ return Number(v||0); }
+function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+function yyyymm(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  return `${y}-${m}`;
+}
+function monthLabel(d){
+  return d.toLocaleString(undefined, {month:"long", year:"numeric"});
+}
+function addMonths(date, months){
+  const d = new Date(date);
+  const day = d.getDate();
+  d.setMonth(d.getMonth() + months);
+  if(d.getDate() !== day) d.setDate(0);
+  return d;
+}
+function lastDayOfMonth(year, monthIndex){
+  return new Date(year, monthIndex+1, 0).getDate();
+}
+
+const DEFAULT_STATE = {
+  meta: { createdAt: Date.now(), lastTab: "dashboard" },
+  budget: {
+    incomes: [
+      {id: cryptoId(), label:"Primary income", amount: 0, freq:"monthly"}
+    ],
+    expenses: [
+      {id: cryptoId(), label:"Rent / Mortgage", amount: 0, freq:"monthly", kind:"fixed"},
+      {id: cryptoId(), label:"Groceries", amount: 0, freq:"monthly", kind:"variable"}
+    ]
+  },
+  debts: [],
+  payoff: {
+    strategy: "snowball",
+    extra: 100,
+    rollForward: true,
+    start: yyyymm(new Date())
+  },
+  bills: [],
+  billsPaid: {},
+  checkins: {}
+};
+
+function cryptoId(){
+  try{
+    return (crypto && crypto.randomUUID) ? crypto.randomUUID() : ("id_"+Math.random().toString(16).slice(2));
+  }catch(e){
+    return ("id_"+Math.random().toString(16).slice(2));
+  }
+}
+
+function mergeDefaults(base, incoming){
+  if(!incoming || typeof incoming !== "object") return base;
+  for(const k of Object.keys(incoming)){
+    if(incoming[k] && typeof incoming[k]==="object" && !Array.isArray(incoming[k])){
+      base[k] = mergeDefaults(base[k] || {}, incoming[k]);
+    }else{
+      base[k] = incoming[k];
+    }
+  }
+  return base;
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+    if(!raw) return structuredClone(DEFAULT_STATE);
+    const s = JSON.parse(raw);
+    return mergeDefaults(structuredClone(DEFAULT_STATE), s);
+  }catch(e){
+    return structuredClone(DEFAULT_STATE);
+  }
+}
+function saveState(){
+  localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state));
+  updateHeaderBadges();
+}
+
+let state = loadState();
+
+/* =========================
+   UI WIRING
+   ========================= */
+const view = $("#view");
+const printBtn = $("#printBtn");
+const resetBtn = $("#resetBtn");
+
+function setTab(name){
+  state.meta.lastTab = name;
+  saveState();
+  $$(".navbtn").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  render();
+}
+
+$$(".navbtn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    const tab = btn.dataset.tab;
+    setTab(tab);
+  });
+});
+
+printBtn.addEventListener("click", ()=>{
+  buildPrintReport();
+  window.print();
+});
+
+resetBtn.addEventListener("click", ()=>{
+  const ok = confirm("Reset all local data for this planner?\n\nThis cannot be undone.");
+  if(!ok) return;
+  localStorage.removeItem(CONFIG.STORAGE_KEY);
+  state = structuredClone(DEFAULT_STATE);
+  saveState();
+  render();
+});
+
+/* =========================
+   HEADER BADGES
+   ========================= */
+function calcMonthlyFromFreq(amount, freq){
+  amount = num(amount);
+  switch(freq){
+    case "weekly": return amount * 52/12;
+    case "biweekly": return amount * 26/12;
+    case "yearly": return amount / 12;
+    default: return amount;
+  }
+}
+function budgetTotals(){
+  const inc = (state.budget.incomes||[]).reduce((a,i)=> a + calcMonthlyFromFreq(i.amount, i.freq), 0);
+  const exp = (state.budget.expenses||[]).reduce((a,e)=> a + calcMonthlyFromFreq(e.amount, e.freq), 0);
+  return {inc, exp, net: inc-exp};
+}
+function debtTotals(){
+  const debts = state.debts || [];
+  const totalBal = debts.reduce((a,d)=> a + Math.max(0,num(d.balance)), 0);
+  const totalMin = debts.reduce((a,d)=> a + Math.max(0,num(d.min)), 0);
+  return {totalBal, totalMin, count: debts.length};
+}
+
+function updateHeaderBadges(){
+  const badges = $("#badgeRow");
+  const {inc, exp, net} = budgetTotals();
+  const {totalBal, totalMin, count} = debtTotals();
+
+  const netDot = net >= 0 ? "good" : "bad";
+
+  badges.innerHTML = `
+    <span class="badge"><span class="dot good"></span><b>FREE LOCAL MODE</b> <span style="opacity:.9">·</span> <span>Offline-first, no subscriptions</span></span>
+    <span class="badge"><span class="dot"></span><b>Monthly Income</b> ${money(inc)}</span>
+    <span class="badge"><span class="dot"></span><b>Monthly Expenses</b> ${money(exp)}</span>
+    <span class="badge"><span class="dot ${netDot}"></span><b>Net</b> ${money(net)}</span>
+    <span class="badge"><span class="dot"></span><b>Debts</b> ${count} <span style="opacity:.9">·</span> <b>Balance</b> ${money(totalBal)} <span style="opacity:.9">·</span> <b>Mins</b> ${money(totalMin)}</span>
+  `;
+
+  $("#navMini1").textContent = "(all features unlocked)";
+}
+updateHeaderBadges();
+
+function escapeHtml(str){
+  return String(str||"").replace(/[&<>"']/g, s=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[s]));
+}
+
+/* =========================
+   RENDER
+   ========================= */
+function render(){
+  const tab = state.meta.lastTab || "dashboard";
+  if(tab === "dashboard") renderDashboard();
+  else if(tab === "budget") renderBudget();
+  else if(tab === "debts") renderDebts();
+  else if(tab === "payoff") renderPayoff();
+  else if(tab === "bills") renderBills();
+  else if(tab === "checkins") renderCheckins();
+  else if(tab === "roadmap") renderRoadmap();
+  else if(tab === "data") renderData();
+  else renderDashboard();
+}
+
+/* =========================
+   DASHBOARD
+   ========================= */
+function renderDashboard(){
+  const {inc, exp, net} = budgetTotals();
+  const {totalBal, totalMin} = debtTotals();
+
+  const nextPay = computePayoff();
+  const eta = nextPay.summary.debtFreeDate ? monthLabel(nextPay.summary.debtFreeDate) : "—";
+  const interest = nextPay.summary.totalInterest;
+
+  const monthKey = yyyymm(new Date());
+  const check = state.checkins[monthKey];
+  const conf = check ? (check.confidence||0) : 0;
+
+  view.innerHTML = `
+    <div class="card">
+      <h2>Dashboard</h2>
+      <p>A free, local-first planner. Build your budget, enter debts, see a payoff simulation, track bills on a calendar, log monthly check-ins, and print a clean Debt-Free Roadmap — all stored privately in this browser.</p>
+
+      <div class="kpi" style="margin-top:10px">
+        <div class="box"><div class="lbl">Monthly Income</div><div class="val">${money(inc)}</div></div>
+        <div class="box"><div class="lbl">Monthly Expenses</div><div class="val">${money(exp)}</div></div>
+        <div class="box"><div class="lbl">Net (Income − Expenses)</div><div class="val">${money(net)}</div></div>
+        <div class="box"><div class="lbl">Total Debt Balance</div><div class="val">${money(totalBal)}</div></div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <span class="pill"><strong>Payoff ETA:</strong> ${escapeHtml(eta)}</span>
+        <span class="pill"><strong>Est. Interest:</strong> ${money(interest)}</span>
+        <span class="pill"><strong>Minimums:</strong> ${money(totalMin)}</span>
+        <span class="pill"><strong>Strategy:</strong> ${escapeHtml(state.payoff.strategy === "avalanche" ? "Avalanche (highest APR first)" : "Snowball (smallest balance first)")}</span>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 6px">Features at a Glance</h3>
+      <p style="margin:4px 0 8px;color:var(--muted2);font-size:14px;">
+        This planner is intentionally simple and sovereign: no accounts, no syncing, just a powerful offline workspace.
+      </p>
+      <ul style="margin:0 0 8px 18px; padding:0; color:var(--muted2); font-size:14px; line-height:1.5;">
+        <li><b>Budget Builder:</b> Track recurring income and expenses with monthly-normalized totals.</li>
+        <li><b>Debt Tracker:</b> List each debt with balance, APR, and minimum payment.</li>
+        <li><b>Snowball & Avalanche Simulator:</b> Run payoff scenarios with roll-forward minimums and extra payments.</li>
+        <li><b>Bills Calendar:</b> Add bills, see them on a monthly grid, and tap to mark them paid.</li>
+        <li><b>Monthly Check-Ins:</b> Log real income, expenses, debt paid, and a 1–5 confidence score.</li>
+        <li><b>Printable Roadmap:</b> Generate a Debt-Free Roadmap and print or save as PDF.</li>
+        <li><b>Data Export / Import:</b> Backup your plan as JSON and restore it anytime.</li>
+        <li><b>Local-Only Storage:</b> All data lives in this browser’s localStorage, under your control.</li>
+      </ul>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <button class="btn" onclick="window.__go('budget')">📒 Build Budget</button>
+        <button class="btn" onclick="window.__go('debts')">🧾 Add Debts</button>
+        <button class="btn primary" onclick="window.__go('payoff')">🧠 Run Payoff Simulator</button>
+        <button class="btn purple" onclick="window.__go('roadmap')">🧾 View Roadmap</button>
+      </div>
+
+      <div class="hint" style="margin-top:10px">
+        Current month confidence check-in: <b>${conf ? conf+"/5" : "Not recorded yet"}</b>
+      </div>
+    </div>
+  `;
+}
+window.__go = (t)=> setTab(t);
+
+/* =========================
+   BUDGET
+   ========================= */
+function renderBudget(){
+  const {inc, exp, net} = budgetTotals();
+
+  view.innerHTML = `
+    <div class="card">
+      <h2>Budget</h2>
+      <p>Enter your recurring income and expenses. Everything converts to a monthly estimate so your plan stays consistent.</p>
+
+      <div class="kpi" style="margin-top:10px">
+        <div class="box"><div class="lbl">Monthly Income</div><div class="val">${money(inc)}</div></div>
+        <div class="box"><div class="lbl">Monthly Expenses</div><div class="val">${money(exp)}</div></div>
+        <div class="box"><div class="lbl">Net</div><div class="val">${money(net)}</div></div>
+        <div class="box"><div class="lbl">Suggested “Extra to Debt”</div><div class="val">${money(Math.max(0, net*0.50))}</div></div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px">Income</h3>
+      ${renderIncomeTable()}
+
+      <div class="row">
+        <div class="field"><label>Label</label><input id="incLabel" placeholder="e.g., Paycheck, Side gig…" /></div>
+        <div class="mini"><label>Amount</label><input id="incAmount" type="number" step="0.01" placeholder="0.00" /></div>
+        <div class="mini"><label>Frequency</label>
+          <select id="incFreq">
+            <option value="monthly">Monthly</option>
+            <option value="biweekly">Biweekly</option>
+            <option value="weekly">Weekly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+        <div class="mini"><button class="btn primary" id="addIncomeBtn">+ Add Income</button></div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px">Expenses</h3>
+      ${renderExpenseTable()}
+
+      <div class="row">
+        <div class="field"><label>Label</label><input id="expLabel" placeholder="e.g., Rent, Groceries…" /></div>
+        <div class="mini"><label>Amount</label><input id="expAmount" type="number" step="0.01" placeholder="0.00" /></div>
+        <div class="mini"><label>Frequency</label>
+          <select id="expFreq">
+            <option value="monthly">Monthly</option>
+            <option value="biweekly">Biweekly</option>
+            <option value="weekly">Weekly</option>
+            <option value="yearly">Yearly</option>
+          </select>
+        </div>
+        <div class="mini"><label>Type</label>
+          <select id="expKind">
+            <option value="fixed">Fixed</option>
+            <option value="variable">Variable</option>
+          </select>
+        </div>
+        <div class="mini"><button class="btn primary" id="addExpenseBtn">+ Add Expense</button></div>
+      </div>
+
+      <div class="hr"></div>
+      <div class="notice">
+        <b>Planning Tip:</b> If your net is positive, you can split it between emergency savings and “extra” debt payments. A common starting point is <b>50% extra to debt</b> and <b>50% to savings</b>, then adjust for your reality.
+      </div>
+    </div>
+  `;
+
+  $("#addIncomeBtn").addEventListener("click", ()=>{
+    const label = ($("#incLabel").value||"").trim() || "Income";
+    const amount = num($("#incAmount").value);
+    const freq = $("#incFreq").value;
+    state.budget.incomes.push({id:cryptoId(), label, amount, freq});
+    saveState(); renderBudget();
+  });
+
+  $("#addExpenseBtn").addEventListener("click", ()=>{
+    const label = ($("#expLabel").value||"").trim() || "Expense";
+    const amount = num($("#expAmount").value);
+    const freq = $("#expFreq").value;
+    const kind = $("#expKind").value;
+    state.budget.expenses.push({id:cryptoId(), label, amount, freq, kind});
+    saveState(); renderBudget();
+  });
+}
+
+function renderIncomeTable(){
+  const rows = (state.budget.incomes||[]).map(i=>{
+    const monthly = calcMonthlyFromFreq(i.amount, i.freq);
+    return `
+      <tr>
+        <td><input data-edit="incLabel" data-id="${i.id}" value="${escapeHtml(i.label)}" /></td>
+        <td><input data-edit="incAmount" data-id="${i.id}" type="number" step="0.01" value="${num(i.amount)}" /></td>
+        <td>
+          <select data-edit="incFreq" data-id="${i.id}">
+            ${["monthly","biweekly","weekly","yearly"].map(f=>`<option value="${f}" ${i.freq===f?"selected":""}>${f}</option>`).join("")}
+          </select>
+        </td>
+        <td>${money(monthly)}</td>
+        <td><button class="btn danger" data-del="income" data-id="${i.id}">Remove</button></td>
+      </tr>
+    `;
+  }).join("");
+
+  const html = `
+    <table>
+      <thead><tr><th>Label</th><th>Amount</th><th>Frequency</th><th>Monthly Est.</th><th></th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="5"><small>No income items yet.</small></td></tr>`}</tbody>
+    </table>
+  `;
+  setTimeout(()=> wireBudgetTableHandlers(), 0);
+  return html;
+}
+
+function renderExpenseTable(){
+  const rows = (state.budget.expenses||[]).map(e=>{
+    const monthly = calcMonthlyFromFreq(e.amount, e.freq);
+    return `
+      <tr>
+        <td><input data-edit="expLabel" data-id="${e.id}" value="${escapeHtml(e.label)}" /></td>
+        <td><input data-edit="expAmount" data-id="${e.id}" type="number" step="0.01" value="${num(e.amount)}" /></td>
+        <td>
+          <select data-edit="expFreq" data-id="${e.id}">
+            ${["monthly","biweekly","weekly","yearly"].map(f=>`<option value="${f}" ${e.freq===f?"selected":""}>${f}</option>`).join("")}
+          </select>
+        </td>
+        <td>
+          <select data-edit="expKind" data-id="${e.id}">
+            <option value="fixed" ${e.kind==="fixed"?"selected":""}>fixed</option>
+            <option value="variable" ${e.kind==="variable"?"selected":""}>variable</option>
+          </select>
+        </td>
+        <td>${money(monthly)}</td>
+        <td><button class="btn danger" data-del="expense" data-id="${e.id}">Remove</button></td>
+      </tr>
+    `;
+  }).join("");
+
+  const html = `
+    <table>
+      <thead><tr><th>Label</th><th>Amount</th><th>Frequency</th><th>Type</th><th>Monthly Est.</th><th></th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="6"><small>No expense items yet.</small></td></tr>`}</tbody>
+    </table>
+  `;
+  setTimeout(()=> wireBudgetTableHandlers(), 0);
+  return html;
+}
+
+function wireBudgetTableHandlers(){
+  $$("[data-edit]").forEach(el=>{
+    el.addEventListener("change", ()=>{
+      const id = el.dataset.id;
+      const key = el.dataset.edit;
+      if(key.startsWith("inc")){
+        const item = state.budget.incomes.find(x=>x.id===id);
+        if(!item) return;
+        if(key==="incLabel") item.label = el.value;
+        if(key==="incAmount") item.amount = num(el.value);
+        if(key==="incFreq") item.freq = el.value;
+      }else{
+        const item = state.budget.expenses.find(x=>x.id===id);
+        if(!item) return;
+        if(key==="expLabel") item.label = el.value;
+        if(key==="expAmount") item.amount = num(el.value);
+        if(key==="expFreq") item.freq = el.value;
+        if(key==="expKind") item.kind = el.value;
+      }
+      saveState();
+    });
+  });
+
+  $$("[data-del]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.dataset.id;
+      const kind = btn.dataset.del;
+      if(kind==="income"){
+        state.budget.incomes = state.budget.incomes.filter(x=>x.id!==id);
+      }else{
+        state.budget.expenses = state.budget.expenses.filter(x=>x.id!==id);
+      }
+      saveState(); renderBudget();
+    });
+  });
+}
+
+/* =========================
+   DEBTS
+   ========================= */
+function renderDebts(){
+  view.innerHTML = `
+    <div class="card">
+      <h2>Debts</h2>
+      <p>Add each debt with balance, APR, and minimum payment. Then go to <b>Payoff Simulator</b> to run Snowball or Avalanche.</p>
+
+      ${renderDebtsTable()}
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <div class="field"><label>Debt name</label><input id="dName" placeholder="e.g., Credit Card, Student Loan…" /></div>
+        <div class="mini"><label>Balance</label><input id="dBal" type="number" step="0.01" placeholder="0.00" /></div>
+        <div class="tiny"><label>APR %</label><input id="dApr" type="number" step="0.01" placeholder="0.00" /></div>
+        <div class="mini"><label>Min / month</label><input id="dMin" type="number" step="0.01" placeholder="0.00" /></div>
+        <div class="mini"><button class="btn primary" id="addDebtBtn">+ Add Debt</button></div>
+      </div>
+
+      <div class="hr"></div>
+      <div class="notice">
+        <b>Accuracy note:</b> This simulator uses monthly compounding (APR/12). Real statements may differ slightly by daily interest and statement timing.
+      </div>
+    </div>
+  `;
+
+  $("#addDebtBtn").addEventListener("click", ()=>{
+    const name = ($("#dName").value||"").trim() || "Debt";
+    const balance = Math.max(0, num($("#dBal").value));
+    const apr = Math.max(0, num($("#dApr").value));
+    const min = Math.max(0, num($("#dMin").value));
+    state.debts.push({id:cryptoId(), name, balance, apr, min});
+    saveState(); renderDebts();
+  });
+
+  wireDebtTableHandlers();
+}
+
+function renderDebtsTable(){
+  const debts = state.debts || [];
+  const rows = debts.map(d=>{
+    return `
+      <tr>
+        <td><input data-dedit="name" data-id="${d.id}" value="${escapeHtml(d.name)}" /></td>
+        <td><input data-dedit="balance" data-id="${d.id}" type="number" step="0.01" value="${num(d.balance)}" /></td>
+        <td><input data-dedit="apr" data-id="${d.id}" type="number" step="0.01" value="${num(d.apr)}" /></td>
+        <td><input data-dedit="min" data-id="${d.id}" type="number" step="0.01" value="${num(d.min)}" /></td>
+        <td><button class="btn danger" data-dremove="${d.id}">Remove</button></td>
+      </tr>
+    `;
+  }).join("");
+
+  return `
+    <table>
+      <thead><tr><th>Name</th><th>Balance</th><th>APR%</th><th>Min / month</th><th></th></tr></thead>
+      <tbody>
+        ${rows || `<tr><td colspan="5"><small>No debts yet. Add one below.</small></td></tr>`}
+      </tbody>
+    </table>
+  `;
+}
+
+function wireDebtTableHandlers(){
+  $$("[data-dedit]").forEach(el=>{
+    el.addEventListener("change", ()=>{
+      const id = el.dataset.id;
+      const k = el.dataset.dedit;
+      const d = state.debts.find(x=>x.id===id);
+      if(!d) return;
+      if(k==="name") d.name = el.value;
+      if(k==="balance") d.balance = Math.max(0, num(el.value));
+      if(k==="apr") d.apr = Math.max(0, num(el.value));
+      if(k==="min") d.min = Math.max(0, num(el.value));
+      saveState();
+    });
+  });
+  $$("[data-dremove]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.dataset.dremove;
+      state.debts = state.debts.filter(x=>x.id!==id);
+      saveState(); renderDebts();
+    });
+  });
+}
+
+/* =========================
+   PAYOFF SIMULATOR
+   ========================= */
+function renderPayoff(){
+  const result = computePayoff();
+
+  const summary = result.summary;
+  const debts = state.debts || [];
+  const canSim = debts.length > 0 && debts.some(d=>num(d.balance) > 0);
+
+  const previewRows = result.schedule.map(m=>{
+    return `
+      <tr>
+        <td>${escapeHtml(monthLabel(m.date))}</td>
+        <td>${money(m.interest)}</td>
+        <td>${money(m.payment)}</td>
+        <td>${money(m.remaining)}</td>
+        <td><small>${escapeHtml(m.targetName || "—")}</small></td>
+      </tr>
+    `;
+  }).join("");
+
+  view.innerHTML = `
+    <div class="card">
+      <h2>Payoff Simulator</h2>
+      <p>Choose a strategy and a monthly extra payment. Toggle “roll freed minimums forward” to keep your total debt payment consistent as debts are eliminated.</p>
+
+      <div class="row">
+        <div class="mini">
+          <label>Strategy</label>
+          <select id="pStrategy">
+            <option value="snowball" ${state.payoff.strategy==="snowball"?"selected":""}>Snowball (smallest balance first)</option>
+            <option value="avalanche" ${state.payoff.strategy==="avalanche"?"selected":""}>Avalanche (highest APR first)</option>
+          </select>
+        </div>
+        <div class="mini">
+          <label>Extra beyond minimums</label>
+          <input id="pExtra" type="number" step="0.01" value="${num(state.payoff.extra)}" />
+        </div>
+        <div class="mini">
+          <label>Start month</label>
+          <input id="pStart" type="month" value="${escapeHtml(state.payoff.start)}" />
+        </div>
+        <div class="mini">
+          <label>Roll freed minimums forward?</label>
+          <select id="pRoll">
+            <option value="yes" ${state.payoff.rollForward ? "selected":""}>Yes</option>
+            <option value="no" ${!state.payoff.rollForward ? "selected":""}>No</option>
+          </select>
+        </div>
+        <div class="mini">
+          <button class="btn primary" id="runPayoff">Recalculate</button>
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="kpi">
+        <div class="box"><div class="lbl">Debt-free date</div><div class="val">${summary.debtFreeDate ? escapeHtml(monthLabel(summary.debtFreeDate)) : "—"}</div></div>
+        <div class="box"><div class="lbl">Months to freedom</div><div class="val">${summary.months ? fmtNum.format(summary.months) : "—"}</div></div>
+        <div class="box"><div class="lbl">Total interest (est.)</div><div class="val">${money(summary.totalInterest)}</div></div>
+        <div class="box"><div class="lbl">Total paid (est.)</div><div class="val">${money(summary.totalPaid)}</div></div>
+      </div>
+
+      <div class="hr"></div>
+
+      ${!canSim ? `<div class="notice"><b>Add debts first.</b> Go to <b>Debts</b>, enter balances/APR/minimums, then return here.</div>` : ""}
+
+      <div class="card" style="margin:14px 0 0">
+        <h2 style="font-size:18px;margin:0 0 8px">Monthly Schedule</h2>
+        <p style="margin:0 0 10px;color:var(--muted)">Full schedule below. Use the Roadmap tab or Print button for a cleaner PDF view.</p>
+
+        <table>
+          <thead><tr><th>Month</th><th>Interest</th><th>Payment</th><th>Remaining</th><th>Target</th></tr></thead>
+          <tbody>
+            ${previewRows || `<tr><td colspan="5"><small>No schedule to show yet.</small></td></tr>`}
+          </tbody>
+        </table>
+
+        <div class="row" style="margin-top:12px">
+          <button class="btn primary" onclick="buildPrintReport(); window.print();">🧾 Print/Save Roadmap PDF</button>
+          <button class="btn" onclick="window.__go('roadmap')">Open Roadmap View</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  $("#runPayoff").addEventListener("click", ()=>{
+    state.payoff.strategy = $("#pStrategy").value;
+    state.payoff.extra = Math.max(0, num($("#pExtra").value));
+    state.payoff.start = $("#pStart").value || yyyymm(new Date());
+    state.payoff.rollForward = ($("#pRoll").value === "yes");
+    saveState();
+    renderPayoff();
+  });
+}
+
+/* Core payoff computation */
+function computePayoff(){
+  const debts = (state.debts||[]).map(d=>({
+    id:d.id,
+    name:d.name || "Debt",
+    balance: Math.max(0, num(d.balance)),
+    apr: Math.max(0, num(d.apr)),
+    min: Math.max(0, num(d.min))
+  })).filter(d=>d.balance > 0.0001);
+
+  const extra = Math.max(0, num(state.payoff.extra));
+  const strategy = state.payoff.strategy || "snowball";
+  const rollForward = !!state.payoff.rollForward;
+
+  const start = (state.payoff.start || yyyymm(new Date()));
+  const [sy, sm] = start.split("-").map(n=>parseInt(n,10));
+  const startDate = new Date(sy, (sm||1)-1, 1);
+
+  if(debts.length === 0){
+    return {summary:{months:0,totalInterest:0,totalPaid:0,debtFreeDate:null}, schedule:[]};
+  }
+
+  const initialMinTotal = debts.reduce((a,d)=> a + d.min, 0);
+
+  const w = debts.map(d=>({...d}));
+  let schedule = [];
+  let totalInterest = 0;
+  let totalPaid = 0;
+
+  for(let monthIndex=0; monthIndex<600; monthIndex++){
+    const remainingTotal = w.reduce((a,d)=> a + Math.max(0,d.balance), 0);
+    if(remainingTotal < 0.01) break;
+
+    const date = addMonths(startDate, monthIndex);
+
+    const active = w.filter(d=>d.balance > 0.01);
+
+    let interestThisMonth = 0;
+    active.forEach(d=>{
+      const mi = (d.apr/100) / 12;
+      const interest = d.balance * mi;
+      d.balance += interest;
+      interestThisMonth += interest;
+    });
+
+    const minTotal = active.reduce((a,d)=> a + Math.min(d.min, d.balance), 0);
+
+    let extraPool = extra;
+    if(rollForward){
+      extraPool += Math.max(0, initialMinTotal - minTotal);
+    }
+
+    let target = null;
+    if(strategy === "avalanche"){
+      target = active.slice().sort((a,b)=> (b.apr - a.apr) || (a.balance - b.balance))[0];
+    }else{
+      target = active.slice().sort((a,b)=> (a.balance - b.balance) || (b.apr - a.apr))[0];
+    }
+
+    let paidThisMonth = 0;
+    active.forEach(d=>{
+      const pay = Math.min(d.min, d.balance);
+      d.balance -= pay;
+      paidThisMonth += pay;
+    });
+
+    if(target && extraPool > 0){
+      const payExtra = Math.min(extraPool, target.balance);
+      target.balance -= payExtra;
+      paidThisMonth += payExtra;
+      extraPool -= payExtra;
+    }
+
+    if(extraPool > 0){
+      const sorted = (strategy === "avalanche")
+        ? active.filter(d=>d.balance>0.01).sort((a,b)=> (b.apr - a.apr) || (a.balance - b.balance))
+        : active.filter(d=>d.balance>0.01).sort((a,b)=> (a.balance - b.balance) || (b.apr - a.apr));
+
+      for(const d of sorted){
+        if(extraPool <= 0) break;
+        const payMore = Math.min(extraPool, d.balance);
+        d.balance -= payMore;
+        paidThisMonth += payMore;
+        extraPool -= payMore;
+      }
+    }
+
+    const remaining = w.reduce((a,d)=> a + Math.max(0,d.balance), 0);
+
+    totalInterest += interestThisMonth;
+    totalPaid += paidThisMonth;
+
+    schedule.push({
+      date,
+      interest: interestThisMonth,
+      payment: paidThisMonth,
+      remaining,
+      targetName: target ? target.name : null
+    });
+  }
+
+  const last = schedule[schedule.length-1];
+  const debtFreeDate = last && last.remaining < 0.01 ? last.date : (schedule.length ? schedule[schedule.length-1].date : null);
+
+  return {
+    summary: {
+      months: schedule.length,
+      totalInterest,
+      totalPaid,
+      debtFreeDate: (schedule.length && schedule[schedule.length-1].remaining < 0.01) ? schedule[schedule.length-1].date : null
+    },
+    schedule
+  };
+}
+
+/* =========================
+   BILLS CALENDAR
+   ========================= */
+let calCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+function renderBills(){
+  const content = `
+    <div class="card">
+      <h2>Bills Calendar</h2>
+      <p>Add bills with a due day. Use the calendar to mark bills paid each month.</p>
+
+      <div class="row">
+        <div class="field"><label>Bill name</label><input id="bName" placeholder="e.g., Electric, Phone, Car insurance…" /></div>
+        <div class="mini"><label>Amount</label><input id="bAmt" type="number" step="0.01" placeholder="0.00" /></div>
+        <div class="tiny"><label>Due day</label><input id="bDay" type="number" min="1" max="31" step="1" placeholder="1-31" /></div>
+        <div class="mini"><label>Category</label><input id="bCat" placeholder="Utilities / Housing / Insurance…" /></div>
+        <div class="mini"><label>Autopay?</label>
+          <select id="bAuto">
+            <option value="yes">Yes</option>
+            <option value="no" selected>No</option>
+          </select>
+        </div>
+        <div class="mini"><button class="btn primary" id="addBillBtn">+ Add Bill</button></div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="cal-head">
+        <div class="cal-title" id="calTitle"></div>
+        <div class="row" style="justify-content:flex-end">
+          <button class="btn" id="calPrev">← Prev</button>
+          <button class="btn" id="calNow">This month</button>
+          <button class="btn" id="calNext">Next →</button>
+        </div>
+      </div>
+
+      <div class="calendar" id="calendar"></div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px">Bills List</h3>
+      ${renderBillsTable()}
+    </div>
+  `;
+
+  view.innerHTML = content;
+
+  $("#addBillBtn").addEventListener("click", ()=>{
+    const name = ($("#bName").value||"").trim() || "Bill";
+    const amount = Math.max(0, num($("#bAmt").value));
+    const dueDay = clamp(parseInt($("#bDay").value||"1",10), 1, 31);
+    const category = ($("#bCat").value||"").trim() || "General";
+    const autopay = ($("#bAuto").value === "yes");
+    state.bills.push({id:cryptoId(), name, amount, dueDay, category, autopay});
+    saveState();
+    renderBills();
+  });
+
+  $("#calPrev").addEventListener("click", ()=>{ calCursor = addMonths(calCursor, -1); renderCalendar(); });
+  $("#calNext").addEventListener("click", ()=>{ calCursor = addMonths(calCursor, 1); renderCalendar(); });
+  $("#calNow").addEventListener("click", ()=>{ calCursor = new Date(new Date().getFullYear(), new Date().getMonth(), 1); renderCalendar(); });
+
+  wireBillsTableHandlers();
+  renderCalendar();
+}
+
+function renderBillsTable(){
+  const rows = (state.bills||[]).map(b=>`
+    <tr>
+      <td><input data-bedit="name" data-id="${b.id}" value="${escapeHtml(b.name)}" /></td>
+      <td><input data-bedit="amount" data-id="${b.id}" type="number" step="0.01" value="${num(b.amount)}" /></td>
+      <td><input data-bedit="dueDay" data-id="${b.id}" type="number" min="1" max="31" step="1" value="${num(b.dueDay)}" /></td>
+      <td><input data-bedit="category" data-id="${b.id}" value="${escapeHtml(b.category)}" /></td>
+      <td>
+        <select data-bedit="autopay" data-id="${b.id}">
+          <option value="yes" ${b.autopay?"selected":""}>yes</option>
+          <option value="no" ${!b.autopay?"selected":""}>no</option>
+        </select>
+      </td>
+      <td><button class="btn danger" data-bremove="${b.id}">Remove</button></td>
+    </tr>
+  `).join("");
+
+  return `
+    <table>
+      <thead><tr><th>Name</th><th>Amount</th><th>Due day</th><th>Category</th><th>Autopay</th><th></th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="6"><small>No bills yet.</small></td></tr>`}</tbody>
+    </table>
+  `;
+}
+
+function wireBillsTableHandlers(){
+  $$("[data-bedit]").forEach(el=>{
+    el.addEventListener("change", ()=>{
+      const id = el.dataset.id;
+      const k = el.dataset.bedit;
+      const b = state.bills.find(x=>x.id===id);
+      if(!b) return;
+      if(k==="name") b.name = el.value;
+      if(k==="amount") b.amount = Math.max(0, num(el.value));
+      if(k==="dueDay") b.dueDay = clamp(parseInt(el.value||"1",10), 1, 31);
+      if(k==="category") b.category = el.value;
+      if(k==="autopay") b.autopay = (el.value==="yes");
+      saveState();
+      renderCalendar();
+    });
+  });
+  $$("[data-bremove]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.dataset.bremove;
+      state.bills = state.bills.filter(x=>x.id!==id);
+      saveState(); renderBills();
+    });
+  });
+}
+
+function renderCalendar(){
+  const y = calCursor.getFullYear();
+  const m = calCursor.getMonth();
+  $("#calTitle").textContent = monthLabel(calCursor);
+
+  const first = new Date(y,m,1);
+  const firstDow = (first.getDay()+6)%7; // Monday = 0
+  const days = lastDayOfMonth(y,m);
+
+  const cal = $("#calendar");
+  const dows = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(d=>`<div class="dow">${d}</div>`).join("");
+  let cells = "";
+
+  for(let i=0;i<firstDow;i++){
+    cells += `<div class="day" style="opacity:.28"><div class="n"> </div></div>`;
+  }
+
+  const monthKey = `${y}-${String(m+1).padStart(2,"0")}`;
+  const paidMap = state.billsPaid[monthKey] || {};
+
+  const billByDay = {};
+  (state.bills||[]).forEach(b=>{
+    const day = clamp(parseInt(b.dueDay||1,10), 1, days);
+    if(!billByDay[day]) billByDay[day] = [];
+    billByDay[day].push(b);
+  });
+
+  for(let day=1; day<=days; day++){
+    const bills = billByDay[day] || [];
+    const chips = bills.map(b=>{
+      const paid = !!paidMap[b.id];
+      return `
+        <span class="chip ${paid?"paid":""}" data-pay="${b.id}">
+          <strong>${escapeHtml(b.name)}</strong>
+          <small>${money(num(b.amount))} · ${escapeHtml(b.category || "General")}${b.autopay?" · autopay":""}</small>
+        </span>
+      `;
+    }).join("");
+
+    cells += `
+      <div class="day">
+        <div class="n">${day}</div>
+        ${chips}
+      </div>
+    `;
+  }
+
+  cal.innerHTML = dows + cells;
+
+  $$("[data-pay]").forEach(chip=>{
+    chip.addEventListener("click", ()=>{
+      const id = chip.dataset.pay;
+      state.billsPaid[monthKey] = state.billsPaid[monthKey] || {};
+      const cur = !!state.billsPaid[monthKey][id];
+      state.billsPaid[monthKey][id] = !cur;
+      saveState();
+      renderCalendar();
+    });
+  });
+}
+
+/* =========================
+   CHECK-INS
+   ========================= */
+function renderCheckins(){
+  const now = new Date();
+  const thisKey = yyyymm(now);
+
+  const keys = Object.keys(state.checkins||{}).sort().reverse().slice(0, 12);
+  const rows = keys.map(k=>{
+    const c = state.checkins[k];
+    return `
+      <tr>
+        <td>${escapeHtml(k)}</td>
+        <td>${money(num(c.incomeActual))}</td>
+        <td>${money(num(c.expenseActual))}</td>
+        <td>${money(num(c.debtPaid))}</td>
+        <td>${escapeHtml((c.confidence||0)+"/5")}</td>
+        <td><small>${escapeHtml((c.notes||"").slice(0,60))}${(c.notes||"").length>60?"…":""}</small></td>
+      </tr>
+    `;
+  }).join("");
+
+  const content = `
+    <div class="card">
+      <h2>Monthly Check-Ins</h2>
+      <p>Record what actually happened each month: income, expenses, debt paid, and a simple confidence score. This becomes your monthly dashboard.</p>
+
+      <div class="row">
+        <div class="mini">
+          <label>Month</label>
+          <input id="cMonth" type="month" value="${escapeHtml(thisKey)}" />
+        </div>
+        <div class="mini">
+          <label>Actual income</label>
+          <input id="cInc" type="number" step="0.01" placeholder="0.00" />
+        </div>
+        <div class="mini">
+          <label>Actual expenses</label>
+          <input id="cExp" type="number" step="0.01" placeholder="0.00" />
+        </div>
+        <div class="mini">
+          <label>Debt paid</label>
+          <input id="cDebt" type="number" step="0.01" placeholder="0.00" />
+        </div>
+        <div class="tiny">
+          <label>Confidence (1–5)</label>
+          <input id="cConf" type="number" min="1" max="5" step="1" placeholder="3" />
+        </div>
+        <div class="mini">
+          <button class="btn primary" id="saveCheckin">Save Check-In</button>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:10px">
+        <label>Notes (wins, challenges, next steps)</label>
+        <textarea id="cNotes" placeholder="Write a quick reflection for the month…"></textarea>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px">Recent Check-Ins</h3>
+      <table>
+        <thead><tr><th>Month</th><th>Income</th><th>Expenses</th><th>Debt Paid</th><th>Confidence</th><th>Notes</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="6"><small>No check-ins yet.</small></td></tr>`}</tbody>
+      </table>
+    </div>
+  `;
+
+  view.innerHTML = content;
+
+  const loadMonth = ()=>{
+    const k = $("#cMonth").value;
+    const c = state.checkins[k] || {};
+    $("#cInc").value = c.incomeActual ?? "";
+    $("#cExp").value = c.expenseActual ?? "";
+    $("#cDebt").value = c.debtPaid ?? "";
+    $("#cConf").value = c.confidence || "";
+    $("#cNotes").value = c.notes || "";
+  };
+  $("#cMonth").addEventListener("change", loadMonth);
+  loadMonth();
+
+  $("#saveCheckin").addEventListener("click", ()=>{
+    const k = $("#cMonth").value || thisKey;
+    state.checkins[k] = {
+      incomeActual: Math.max(0, num($("#cInc").value)),
+      expenseActual: Math.max(0, num($("#cExp").value)),
+      debtPaid: Math.max(0, num($("#cDebt").value)),
+      confidence: clamp(parseInt($("#cConf").value||"0",10), 0, 5),
+      notes: ($("#cNotes").value||"").trim()
+    };
+    saveState();
+    renderCheckins();
+  });
+}
+
+/* =========================
+   ROADMAP
+   ========================= */
+function renderRoadmap(){
+  const res = computePayoff();
+  const s = res.summary;
+  const debts = (state.debts||[]).filter(d=>num(d.balance)>0.01);
+
+  const content = `
+    <div class="card">
+      <h2>Debt-Free Roadmap</h2>
+      <p>This page summarizes your plan into a clean roadmap. Use <b>Print/Save as PDF</b> for a shareable, printable plan.</p>
+
+      <div class="kpi" style="margin-top:10px">
+        <div class="box"><div class="lbl">Debts in plan</div><div class="val">${fmtNum.format(debts.length)}</div></div>
+        <div class="box"><div class="lbl">Debt-free date</div><div class="val">${s.debtFreeDate ? escapeHtml(monthLabel(s.debtFreeDate)) : "—"}</div></div>
+        <div class="box"><div class="lbl">Months</div><div class="val">${s.months ? fmtNum.format(s.months) : "—"}</div></div>
+        <div class="box"><div class="lbl">Total interest (est.)</div><div class="val">${money(s.totalInterest)}</div></div>
+      </div>
+
+      <div class="hr"></div>
+
+      <h3 style="margin:0 0 8px">Your Debts</h3>
+      <table>
+        <thead><tr><th>Debt</th><th>Balance</th><th>APR%</th><th>Minimum</th></tr></thead>
+        <tbody>
+          ${(state.debts||[]).map(d=>`
+            <tr>
+              <td>${escapeHtml(d.name||"Debt")}</td>
+              <td>${money(num(d.balance))}</td>
+              <td>${escapeHtml(String(num(d.apr)))}</td>
+              <td>${money(num(d.min))}</td>
+            </tr>
+          `).join("") || `<tr><td colspan="4"><small>No debts yet.</small></td></tr>`}
+        </tbody>
+      </table>
+
+      <div class="hr"></div>
+
+      <div class="row">
+        <button class="btn primary" onclick="buildPrintReport(); window.print();">🧾 Print/Save Roadmap PDF</button>
+        <button class="btn" onclick="window.__go('payoff')">Adjust Strategy</button>
+      </div>
+
+      <div class="hint" style="margin-top:10px">
+        Strategy: <b>${escapeHtml(state.payoff.strategy==="avalanche"?"Avalanche":"Snowball")}</b> · Extra: <b>${money(num(state.payoff.extra))}</b> · Roll-forward mins: <b>${state.payoff.rollForward?"Yes":"No"}</b>
+      </div>
+    </div>
+  `;
+
+  view.innerHTML = content;
+}
+
+/* Build a printable report into #printReport */
+function buildPrintReport(){
+  const res = computePayoff();
+  const s = res.summary;
+  const debts = state.debts || [];
+  const {inc, exp, net} = budgetTotals();
+
+  const highlights = res.schedule.slice(0,12).map(m=>`
+    <tr>
+      <td>${escapeHtml(monthLabel(m.date))}</td>
+      <td>${money(m.interest)}</td>
+      <td>${money(m.payment)}</td>
+      <td>${money(m.remaining)}</td>
+      <td>${escapeHtml(m.targetName || "—")}</td>
+    </tr>
+  `).join("");
+
+  const html = `
+    <h1>Khaemenes Budget + Debt Freedom Roadmap</h1>
+    <p class="muted">Generated: ${new Date().toLocaleString()}</p>
+
+    <h2>Budget Snapshot (Monthly Estimates)</h2>
+    <table>
+      <tr><th>Income</th><td>${money(inc)}</td></tr>
+      <tr><th>Expenses</th><td>${money(exp)}</td></tr>
+      <tr><th>Net</th><td>${money(net)}</td></tr>
+    </table>
+
+    <h2>Plan Settings</h2>
+    <ul>
+      <li><b>Strategy:</b> ${escapeHtml(state.payoff.strategy==="avalanche"?"Avalanche (highest APR first)":"Snowball (smallest balance first)")}</li>
+      <li><b>Extra beyond minimums:</b> ${money(num(state.payoff.extra))}</li>
+      <li><b>Roll freed minimums forward:</b> ${state.payoff.rollForward ? "Yes" : "No"}</li>
+      <li><b>Estimated debt-free date:</b> ${s.debtFreeDate ? escapeHtml(monthLabel(s.debtFreeDate)) : "—"}</li>
+      <li><b>Estimated months:</b> ${s.months ? fmtNum.format(s.months) : "—"}</li>
+      <li><b>Total interest (est.):</b> ${money(s.totalInterest)}</li>
+    </ul>
+
+    <h2>Debts</h2>
+    <table>
+      <thead><tr><th>Debt</th><th>Balance</th><th>APR%</th><th>Minimum</th></tr></thead>
+      <tbody>
+        ${debts.map(d=>`
+          <tr>
+            <td>${escapeHtml(d.name||"Debt")}</td>
+            <td>${money(num(d.balance))}</td>
+            <td>${escapeHtml(String(num(d.apr)))}</td>
+            <td>${money(num(d.min))}</td>
+          </tr>
+        `).join("") || `<tr><td colspan="4">No debts entered.</td></tr>`}
+      </tbody>
+    </table>
+
+    <h2>First 12 Months (Highlights)</h2>
+    <table>
+      <thead><tr><th>Month</th><th>Interest</th><th>Payment</th><th>Remaining</th><th>Target</th></tr></thead>
+      <tbody>${highlights || `<tr><td colspan="5">No schedule yet.</td></tr>`}</tbody>
+    </table>
+
+    <h2>Monthly Posture</h2>
+    <ul>
+      <li>Pay every minimum on time.</li>
+      <li>Apply extra to the target debt (snowball/avalanche).</li>
+      <li>When a debt is gone, roll that payment forward.</li>
+      <li>Do a quick monthly check-in: numbers + notes + confidence.</li>
+    </ul>
+
+    <p class="muted"><b>Disclaimer:</b> Educational planning tool only. Verify figures with your statements and lenders.</p>
+  `;
+  $("#printReport").innerHTML = html;
+}
+
+/* =========================
+   DATA
+   ========================= */
+function renderData(){
+  const json = JSON.stringify(state, null, 2);
+  view.innerHTML = `
+    <div class="card">
+      <h2>Data</h2>
+      <p>Export your plan as JSON (backup) and import it later on the same or another device. This is separate from the printable Roadmap PDF.</p>
+
+      <div class="row">
+        <button class="btn primary" id="downloadJson">⬇️ Download JSON</button>
+        <button class="btn" id="copyJson">Copy JSON</button>
+      </div>
+
+      <div class="field" style="margin-top:10px">
+        <label>Current data (JSON)</label>
+        <textarea id="dataBox">${escapeHtml(json)}</textarea>
+      </div>
+
+      <div class="row">
+        <button class="btn purple" id="importJson">⬆️ Import JSON</button>
+        <button class="btn danger" id="wipeJson">Reset data</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="notice ok">
+        <b>Privacy note:</b> All data lives only in this browser’s localStorage. Export regularly if you plan to switch devices or clear your cache.
+      </div>
+    </div>
+  `;
+
+  $("#downloadJson").addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "khaemenes-budget-planner-backup.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  $("#copyJson").addEventListener("click", async ()=>{
+    const txt = $("#dataBox").value;
+    try{
+      await navigator.clipboard.writeText(txt);
+      alert("Copied ✅");
+    }catch(e){
+      $("#dataBox").select();
+      document.execCommand("copy");
+      alert("Copied ✅");
+    }
+  });
+
+  $("#importJson").addEventListener("click", ()=>{
+    const raw = $("#dataBox").value;
+    try{
+      const parsed = JSON.parse(raw);
+      state = mergeDefaults(structuredClone(DEFAULT_STATE), parsed);
+      saveState();
+      alert("Imported ✅");
+      renderData();
+    }catch(e){
+      alert("Import failed: invalid JSON.");
+    }
+  });
+
+  $("#wipeJson").addEventListener("click", ()=>{
+    const ok = confirm("Reset all local data?");
+    if(!ok) return;
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
+    state = structuredClone(DEFAULT_STATE);
+    saveState();
+    renderData();
+  });
+}
+
+/* =========================
+   INITIALIZE
+   ========================= */
+if(!state.meta.lastTab) state.meta.lastTab = "dashboard";
+setTab(state.meta.lastTab);
+</script>
+</body>
+</html>
