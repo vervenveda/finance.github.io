@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Global Employment & Finance News</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --bg: #0697A1;
+    --text: #222;
+    --card: #fff;
+    --accent: #2EC1CC;
+  }
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+  }
+  .dark {
+    --bg: #111;
+    --text: #e8e8e8;
+    --card: #1c1c1c;
+    --accent: #2EC1CC;
+  }
+
+  header {
+    padding: 12px;
+    background: var(--accent);
+    color: white;
+    text-align: center;
+    font-size: 1.4em;
+    font-weight: bold;
+  }
+
+  #newsCard {
+    margin: 16px;
+    padding: 20px;
+    background: var(--card);
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    transition: transform 0.4s ease, opacity 0.4s ease;
+    min-height: 180px;
+  }
+
+  #title { font-size:1.2em; font-weight:bold; margin-bottom:10px; }
+  #desc { opacity:0.88; }
+  .controls { margin-top: 16px; display:flex; justify-content:space-around; flex-wrap:wrap; gap:8px; }
+  button { padding:10px 14px; border-radius:7px; border:none; background:var(--accent); color:white; font-size:1em; cursor:pointer; flex:1; min-width:80px; }
+
+  .tabs { display:flex; overflow-x:auto; padding:10px; background:var(--card); gap:10px; }
+  .tab { padding:6px 12px; border-radius:20px; background:var(--accent); color:white; cursor:pointer; white-space:nowrap; font-size:0.9em; }
+  .tab.active { opacity:0.9; }
+
+  #favoritesPanel, #jobSearchWidget { margin:16px; padding:16px; border-radius:12px; background:var(--card); }
+  #jobSearchWidget input { width:100%; padding:6px; margin:6px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>🌐 Global Employment & Finance News</header>
+
+  <div class="tabs">
+    <button class="tab active" data-cat="general">All</button>
+    <button class="tab" data-cat="employment">Employment</button>
+    <button class="tab" data-cat="finance">Finance</button>
+    <button class="tab" type="button" onclick="toggleFavorites()">⭐ Favorites</button>
+    <button class="tab" type="button" onclick="toggleDark()">🌙/☀️</button>
+    <button class="tab" type="button" onclick="toggleFullscreen()">⛶</button>
+  </div>
+
+  <div id="newsCard">
+    <div id="title">Loading news…</div>
+    <div id="metaLine"></div>
+    <div id="desc"></div>
+  </div>
+
+  <div class="controls">
+    <button type="button" onclick="prev()">⬅ Prev</button>
+    <button type="button" onclick="readAloud()">🔊 Read</button>
+    <button type="button" onclick="saveFavorite()">⭐ Save</button>
+    <button type="button" onclick="openArticle()">🔗 Open</button>
+    <button type="button" onclick="next()">Next ➡</button>
+  </div>
+
+  <div id="statusLine"></div>
+  <div id="favoritesPanel"></div>
+
+  <!-- Job Search + Salary Calculator -->
+  <div id="jobSearchWidget">
+    <h3>💼 Job Search Links</h3>
+    <p>Click a link to explore job opportunities:</p>
+    <ul id="jobLinks" style="list-style:none; padding-left:0;"></ul>
+
+    <h3>💰 Salary Calculator</h3>
+    <label for="salaryInput">Enter annual salary ($):</label>
+    <input type="number" id="salaryInput" placeholder="e.g., 60000"/>
+    <button onclick="calculateSalary()">Calculate Monthly</button>
+    <p id="salaryResult" style="margin-top:10px; font-weight:bold;"></p>
+  </div>
+</div>
+
+<script>
+// ------------------- NEWS -------------------
+const FEEDS = [
+  "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml",
+  "https://rss.nytimes.com/services/xml/rss/nyt/Economy.xml",
+  "https://feeds.bbci.co.uk/news/business/rss.xml",
+  "https://www.cnbc.com/id/10001147/device/rss/rss.html",
+  "https://www.ft.com/?format=rss",
+  "https://www.reuters.com/rssFeed/businessNews",
+  "https://www.forbes.com/business/feed2/",
+  "https://www.businessinsider.com/rss",
+  "https://www.marketwatch.com/rss/topstories",
+  "https://www.theguardian.com/business/rss"
+];
+
+let articles=[], index=0, currentCategory="general", isLoading=false;
+
+// Helpers
+function normalizeCategory(title, desc) {
+  const text = (title+" "+desc).toLowerCase();
+  if(text.includes("job") || text.includes("hiring") || text.includes("employment")) return "employment";
+  if(text.includes("finance") || text.includes("stock") || text.includes("market") || text.includes("economy") || text.includes("investment")) return "finance";
+  return "general";
+}
+
+async function fetchRSS(url){
+  try {
+    const res = await fetch("https://api.allorigins.win/get?url="+encodeURIComponent(url));
+    if(!res.ok) throw new Error("Feed error");
+    const data = await res.json();
+    const xml = new DOMParser().parseFromString(data.contents, "text/xml");
+    return [...xml.querySelectorAll("item")].map(item=>{
+      const title = item.querySelector("title")?.textContent || "Untitled";
+      const desc  = item.querySelector("description")?.textContent || "";
+      const link  = item.querySelector("link")?.textContent || "";
+      const category = normalizeCategory(title, desc);
+      return {title, desc, link, category};
+    });
+  } catch(e){console.warn("RSS error",url,e); return []; }
+}
+
+async function loadNews(){
+  if(isLoading) return; isLoading=true;
+  let temp=[];
+  for(let feed of FEEDS){
+    const items = await fetchRSS(feed);
+    temp.push(...items);
+  }
+  if(temp.length){ articles=temp; applyCategoryFilter(); }
+  else if(!articles.length){ document.getElementById("title").textContent="Unable to load news."; document.getElementById("desc").textContent="Check connection."; }
+  isLoading=false;
+}
+
+function applyCategoryFilter(){
+  let cache = articles || [];
+  if(currentCategory!=="general") cache = cache.filter(a=>a.category===currentCategory);
+  if(!cache.length) cache=articles;
+  index=0; updateActiveTabs(); showArticle();
+}
+
+function updateActiveTabs(){
+  document.querySelectorAll(".tab[data-cat]").forEach(tab=>{
+    tab.classList.toggle("active", tab.dataset.cat===currentCategory);
+  });
+}
+
+function sanitizeHtml(html){ const div=document.createElement("div"); div.innerHTML=html; div.querySelectorAll("script,style,iframe").forEach(el=>el.remove()); return div.innerHTML; }
+
+function showArticle(direction=1){
+  if(!articles.length) return;
+  const card=document.getElementById("newsCard");
+  card.style.opacity=0; card.style.transform=`translateX(${direction*40}px)`;
+  setTimeout(()=>{
+    const a=articles[index];
+    document.getElementById("title").textContent=a.title;
+    document.getElementById("title").onclick=openArticle;
+    let host=""; try{ host=a.link?new URL(a.link).hostname.replace(/^www\./,""):""; }catch(e){ host=""; }
+    document.getElementById("metaLine").textContent = host ? `${host} · ${a.category}` : a.category;
+    document.getElementById("desc").innerHTML = sanitizeHtml(a.desc);
+    card.style.opacity=1; card.style.transform="translateX(0)";
+    document.getElementById("statusLine").textContent=`${index+1} of ${articles.length} stories`;
+  },220);
+}
+
+function next(){ if(!articles.length) return; index=(index+1)%articles.length; showArticle(+1); }
+function prev(){ if(!articles.length) return; index=(index-1+articles.length)%articles.length; showArticle(-1); }
+function openArticle(){ if(!articles.length) return; const link=articles[index].link; if(link) window.open(link,"_blank"); else alert("No link"); }
+function readAloud(){ if(!articles.length || !("speechSynthesis" in window)) return; const a=articles[index]; speechSynthesis.speak(new SpeechSynthesisUtterance(`${a.title}. ${stripHtml(a.desc)}`)); }
+function stripHtml(html){ const div=document.createElement("div"); div.innerHTML=html; return div.textContent||div.innerText||""; }
+function saveFavorite(){ if(!articles.length) return; let favs=[]; try{ favs=JSON.parse(localStorage.empFavs||"[]"); }catch(e){ favs=[]; } favs.push(articles[index]); localStorage.empFavs=JSON.stringify(favs); alert("Saved to favorites."); }
+function toggleFavorites(){ const panel=document.getElementById("favoritesPanel"); if(panel.style.display==="block"){ panel.style.display="none"; }else{ let favs=[]; try{ favs=JSON.parse(localStorage.empFavs||"[]"); }catch(e){ favs=[]; } panel.style.display="block"; panel.innerHTML=!favs.length ? "<p>No favorites yet.</p>" : favs.map(f=>`<p><b>${f.title}</b><br><small>${stripHtml(f.desc).slice(0,180)}${stripHtml(f.desc).length>180?"…":""}</small></p>`).join(""); } }
+function toggleDark(){ document.body.classList.toggle("dark"); }
+function toggleFullscreen(){ if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.(); }
+let touchStartX=0; document.addEventListener("touchstart", e=>{ if(!e.touches[0]) return; touchStartX=e.touches[0].clientX; });
+document.addEventListener("touchend", e=>{ if(!e.changedTouches[0]) return; const dx=e.changedTouches[0].clientX-touchStartX; if(dx>40) prev(); if(dx<-40) next(); });
+document.querySelectorAll(".tab[data-cat]").forEach(tab=>{ tab.addEventListener("click",()=>{ currentCategory=tab.dataset.cat; applyCategoryFilter(); }); });
+
+// --- Start app ---
+if(articles.length) applyCategoryFilter(); else showArticle(); loadNews(); setInterval(loadNews,3*60*60*1000);
+
+// ------------------- JOB SEARCH + SALARY -------------------
+const JOB_PORTALS=[
+  { "name": "Indeed", "url": "https://www.indeed.com" },
+  { "name": "LinkedIn Jobs", "url": "https://www.linkedin.com/jobs/" },
+  { "name": "Glassdoor", "url": "https://www.glassdoor.com/Job/index.htm" },
+  { "name": "Monster", "url": "https://www.monster.com" },
+  { "name": "CareerBuilder", "url": "https://www.careerbuilder.com" },
+  { "name": "ZipRecruiter", "url": "https://www.ziprecruiter.com" },
+  { "name": "SimplyHired", "url": "https://www.simplyhired.com" },
+  { "name": "FlexJobs", "url": "https://www.flexjobs.com" },
+  { "name": "We Work Remotely", "url": "https://weworkremotely.com" },
+  { "name": "Remote.co", "url": "https://remote.co/remote-jobs/" },
+  { "name": "AngelList", "url": "https://angel.co/jobs" },
+  { "name": "JobStreet", "url": "https://www.jobstreet.com" },
+  { "name": "JobsDB", "url": "https://www.jobsdb.com" },
+  { "name": "Jobrapido", "url": "https://www.jobrapido.com" },
+  { "name": "Adzuna", "url": "https://www.adzuna.com" },
+  { "name": "EuroJobs", "url": "https://www.eurojobs.com" },
+  { "name": "Michael Page", "url": "https://www.michaelpage.com" },
+  { "name": "Robert Half", "url": "https://www.roberthalf.com" },
+  { "name": "Hired", "url": "https://hired.com/" },
+  { "name": "Dice", "url": "https://www.dice.com" }
+];
+
+const jobLinksList=document.getElementById("jobLinks");
+JOB_PORTALS.forEach(job=>{
+  const li=document.createElement("li");
+  li.style.marginBottom="6px";
+  li.innerHTML=`<a href="${job.url}" target="_blank" style="color:var(--accent); text-decoration:none;">${job.name}</a>`;
+  jobLinksList.appendChild(li);
+});
+
+function calculateSalary(){
+  const annual=parseFloat(document.getElementById("salaryInput").value);
+  if(isNaN(annual)||annual<=0){ document.getElementById("salaryResult").textContent="Please enter a valid salary."; return; }
+  const monthly=(annual/12).toFixed(2);
+  document.getElementById("salaryResult").textContent=`Estimated Monthly Salary: $${monthly}`;
+}
+</script>
+</body>
+</html>
