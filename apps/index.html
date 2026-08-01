@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Verve N Veda Finance — a professional, local-first gateway to verified budgeting, credit, tax, financial-aid, investing education, family money, and financial research applications.">
+<meta name="theme-color" content="#102a28">
+<meta name="color-scheme" content="light">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; base-uri 'none'; form-action 'none';">
+<title>Verve N Veda Finance | The Open Ledger</title>
+<style>
+:root{
+  --paper:#f4efe5;
+  --paper-bright:#fffdf8;
+  --white:#fff;
+  --ink:#17211d;
+  --muted:#657069;
+  --navy:#10283d;
+  --navy-deep:#081a2a;
+  --emerald:#245b4b;
+  --emerald-deep:#153c32;
+  --copper:#b77443;
+  --gold:#c5a45d;
+  --gold-soft:#e9dcc0;
+  --sage:#dce7df;
+  --blue-soft:#e6edf3;
+  --rose-soft:#f1e3df;
+  --line:rgba(23,33,29,.14);
+  --line-strong:rgba(23,33,29,.27);
+  --shadow:0 22px 62px rgba(27,39,34,.11);
+  --shadow-small:0 10px 28px rgba(27,39,34,.08);
+  --radius:7px;
+  --max:1240px;
+  --display:"Iowan Old Style","Baskerville","Palatino Linotype",Georgia,serif;
+  --ceremonial:"Cinzel","Baskerville","Times New Roman",serif;
+  --sans:"Brandon Grotesque","Avenir Next","Montserrat","Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--paper)}
+body{margin:0;min-height:100vh;overflow-x:hidden;color:var(--ink);background:
+  radial-gradient(circle at 5% 4%,rgba(197,164,93,.12),transparent 26rem),
+  radial-gradient(circle at 94% 5%,rgba(36,91,75,.10),transparent 28rem),
+  var(--paper);font-family:var(--sans);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+body.drawer-open{overflow:hidden}
+a{color:inherit}button,input,select{font:inherit}button{color:inherit;cursor:pointer}
+[hidden]{display:none!important}
+::selection{background:var(--gold-soft);color:var(--ink)}
+:focus-visible{outline:3px solid rgba(183,116,67,.42);outline-offset:3px}
+.skip-link{position:fixed;left:12px;top:12px;z-index:4000;transform:translateY(-170%);padding:10px 14px;border-radius:var(--radius);color:#fff;background:var(--navy-deep)}
+.skip-link:focus{transform:none}
+.top-rule{height:5px;background:linear-gradient(90deg,var(--navy-deep) 0 25%,var(--emerald) 25% 50%,var(--gold) 50% 75%,var(--copper) 75% 100%)}
+.wrap{width:min(calc(100% - 32px),var(--max));margin-inline:auto}
+.site-header{position:sticky;top:0;z-index:1200;border-bottom:1px solid var(--line);background:rgba(244,239,229,.94);backdrop-filter:blur(18px)}
+.header-inner{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.brand{min-width:0;display:inline-flex;align-items:center;gap:12px;text-decoration:none}
+.brand-mark{position:relative;width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border:1px solid var(--navy-deep);border-radius:var(--radius);background:var(--paper-bright);font-family:var(--display);font-size:1.1rem;color:var(--navy-deep);overflow:hidden}
+.brand-mark:before,.brand-mark:after{content:"";position:absolute;background:var(--gold)}
+.brand-mark:before{width:1px;height:100%}.brand-mark:after{width:100%;height:1px}
+.brand-mark span{position:relative;z-index:1;padding:2px 4px;background:var(--paper-bright)}
+.brand-copy{display:grid;line-height:1.02}
+.brand-name{font-family:var(--ceremonial);font-size:1.04rem;font-weight:500;letter-spacing:.095em;text-transform:uppercase}
+.brand-sub{margin-top:5px;color:var(--muted);font-size:.66rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.header-actions{display:flex;align-items:center;gap:7px}
+.header-link{min-height:39px;display:inline-flex;align-items:center;padding:8px 10px;color:var(--muted);text-decoration:none;font-size:.73rem;font-weight:800;letter-spacing:.075em;text-transform:uppercase}
+.header-link:hover{color:var(--ink)}
+.menu-button,.icon-button{width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--line-strong);border-radius:var(--radius);background:transparent}
+.menu-button:hover,.icon-button:hover{background:var(--white)}
+.menu-lines,.menu-lines:before,.menu-lines:after{content:"";display:block;width:18px;height:1.5px;background:var(--ink);transition:.18s}
+.menu-lines{position:relative}.menu-lines:before,.menu-lines:after{position:absolute;left:0}.menu-lines:before{top:-6px}.menu-lines:after{top:6px}
+.menu-button[aria-expanded="true"] .menu-lines{background:transparent}.menu-button[aria-expanded="true"] .menu-lines:before{transform:translateY(6px) rotate(45deg)}.menu-button[aria-expanded="true"] .menu-lines:after{transform:translateY(-6px) rotate(-45deg)}
+.hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line);background:var(--paper-bright)}
+.hero:before{content:"";position:absolute;left:-210px;top:-200px;width:520px;height:520px;border:1px solid rgba(197,164,93,.16);border-radius:50%;box-shadow:0 0 0 70px rgba(197,164,93,.05),0 0 0 140px rgba(36,91,75,.035)}
+.hero-inner{position:relative;min-height:740px;padding:88px 0 78px;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(360px,.94fr);gap:clamp(38px,6vw,86px);align-items:center}
+.eyebrow,.kicker{margin:0;color:var(--copper);font-family:var(--ceremonial);font-size:.73rem;font-weight:800;letter-spacing:.17em;text-transform:uppercase}
+h1{margin:19px 0 0;max-width:760px;color:var(--navy-deep);font-family:var(--display);font-size:clamp(4rem,8vw,7.8rem);font-weight:500;line-height:.83;letter-spacing:-.035em;text-wrap:balance}
+h1 span{display:block;margin-top:1.3rem;color:var(--emerald);font-family:var(--sans);font-size:clamp(.74rem,1.4vw,.94rem);font-weight:800;line-height:1.5;letter-spacing:.22em;text-transform:uppercase}
+.hero-copy{max-width:720px;margin:25px 0 0;color:var(--muted);font-family:var(--display);font-size:clamp(1.12rem,2vw,1.34rem);line-height:1.72}
+.hero-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:29px}
+.button{min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border:1px solid transparent;border-radius:var(--radius);text-decoration:none;font-size:.75rem;font-weight:850;line-height:1.35;letter-spacing:.07em;text-align:center;text-transform:uppercase;transition:.17s}
+.button:hover{transform:translateY(-2px)}
+.button.primary{color:#fff;background:var(--navy-deep);box-shadow:var(--shadow-small)}
+.button.primary:hover{background:var(--emerald-deep)}
+.button.secondary{border-color:var(--line-strong);background:transparent}.button.secondary:hover{background:#fff;border-color:var(--navy-deep)}
+.hero-notes{display:flex;flex-wrap:wrap;gap:9px 18px;margin-top:26px;color:var(--muted);font-size:.78rem}
+.hero-notes span{display:inline-flex;align-items:center;gap:7px}.hero-notes span:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.ledger-visual{position:relative;min-height:570px;padding:24px;border:1px solid rgba(16,40,61,.13);border-radius:var(--radius);background:linear-gradient(145deg,rgba(16,40,61,.98),rgba(8,26,42,.98));box-shadow:var(--shadow);overflow:hidden;color:#fff}
+.ledger-visual:before{content:"";position:absolute;inset:14px;border:1px solid rgba(197,164,93,.34);border-radius:var(--radius)}
+.ledger-visual:after{content:"";position:absolute;width:420px;height:420px;right:-180px;top:-170px;border:1px solid rgba(255,255,255,.11);border-radius:50%;box-shadow:0 0 0 54px rgba(255,255,255,.035),0 0 0 108px rgba(197,164,93,.025)}
+.ledger-head{position:relative;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:11px 8px 18px;border-bottom:1px solid rgba(255,255,255,.14)}
+.ledger-head small{display:block;color:rgba(255,255,255,.55);font-size:.64rem;letter-spacing:.13em;text-transform:uppercase}.ledger-head strong{display:block;margin-top:4px;font-family:var(--display);font-size:1.55rem;font-weight:500}
+.seal{width:62px;height:62px;display:grid;place-items:center;border:1px solid rgba(197,164,93,.72);border-radius:50%;color:var(--gold-soft);font-family:var(--ceremonial);font-size:.7rem;letter-spacing:.08em}
+.ledger-lines{position:relative;z-index:2;display:grid;gap:16px;margin-top:31px}
+.ledger-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end;padding:0 8px 15px;border-bottom:1px solid rgba(255,255,255,.12)}
+.ledger-row span{color:rgba(255,255,255,.62);font-size:.78rem}.ledger-row strong{font-family:var(--display);font-size:1.28rem;font-weight:500}.ledger-row i{grid-column:1/-1;height:6px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}.ledger-row i:after{content:"";display:block;width:var(--w);height:100%;background:linear-gradient(90deg,var(--gold),#d8c49b)}
+.ledger-quote{position:relative;z-index:2;margin:29px 8px 0;padding:19px;border-left:2px solid var(--gold);background:rgba(255,255,255,.045);font-family:var(--display);font-size:1.22rem;line-height:1.45}.ledger-quote small{display:block;margin-top:9px;color:rgba(255,255,255,.5);font-family:var(--sans);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase}
+.metric-strip{border-bottom:1px solid var(--line);background:var(--paper)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr)}
+.metric{padding:22px;text-align:center;border-left:1px solid var(--line)}.metric:first-child{border-left:0}
+.metric strong{display:block;color:var(--navy-deep);font-family:var(--display);font-size:2rem;font-weight:500}.metric span{display:block;margin-top:3px;color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.section{padding:clamp(76px,9vw,116px) 0}.section.alt{border-block:1px solid var(--line);background:var(--paper-bright)}
+.section-heading{max-width:900px;margin:0 auto 39px;text-align:center}.section-heading h2{margin:12px auto 0;color:var(--navy-deep);font-family:var(--display);font-size:clamp(3rem,6vw,5.8rem);font-weight:500;line-height:.92;letter-spacing:-.025em;text-wrap:balance}.section-intro{max-width:740px;margin:20px auto 0;color:var(--muted)}
+.path-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.path-card{min-height:260px;display:flex;flex-direction:column;align-items:center;padding:24px;border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:var(--radius);background:#fff;text-align:center;box-shadow:var(--shadow-small)}
+.path-mark{width:50px;height:50px;display:grid;place-items:center;border-radius:var(--radius);color:#fff;background:var(--accent);font-family:var(--display);font-size:1.13rem}.path-card h3{margin:19px 0 0;color:var(--navy-deep);font-family:var(--display);font-size:1.75rem;font-weight:600;line-height:1.06}.path-card p{margin:11px 0 0;color:var(--muted);font-size:.87rem}.path-card button{margin-top:auto;padding:17px 0 0;border:0;background:transparent;color:var(--accent);font-size:.69rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.snapshot-shell{display:grid;grid-template-columns:.8fr 1.2fr;gap:13px;padding:13px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(255,255,255,.58);box-shadow:var(--shadow)}
+.snapshot-copy{padding:30px;color:#fff;border-radius:var(--radius);background:linear-gradient(145deg,var(--emerald-deep),var(--navy-deep));display:flex;flex-direction:column;justify-content:center}.snapshot-copy h3{margin:12px 0 0;font-family:var(--display);font-size:clamp(2.5rem,4vw,4.2rem);font-weight:500;line-height:.94}.snapshot-copy p{color:rgba(255,255,255,.72)}.snapshot-copy ul{margin:15px 0 0;padding-left:18px;color:rgba(255,255,255,.76);font-size:.83rem}
+.snapshot-form{padding:25px;border:1px solid var(--line);border-radius:var(--radius);background:#fff}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.field-wrap label{display:block;margin-bottom:5px;color:var(--navy-deep);font-size:.69rem;font-weight:850;letter-spacing:.07em;text-transform:uppercase}.field{width:100%;min-height:48px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:var(--radius);background:#fff;color:var(--ink)}.field:focus{border-color:var(--emerald);box-shadow:0 0 0 3px rgba(36,91,75,.11);outline:0}.snapshot-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.small-button{min-height:42px;padding:9px 13px;border:1px solid var(--line-strong);border-radius:var(--radius);background:#fff;font-size:.73rem;font-weight:850}.small-button.primary{color:#fff;background:var(--emerald-deep);border-color:var(--emerald-deep)}
+.snapshot-result{margin-top:15px;padding:17px;border:1px solid var(--line);border-radius:var(--radius);background:#f8f6ef}.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.result-cell{padding:11px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;text-align:center}.result-cell small{display:block;color:var(--muted);font-size:.63rem;font-weight:800;letter-spacing:.075em;text-transform:uppercase}.result-cell strong{display:block;margin-top:5px;color:var(--navy-deep);font-family:var(--display);font-size:1.5rem}.snapshot-note{margin:11px 0 0;color:var(--muted);font-size:.78rem}
+.directory-shell{padding:18px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(255,255,255,.7);box-shadow:var(--shadow)}
+.directory-tools{display:grid;grid-template-columns:minmax(260px,1fr) 205px 190px auto auto;gap:8px;align-items:center}.search-wrap{position:relative}.search-wrap:before{content:"⌕";position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted)}.search-wrap .field{padding-left:42px}.tool-button{min-height:48px;padding:9px 12px;border:1px solid var(--line-strong);border-radius:var(--radius);background:#fff;color:var(--navy-deep);font-size:.7rem;font-weight:850;line-height:1.3;text-align:center}.tool-button[aria-pressed="true"]{color:#fff;background:var(--copper);border-color:var(--copper)}
+.result-note{margin:11px 4px 0;color:var(--muted);font-size:.82rem;text-align:center}
+.app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.app-card{--accent:var(--emerald);min-height:315px;display:flex;flex-direction:column;padding:19px;border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:var(--radius);background:#fff;box-shadow:var(--shadow-small);transition:.16s}.app-card:hover{transform:translateY(-3px);border-color:var(--accent)}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.app-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:var(--radius);color:#fff;background:var(--accent);font-family:var(--display);font-size:1rem}.favorite{width:37px;height:37px;display:grid;place-items:center;border:1px solid var(--line);border-radius:var(--radius);background:#fff;color:var(--muted);font-size:1rem}.favorite[aria-pressed="true"]{color:#fff;background:var(--copper);border-color:var(--copper)}
+.app-source{margin:16px 0 0;color:var(--accent);font-size:.65rem;font-weight:850;letter-spacing:.085em;text-transform:uppercase}.app-card h3{margin:7px 0 0;color:var(--navy-deep);font-family:var(--display);font-size:1.55rem;font-weight:600;line-height:1.1}.app-card p{margin:10px 0 0;color:var(--muted);font-size:.86rem;line-height:1.56}.app-note{margin-top:10px;padding:8px 9px;border-radius:var(--radius);background:var(--blue-soft);color:#536675;font-size:.71rem}.card-actions{display:grid;grid-template-columns:1fr auto;gap:7px;margin-top:auto;padding-top:17px}.open-link,.copy-button{min-height:43px;display:flex;align-items:center;justify-content:center;border-radius:var(--radius);font-size:.7rem;font-weight:850;letter-spacing:.06em;text-transform:uppercase}.open-link{color:#fff;background:var(--navy-deep);text-decoration:none}.copy-button{padding:0 12px;border:1px solid var(--line);background:#fff;color:var(--navy-deep)}
+.empty{display:none;margin-top:15px;padding:28px;border:1px dashed var(--line-strong);border-radius:var(--radius);color:var(--muted);text-align:center}.empty.show{display:block}
+.repair-grid,.future-grid,.network-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.repair-card,.future-card{min-height:240px;display:flex;flex-direction:column;align-items:center;padding:21px;border:1px dashed var(--line-strong);border-radius:var(--radius);background:rgba(255,255,255,.64);text-align:center}.repair-mark,.future-mark{width:46px;height:46px;display:grid;place-items:center;border-radius:var(--radius);color:#fff;background:var(--copper);font-family:var(--display)}.repair-card h3,.future-card h3{margin:16px 0 0;color:var(--navy-deep);font-family:var(--display);font-size:1.48rem;line-height:1.12}.repair-card p,.future-card p{margin:10px 0 0;color:var(--muted);font-size:.85rem}.status-line{margin-top:auto;padding-top:17px;color:var(--copper);font-size:.67rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.audit-note{max-width:900px;margin:19px auto 0;padding:17px;border:1px solid rgba(183,116,67,.25);border-radius:var(--radius);background:#fbf1e8;color:#73543d;text-align:center;font-size:.81rem}
+.network-grid{grid-template-columns:repeat(4,1fr)}
+.network-card{min-height:205px;display:flex;flex-direction:column;padding:19px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;text-decoration:none;box-shadow:var(--shadow-small)}.network-card:hover{border-color:var(--emerald);transform:translateY(-3px)}.network-mark{width:42px;height:42px;display:grid;place-items:center;border-radius:var(--radius);color:#fff;background:var(--emerald-deep);font-family:var(--display)}.network-card strong{display:block;margin-top:16px;color:var(--navy-deep);font-family:var(--display);font-size:1.35rem}.network-card span:last-child{display:block;margin-top:8px;color:var(--muted);font-size:.81rem}.network-card small{margin-top:auto;padding-top:13px;color:var(--emerald);font-size:.66rem;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
+.disclaimer{max-width:960px;margin:auto;padding:26px;border-block:1px solid var(--line);text-align:center}.disclaimer strong{display:block;color:var(--navy-deep);font-family:var(--display);font-size:2rem;font-weight:600}.disclaimer span{display:block;margin-top:8px;color:var(--muted);font-size:.86rem}
+.site-footer{padding:34px 0;color:#fff;background:var(--navy-deep)}.footer-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}.footer-title{font-family:var(--ceremonial);letter-spacing:.09em;text-transform:uppercase}.footer-meta{color:rgba(255,255,255,.62);font-size:.76rem}
+.drawer-overlay{position:fixed;inset:0;z-index:2200;visibility:hidden;opacity:0;background:rgba(8,26,42,.62);transition:.2s}.drawer-overlay.open{visibility:visible;opacity:1}.drawer{position:absolute;right:0;top:0;width:min(95vw,500px);height:100%;overflow:auto;padding:20px;background:var(--paper-bright);transform:translateX(102%);transition:.22s;box-shadow:-20px 0 60px rgba(0,0,0,.22)}.drawer-overlay.open .drawer{transform:none}.drawer-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--line)}.drawer-title{margin:0;color:var(--navy-deep);font-family:var(--display);font-size:2rem;font-weight:600}.drawer-search{width:100%;min-height:49px;margin:15px 0 10px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:var(--radius)}.drawer-group{margin:17px 0 7px;color:var(--copper);font-family:var(--ceremonial);font-size:.69rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.drawer-list{display:grid;gap:6px}.drawer-link{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:var(--radius);background:#fff;text-decoration:none}.drawer-link:hover{border-color:var(--emerald)}.drawer-link i{width:35px;height:35px;display:grid;place-items:center;border-radius:var(--radius);color:#fff;background:var(--emerald-deep);font-style:normal}.drawer-link strong{display:block;color:var(--navy-deep);font-family:var(--display);font-size:1.02rem}.drawer-link small{display:block;margin-top:2px;color:var(--muted);font-size:.68rem}.drawer-record{opacity:.72;cursor:default}.toast{position:fixed;left:50%;bottom:18px;z-index:2600;max-width:calc(100vw - 28px);transform:translate(-50%,130%);padding:10px 14px;border-radius:999px;color:#fff;background:var(--emerald-deep);box-shadow:var(--shadow);transition:.2s}.toast.show{transform:translate(-50%,0)}
+@media(max-width:1100px){.hero-inner{grid-template-columns:1fr}.ledger-visual{min-height:510px}.path-grid{grid-template-columns:repeat(2,1fr)}.directory-tools{grid-template-columns:1fr 1fr 1fr}.directory-tools .search-wrap{grid-column:1/-1}.app-grid{grid-template-columns:repeat(2,1fr)}.network-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){.header-link{display:none}.snapshot-shell{grid-template-columns:1fr}.repair-grid,.future-grid{grid-template-columns:repeat(2,1fr)}.metrics{grid-template-columns:repeat(2,1fr)}.metric:nth-child(3){border-left:0;border-top:1px solid var(--line)}.metric:nth-child(4){border-top:1px solid var(--line)}}
+@media(max-width:620px){.wrap{width:min(calc(100% - 22px),var(--max))}.hero-inner{min-height:auto;padding:70px 0}.hero-actions .button{width:100%}.ledger-visual{min-height:530px;padding:18px}.path-grid,.app-grid,.repair-grid,.future-grid,.network-grid,.form-grid,.result-grid{grid-template-columns:1fr}.directory-tools{grid-template-columns:1fr}.directory-tools .search-wrap{grid-column:auto}.card-actions{grid-template-columns:1fr}.brand-sub{display:none}.metric{border-left:0;border-top:1px solid var(--line)}.metric:first-child{border-top:0}.metrics{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#directory">Skip to verified finance applications</a>
+<div class="top-rule"></div>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="#top" aria-label="Return to the top of Verve N Veda Finance">
+      <span class="brand-mark" aria-hidden="true"><span>F</span></span>
+      <span class="brand-copy"><span class="brand-name">Verve N Veda Finance</span><span class="brand-sub">The Open Ledger</span></span>
+    </a>
+    <div class="header-actions">
+      <a class="header-link" href="#snapshot">Money Snapshot</a>
+      <a class="header-link" href="#directory">Verified Tools</a>
+      <a class="header-link" href="#planning">Future Ledger</a>
+      <button class="menu-button" id="menuButton" type="button" aria-label="Open complete finance directory" aria-controls="drawerOverlay" aria-expanded="false"><span class="menu-lines"></span></button>
+    </div>
+  </div>
+</header>
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div>
+        <p class="eyebrow">Financial education · practical tools · open access</p>
+        <h1>The Open Ledger<span>Understand · organize · protect · grow</span></h1>
+        <p class="hero-copy">A calm, professional financial gateway for households, young learners, students, educators, founders, and small organizations. Verve N Veda applications remain at the center; every live doorway below was verified inside the public repository network.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#directory">Explore Verified Finance Rooms <span aria-hidden="true">↓</span></a>
+          <a class="button secondary" href="#snapshot">Open the Local Snapshot</a>
+          <button class="button secondary" id="randomHero" type="button">Choose a Useful Starting Point</button>
+        </div>
+        <div class="hero-notes"><span>No custom domains</span><span>No account required here</span><span>Local snapshot only</span><span>Educational, not individualized advice</span></div>
+      </div>
+      <div class="ledger-visual" aria-label="Decorative open ledger illustration">
+        <div class="ledger-head"><div><small>Verve N Veda Finance</small><strong>Stewardship Ledger</strong></div><div class="seal">OPEN<br>LEDGER</div></div>
+        <div class="ledger-lines">
+          <div class="ledger-row"><span>Household clarity</span><strong>Essential</strong><i style="--w:86%"></i></div>
+          <div class="ledger-row"><span>Education and confidence</span><strong>Growing</strong><i style="--w:74%"></i></div>
+          <div class="ledger-row"><span>Protection and verification</span><strong>Reviewed</strong><i style="--w:92%"></i></div>
+          <div class="ledger-row"><span>Enterprise and opportunity</span><strong>Building</strong><i style="--w:63%"></i></div>
+        </div>
+        <div class="ledger-quote">“A useful financial system makes the next honest decision easier.”<small>Verve N Veda · Open Ledger principle</small></div>
+      </div>
+    </div>
+  </section>
+  <div class="metric-strip"><div class="wrap metrics"><div class="metric"><strong id="liveMetric">10</strong><span>Verified live rooms</span></div><div class="metric"><strong>3</strong><span>Public repositories</span></div><div class="metric"><strong>3</strong><span>Repair or planning records</span></div><div class="metric"><strong>0</strong><span>Custom-domain links</span></div></div></div>
+
+  <section class="section" id="pathways">
+    <div class="wrap">
+      <div class="section-heading"><p class="kicker">Choose a financial pathway</p><h2>Begin with the ledger that fits today</h2><p class="section-intro">Each pathway filters the verified application directory. The tools range from youth allowance and household budgeting to credit, taxes, aid, investment education, and deeper research.</p></div>
+      <div class="path-grid">
+        <article class="path-card" style="--accent:#245b4b"><span class="path-mark">H</span><h3>Household & Family Money</h3><p>Allowance, chores, wallets, monthly planning, savings jars, and day-to-day money habits.</p><button type="button" data-path="Household & Family">Open this ledger</button></article>
+        <article class="path-card" style="--accent:#b77443"><span class="path-mark">B</span><h3>Budgeting & Cashflow</h3><p>Build budgets, compare methods, organize bills, plan savings, and understand cash movement.</p><button type="button" data-path="Budgeting & Cashflow">Open this ledger</button></article>
+        <article class="path-card" style="--accent:#6b557b"><span class="path-mark">C</span><h3>Credit, Debt & Taxes</h3><p>Learn how credit works, evaluate debt strategies, prepare for taxes, and recognize common risks.</p><button type="button" data-path="Credit, Debt & Tax">Open this ledger</button></article>
+        <article class="path-card" style="--accent:#315f7b"><span class="path-mark">L</span><h3>Learning, Aid & Long-Term Planning</h3><p>Explore grants, trusted financial resources, investment foundations, and certificate-based study.</p><button type="button" data-path="Learning, Aid & Planning">Open this ledger</button></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="snapshot">
+    <div class="wrap">
+      <div class="section-heading"><p class="kicker">Private browser tool</p><h2>Your monthly money snapshot</h2><p class="section-intro">Enter broad monthly totals to see a simple planning picture. Nothing is transmitted or saved by this page. This is an organizational aid—not financial, tax, legal, or investment advice.</p></div>
+      <div class="snapshot-shell">
+        <div class="snapshot-copy"><p class="kicker" style="color:var(--gold-soft)">Five numbers · one clear page</p><h3>See the shape of the month.</h3><p>The snapshot groups your inputs without judging them or prescribing a financial plan.</p><ul><li>Income compared with planned outflow</li><li>Essential and flexible spending shares</li><li>Goals and debt contribution share</li><li>Unassigned balance, positive or negative</li></ul></div>
+        <form class="snapshot-form" id="snapshotForm">
+          <div class="form-grid">
+            <div class="field-wrap"><label for="income">Monthly take-home income</label><input class="field" id="income" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+            <div class="field-wrap"><label for="essentials">Essential expenses</label><input class="field" id="essentials" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Housing, food, utilities…"></div>
+            <div class="field-wrap"><label for="flexible">Flexible expenses</label><input class="field" id="flexible" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Optional or adjustable…"></div>
+            <div class="field-wrap"><label for="goals">Savings and planned goals</label><input class="field" id="goals" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Savings, sinking funds…"></div>
+            <div class="field-wrap"><label for="debt">Debt payments</label><input class="field" id="debt" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Beyond or including minimums…"></div>
+          </div>
+          <div class="snapshot-actions"><button class="small-button primary" type="submit">Calculate Snapshot</button><button class="small-button" id="snapshotReset" type="button">Clear</button></div>
+          <div class="snapshot-result" id="snapshotResult" aria-live="polite">
+            <div class="result-grid"><div class="result-cell"><small>Planned outflow</small><strong id="outflowResult">$0.00</strong></div><div class="result-cell"><small>Unassigned balance</small><strong id="balanceResult">$0.00</strong></div><div class="result-cell"><small>Goals + debt share</small><strong id="goalRateResult">0.0%</strong></div></div>
+            <p class="snapshot-note" id="snapshotNote">Enter monthly totals and calculate to create a private planning snapshot.</p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="directory">
+    <div class="wrap">
+      <div class="section-heading"><p class="kicker">Verve N Veda originals and curated halls</p><h2>Verified financial applications</h2><p class="section-intro">Every active button below resolves to a current file inside a Verve N Veda GitHub Pages repository. Some learning rooms contain clearly identified official public resources or educational media within their own pages.</p></div>
+      <div class="directory-shell">
+        <div class="directory-tools">
+          <div class="search-wrap"><input class="field" id="search" type="search" placeholder="Search budget, tax, credit, aid, family, investing…" aria-label="Search verified finance applications"></div>
+          <select class="field" id="category" aria-label="Filter by financial pathway"></select>
+          <select class="field" id="source" aria-label="Filter by repository source"></select>
+          <button class="tool-button" id="favoritesOnly" type="button" aria-pressed="false">Saved Shelf · <span id="favoriteCount">0</span></button>
+          <button class="tool-button" id="randomButton" type="button">Open a Verified Tool</button>
+        </div>
+        <p class="result-note" id="resultNote" aria-live="polite"></p>
+        <div class="app-grid" id="appGrid"></div>
+        <div class="empty" id="empty">No verified finance applications match the current filters.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="repairs">
+    <div class="wrap">
+      <div class="section-heading"><p class="kicker">Fail-closed review</p><h2>Repair and planning ledger</h2><p class="section-intro">These records were found during the repository audit, but they are intentionally non-clickable until they become complete, dependable public applications.</p></div>
+      <div class="repair-grid" id="repairGrid"></div>
+      <div class="audit-note"><strong>Admin/founder repository result:</strong> the older founder architecture describes financial stewardship and future finance governance, but no complete public finance application was found there. It is preserved as a planning record, not exposed as a visitor link.</div>
+    </div>
+  </section>
+
+  <section class="section" id="planning">
+    <div class="wrap">
+      <div class="section-heading"><p class="kicker">Future growth</p><h2>Reserved rooms for the financial campus</h2><p class="section-intro">These non-clickable houses establish a thoughtful expansion plan without pretending unfinished tools are already available.</p></div>
+      <div class="future-grid" id="futureGrid"></div>
+    </div>
+  </section>
+
+  <section class="section alt" id="network">
+    <div class="wrap">
+      <div class="section-heading"><p class="kicker">Verified public homes</p><h2>Continue through the Verve N Veda network</h2><p class="section-intro">Home-page buttons use only verified GitHub Pages routes. No campaign, private founder, source-repository, or unverified custom-domain doorway is included.</p></div>
+      <div class="network-grid" id="networkGrid"></div>
+    </div>
+  </section>
+
+  <div class="disclaimer"><strong>Educational use and careful verification</strong><span>Financial rules, tax requirements, aid programs, and investment information can change. Use these tools for learning and organization, then verify consequential decisions with current official sources or an appropriately qualified professional.</span></div>
+</main>
+<footer class="site-footer"><div class="wrap footer-inner"><div class="footer-title">Verve N Veda Finance · The Open Ledger</div><div class="footer-meta">Verified repository navigation · local browser tools · © <span id="year"></span></div></div></footer>
+
+<div class="drawer-overlay" id="drawerOverlay" aria-hidden="true">
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div class="drawer-head"><h2 class="drawer-title" id="drawerTitle">Finance Directory</h2><button class="icon-button" id="closeDrawer" type="button" aria-label="Close directory">✕</button></div>
+    <input class="drawer-search" id="drawerSearch" type="search" placeholder="Search applications, sources, and future rooms…" aria-label="Search complete finance directory">
+    <div id="drawerContent"></div>
+  </aside>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+const APPROVED_HOST="vervenveda.github.io";
+const APPROVED_REPOSITORIES=new Set(["finance.github.io","Khaemenes_Academy.github.io","Arshif.github.io","vervenveda.github.io"]);
+const APPS=[
+  {id:"chore-budget",title:"Chore & Budget Hub",url:"https://vervenveda.github.io/finance.github.io/apps/chore_budget_hub_index.html",source:"Finance",category:"Household & Family",icon:"CB",accent:"#245b4b",description:"A parent-managed family finance room with chores, allowances, multi-wallet jars, pay stubs, rewards, local records, and export/import tools.",note:"Original Finance repository application · local browser storage."},
+  {id:"budget-calculator",title:"Budget Calculator",url:"https://vervenveda.github.io/Khaemenes_Academy.github.io/higher_learming/apps/financial_budget_calculator_index.html",source:"Khaemenes Academy",category:"Budgeting & Cashflow",icon:"∑",accent:"#b77443",description:"A focused monthly calculator for income, core expenses, savings, debt payments, total outflow, and remaining balance.",note:"Simple educational calculator · no outside dependency."},
+  {id:"budget-workshop",title:"6-Week Budgeting Workshop",url:"https://vervenveda.github.io/Khaemenes_Academy.github.io/higher_learming/apps/financial_budget_index.html",source:"Khaemenes Academy",category:"Budgeting & Cashflow",icon:"6W",accent:"#b77443",description:"A comprehensive learning sequence with budget methods, category building, debt planning, savings goals, sinking funds, subscription review, progress, and certificate features.",note:"Original Academy workshop · saves progress locally."},
+  {id:"cashflow-workshop",title:"Budgeting & Cashflow Workshop",url:"https://vervenveda.github.io/Khaemenes_Academy.github.io/higher_learming/apps/financial%20_academy_index.html",source:"Khaemenes Academy",category:"Budgeting & Cashflow",icon:"CF",accent:"#b77443",description:"A six-week guided course on money snapshots, fixed and variable costs, budget frameworks, cashflow calendars, cost reduction, and living budgets.",note:"Current filename contains a space; the verified URL preserves it safely."},
+  {id:"credit-debt",title:"Credit & Debt Workshop",url:"https://vervenveda.github.io/Khaemenes_Academy.github.io/higher_learming/apps/financial_debit_credit_index.html",source:"Khaemenes Academy",category:"Credit, Debt & Tax",icon:"CD",accent:"#6b557b",description:"Six weeks of credit reports, debt types, interest and APR, payoff strategies, credit protection, and long-term debt prevention.",note:"Educational workshop · progress and notes remain in the browser."},
+  {id:"tax-workshop",title:"Personal Tax Workshop",url:"https://vervenveda.github.io/Khaemenes_Academy.github.io/higher_learming/apps/financial_tax_index.html",source:"Khaemenes Academy",category:"Credit, Debt & Tax",icon:"TX",accent:"#6b557b",description:"A two-week U.S. tax-learning room with lessons, checklists, quizzes, private notes, progress export, and safety guidance.",note:"Contains links to current official and third-party tax resources inside the workshop; verify them before use."},
+  {id:"investment-foundations",title:"Investment Foundations Workshop",url:"https://vervenveda.github.io/Khaemenes_Academy.github.io/higher_learming/apps/financial_workshop_index.html",source:"Khaemenes Academy",category:"Learning, Aid & Planning",icon:"IF",accent:"#315f7b",description:"A six-week introduction to goals, risk and reward, stocks and ETFs, compounding, investor psychology, and long-term strategy design.",note:"Educational only · includes outside video links inside the workshop."},
+  {id:"grant-aid",title:"Grant & Aid Matcher",url:"https://vervenveda.github.io/Khaemenes_Academy.github.io/higher_learming/apps/Financial_aid_index.html",source:"Khaemenes Academy",category:"Learning, Aid & Planning",icon:"GA",accent:"#315f7b",description:"A private local survey that organizes education aid, scholarships, grants, community support, and scam-safety guidance around a learner’s broad needs.",note:"Links inside the matcher may lead to official or established aid providers."},
+  {id:"resource-library",title:"Financial Master Resource Library",url:"https://vervenveda.github.io/Khaemenes_Academy.github.io/higher_learming/apps/financial_library_index.html",source:"Khaemenes Academy",category:"Learning, Aid & Planning",icon:"RL",accent:"#315f7b",description:"A searchable, locally favorited directory for budgeting, banking safety, credit, investing, retirement, Social Security, calculators, educators, and fraud protection.",note:"Verve N Veda-curated gateway to official public financial resources."},
+  {id:"arshif-financial-hall",title:"ARSHIF Financial Hall",url:"https://vervenveda.github.io/Arshif.github.io/apps/financial_hall/",source:"ARSHIF Archives",category:"Learning, Aid & Planning",icon:"AF",accent:"#7d674e",description:"A local-first financial education and certificate portal that places financial learning inside the wider ARSHIF archive and research system.",note:"Verified ARSHIF hall · educational and certificate-focused."}
+];
+const REPAIRS=[
+  {title:"Small Business Budget Engine",mark:"SB",description:"The file exists, but its chart is rendered into a div while the script expects a canvas, and PDF export calls a library that is not loaded. It should be repaired before public launch.",status:"Runtime repair required"},
+  {title:"Grant Proposal Budget Template",mark:"GP",description:"A useful grant and budget narrative was found in ProReSources, but it is an HTML fragment rather than a complete standalone application.",status:"Needs a complete page shell"},
+  {title:"Founder Finance Governance",mark:"FG",description:"Older founder documentation names financial stewardship and a future finance platform, but no complete deployable public finance app was found in that repository.",status:"Planning record only"}
+];
+const FUTURE=[
+  {title:"Invoice & Estimate Studio",mark:"IN",description:"Professional estimates, invoices, payment records, printable statements, and client-ready exports."},
+  {title:"Expense & Receipt Ledger",mark:"ER",description:"Private expense categories, receipt notes, recurring costs, monthly summaries, and exportable records."},
+  {title:"Small Business Cash Runway",mark:"CR",description:"Revenue, fixed costs, variable costs, cash reserves, scenario planning, and runway visibility."},
+  {title:"Nonprofit Budget House",mark:"NP",description:"Program budgets, restricted funds, grant allocations, board summaries, and stewardship reporting."},
+  {title:"Tax Document Organizer",mark:"TD",description:"A local-only annual checklist for income forms, deductions, credits, notices, deadlines, and records."},
+  {title:"Retirement Learning Planner",mark:"RP",description:"Goal-setting, timeline education, contribution scenarios, questions to verify, and official-resource pathways."}
+];
+const NETWORK=[
+  {title:"Verve N Veda Matrix",url:"https://vervenveda.github.io/",mark:"V",description:"The reviewed public gateway to the complete Verve N Veda network."},
+  {title:"Finance Home",url:"https://vervenveda.github.io/finance.github.io/",mark:"F",description:"The public home for this Open Ledger after the new index is deployed."},
+  {title:"Khaemenes Academy",url:"https://vervenveda.github.io/Khaemenes_Academy.github.io/",mark:"K",description:"Financial literacy courses within the wider educational campus."},
+  {title:"ARSHIF Archives",url:"https://vervenveda.github.io/Arshif.github.io/",mark:"A",description:"Research, history, culture, public learning, and the ARSHIF Financial Hall."}
+];
+const CATEGORIES=["All","Household & Family","Budgeting & Cashflow","Credit, Debt & Tax","Learning, Aid & Planning"];
+const SOURCES=["All","Finance","Khaemenes Academy","ARSHIF Archives"];
+const FAVORITES_KEY="vnv-finance-open-ledger-favorites-v1";
+let favorites=new Set();
+try{favorites=new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY)||"[]"));}catch{favorites=new Set();}
+let favoritesOnly=false;
+const $=id=>document.getElementById(id);
+function escapeHtml(value){return String(value).replace(/[&<>'"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[ch]));}
+function safeVnvUrl(raw){
+  try{
+    const u=new URL(raw);
+    if(u.protocol!=="https:"||u.hostname!==APPROVED_HOST)return null;
+    const first=u.pathname.split("/").filter(Boolean)[0]||"vervenveda.github.io";
+    if(!APPROVED_REPOSITORIES.has(first))return null;
+    return u.href;
+  }catch{return null;}
+}
+function saveFavorites(){try{localStorage.setItem(FAVORITES_KEY,JSON.stringify([...favorites]));}catch{}}
+function toast(message){$("toast").textContent=message;$("toast").classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>$("toast").classList.remove("show"),1900);}
+function money(value){return new Intl.NumberFormat(undefined,{style:"currency",currency:"USD",maximumFractionDigits:2}).format(value||0);}
+function pct(value){return `${Number.isFinite(value)?value.toFixed(1):"0.0"}%`;}
+function buildSelects(){
+  $("category").innerHTML=CATEGORIES.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v==="All"?"All financial pathways":v)}</option>`).join("");
+  $("source").innerHTML=SOURCES.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v==="All"?"All repository sources":v)}</option>`).join("");
+}
+function filteredApps(){
+  const q=$("search").value.trim().toLowerCase(),cat=$("category").value,source=$("source").value;
+  return APPS.filter(a=>(cat==="All"||a.category===cat)&&(source==="All"||a.source===source)&&(!favoritesOnly||favorites.has(a.id))&&(!q||`${a.title} ${a.source} ${a.category} ${a.description} ${a.note}`.toLowerCase().includes(q)));
+}
+function renderApps(){
+  const items=filteredApps();
+  $("appGrid").innerHTML=items.map(a=>{
+    const url=safeVnvUrl(a.url);
+    if(!url)return `<article class="app-card" style="--accent:${a.accent}"><div class="card-top"><span class="app-icon">${escapeHtml(a.icon)}</span></div><p class="app-source">Blocked route</p><h3>${escapeHtml(a.title)}</h3><p>${escapeHtml(a.description)}</p><div class="app-note">The destination did not pass the Verve N Veda host policy.</div></article>`;
+    return `<article class="app-card" style="--accent:${a.accent}" data-id="${escapeHtml(a.id)}"><div class="card-top"><span class="app-icon" aria-hidden="true">${escapeHtml(a.icon)}</span><button class="favorite" type="button" data-favorite="${escapeHtml(a.id)}" aria-label="${favorites.has(a.id)?"Remove":"Save"} ${escapeHtml(a.title)}" aria-pressed="${favorites.has(a.id)}">${favorites.has(a.id)?"♥":"♡"}</button></div><p class="app-source">Verified · ${escapeHtml(a.source)} · ${escapeHtml(a.category)}</p><h3>${escapeHtml(a.title)}</h3><p>${escapeHtml(a.description)}</p><div class="app-note">${escapeHtml(a.note)}</div><div class="card-actions"><a class="open-link" href="${url}" target="_blank" rel="noopener noreferrer">Open Application ↗</a><button class="copy-button" type="button" data-copy="${escapeHtml(a.id)}">Copy</button></div></article>`;
+  }).join("");
+  $("resultNote").textContent=`${items.length} of ${APPS.length} verified finance rooms shown${favoritesOnly?" · saved shelf only":""}.`;
+  $("empty").classList.toggle("show",items.length===0);
+  $("favoriteCount").textContent=favorites.size;
+  $("favoritesOnly").setAttribute("aria-pressed",String(favoritesOnly));
+  wireCards();
+}
+function wireCards(){
+  document.querySelectorAll("[data-favorite]").forEach(btn=>btn.addEventListener("click",()=>{const id=btn.dataset.favorite;favorites.has(id)?favorites.delete(id):favorites.add(id);saveFavorites();renderApps();buildDrawer($("drawerSearch").value);}));
+  document.querySelectorAll("[data-copy]").forEach(btn=>btn.addEventListener("click",async()=>{const app=APPS.find(a=>a.id===btn.dataset.copy);const url=app&&safeVnvUrl(app.url);if(!url)return;try{await navigator.clipboard.writeText(url);toast("Verified application link copied.");}catch{prompt("Copy this verified link:",url);}}));
+}
+function chooseRandom(category){
+  let pool=APPS.filter(a=>!category||category==="All"||a.category===category).filter(a=>safeVnvUrl(a.url));
+  if(favoritesOnly)pool=pool.filter(a=>favorites.has(a.id));
+  if(!pool.length)return toast("No verified tools are available in that selection.");
+  const app=pool[Math.floor(Math.random()*pool.length)];window.open(safeVnvUrl(app.url),"_blank","noopener");
+}
+function renderRepairs(){$("repairGrid").innerHTML=REPAIRS.map(r=>`<article class="repair-card"><span class="repair-mark">${escapeHtml(r.mark)}</span><h3>${escapeHtml(r.title)}</h3><p>${escapeHtml(r.description)}</p><span class="status-line">${escapeHtml(r.status)}</span></article>`).join("");}
+function renderFuture(){$("futureGrid").innerHTML=FUTURE.map(r=>`<article class="future-card"><span class="future-mark">${escapeHtml(r.mark)}</span><h3>${escapeHtml(r.title)}</h3><p>${escapeHtml(r.description)}</p><span class="status-line">Reserved future room</span></article>`).join("");}
+function renderNetwork(){$("networkGrid").innerHTML=NETWORK.map(n=>{const url=safeVnvUrl(n.url);return url?`<a class="network-card" href="${url}" target="_blank" rel="noopener noreferrer"><span class="network-mark">${escapeHtml(n.mark)}</span><strong>${escapeHtml(n.title)}</strong><span>${escapeHtml(n.description)}</span><small>Verified GitHub Pages home ↗</small></a>`:`<article class="network-card"><span class="network-mark">${escapeHtml(n.mark)}</span><strong>${escapeHtml(n.title)}</strong><span>${escapeHtml(n.description)}</span><small>Route unavailable</small></article>`;}).join("");}
+function buildDrawer(query=""){
+  const q=query.trim().toLowerCase();
+  const live=APPS.filter(a=>!q||`${a.title} ${a.source} ${a.category} ${a.description}`.toLowerCase().includes(q));
+  const repairs=REPAIRS.filter(a=>!q||`${a.title} ${a.description} ${a.status}`.toLowerCase().includes(q));
+  const future=FUTURE.filter(a=>!q||`${a.title} ${a.description}`.toLowerCase().includes(q));
+  const liveHtml=live.length?`<p class="drawer-group">Verified finance rooms · ${live.length}</p><div class="drawer-list">${live.map(a=>`<a class="drawer-link" href="${safeVnvUrl(a.url)}" target="_blank" rel="noopener noreferrer"><i>${escapeHtml(a.icon)}</i><span><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.source)} · ${escapeHtml(a.category)}</small></span><span>↗</span></a>`).join("")}</div>`:"";
+  const repairHtml=repairs.length?`<p class="drawer-group">Repair ledger · ${repairs.length}</p><div class="drawer-list">${repairs.map(a=>`<div class="drawer-link drawer-record"><i>${escapeHtml(a.mark)}</i><span><strong>${escapeHtml(a.title)}</strong><small>${escapeHtml(a.status)}</small></span><span>—</span></div>`).join("")}</div>`:"";
+  const futureHtml=future.length?`<p class="drawer-group">Reserved future rooms · ${future.length}</p><div class="drawer-list">${future.map(a=>`<div class="drawer-link drawer-record"><i>${escapeHtml(a.mark)}</i><span><strong>${escapeHtml(a.title)}</strong><small>Reserved future room</small></span><span>—</span></div>`).join("")}</div>`:"";
+  $("drawerContent").innerHTML=liveHtml+repairHtml+futureHtml||`<p class="empty show">No finance records match that search.</p>`;
+}
+function openDrawer(){$("drawerOverlay").classList.add("open");$("drawerOverlay").setAttribute("aria-hidden","false");$("menuButton").setAttribute("aria-expanded","true");document.body.classList.add("drawer-open");setTimeout(()=>$("drawerSearch").focus(),70);}
+function closeDrawer(){$("drawerOverlay").classList.remove("open");$("drawerOverlay").setAttribute("aria-hidden","true");$("menuButton").setAttribute("aria-expanded","false");document.body.classList.remove("drawer-open");}
+function calculateSnapshot(event){
+  event.preventDefault();
+  const income=Math.max(0,Number($("income").value)||0),essentials=Math.max(0,Number($("essentials").value)||0),flexible=Math.max(0,Number($("flexible").value)||0),goals=Math.max(0,Number($("goals").value)||0),debt=Math.max(0,Number($("debt").value)||0);
+  const outflow=essentials+flexible+goals+debt,balance=income-outflow,goalRate=income>0?((goals+debt)/income)*100:0,essentialRate=income>0?(essentials/income)*100:0,flexRate=income>0?(flexible/income)*100:0;
+  $("outflowResult").textContent=money(outflow);$("balanceResult").textContent=money(balance);$("goalRateResult").textContent=pct(goalRate);
+  $("balanceResult").style.color=balance<0?"#9b493d":"#153c32";
+  $("snapshotNote").textContent=income>0?`Essentials represent ${pct(essentialRate)} of entered income; flexible spending represents ${pct(flexRate)}. The unassigned balance is the difference between income and all entered outflows.`:"Enter a monthly income greater than zero to calculate percentage shares.";
+}
+function resetSnapshot(){$("snapshotForm").reset();$("outflowResult").textContent="$0.00";$("balanceResult").textContent="$0.00";$("goalRateResult").textContent="0.0%";$("snapshotNote").textContent="Enter monthly totals and calculate to create a private planning snapshot.";}
+function auditFinanceLanding(){
+  const duplicate=(arr,key)=>{const seen=new Set(),dupes=new Set();arr.forEach(x=>seen.has(x[key])?dupes.add(x[key]):seen.add(x[key]));return [...dupes];};
+  const sourceUrls=[...APPS.map(a=>a.url),...NETWORK.map(n=>n.url)];
+  const report={
+    verifiedApplications:APPS.length,
+    repositorySources:new Set(APPS.map(a=>a.source)).size,
+    repairRecords:REPAIRS.length,
+    futureRooms:FUTURE.length,
+    duplicateIds:duplicate(APPS,"id"),
+    duplicateUrls:duplicate(APPS,"url"),
+    blockedUrls:sourceUrls.filter(u=>!safeVnvUrl(u)),
+    customDomains:sourceUrls.filter(u=>{try{return new URL(u).hostname!==APPROVED_HOST;}catch{return true;}}),
+    directRepositoryLinks:sourceUrls.filter(u=>u.includes("github.com/"))
+  };
+  report.passed=!report.duplicateIds.length&&!report.duplicateUrls.length&&!report.blockedUrls.length&&!report.customDomains.length&&!report.directRepositoryLinks.length;
+  console.table(report);return report;
+}
+window.auditFinanceLanding=auditFinanceLanding;
+buildSelects();renderApps();renderRepairs();renderFuture();renderNetwork();buildDrawer();$("year").textContent=new Date().getFullYear();$("liveMetric").textContent=APPS.length;
+$("search").addEventListener("input",renderApps);$("category").addEventListener("change",renderApps);$("source").addEventListener("change",renderApps);
+$("favoritesOnly").addEventListener("click",()=>{favoritesOnly=!favoritesOnly;renderApps();});$("randomButton").addEventListener("click",()=>chooseRandom($("category").value));$("randomHero").addEventListener("click",()=>chooseRandom());
+document.querySelectorAll("[data-path]").forEach(btn=>btn.addEventListener("click",()=>{$("category").value=btn.dataset.path;favoritesOnly=false;renderApps();$("directory").scrollIntoView({behavior:"smooth"});}));
+$("snapshotForm").addEventListener("submit",calculateSnapshot);$("snapshotReset").addEventListener("click",resetSnapshot);
+$("menuButton").addEventListener("click",openDrawer);$("closeDrawer").addEventListener("click",closeDrawer);$("drawerOverlay").addEventListener("click",e=>{if(e.target===$("drawerOverlay"))closeDrawer();});$("drawerSearch").addEventListener("input",e=>buildDrawer(e.target.value));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer();if(e.key==="/"&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){e.preventDefault();$("search").focus();}});
+auditFinanceLanding();
+</script>
+</body>
+</html>
