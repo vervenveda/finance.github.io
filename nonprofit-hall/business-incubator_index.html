@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Verve N Veda Entrepreneur Incubator</title>
+<style>
+  :root{
+    --navy:#061a3a;
+    --navy2:#0d2d5f;
+    --red:#8c1f2d;
+    --red2:#b62734;
+    --cream:#fff8ec;
+    --paper:#fffdf8;
+    --gold:#d7a948;
+    --ink:#162033;
+    --muted:#667085;
+    --line:rgba(6,26,58,.16);
+    --soft:#f4f7fb;
+    --good:#1f7a4d;
+    --warn:#9a5b00;
+    --bad:#a53131;
+    --shadow:0 18px 50px rgba(6,26,58,.14);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at top left, rgba(183,39,52,.14), transparent 32rem),
+      radial-gradient(circle at top right, rgba(13,45,95,.20), transparent 30rem),
+      linear-gradient(135deg, #fff8ec 0%, #f7f9ff 48%, #fff3f0 100%);
+    min-height:100vh;
+  }
+  a{color:inherit}
+  button, input, select, textarea{font:inherit}
+  .wrap{width:min(1180px, 100%); margin:0 auto; padding:18px}
+  .shell{
+    background:rgba(255,255,255,.72);
+    border:1px solid rgba(255,255,255,.7);
+    box-shadow:var(--shadow);
+    border-radius:30px;
+    overflow:hidden;
+    backdrop-filter: blur(10px);
+  }
+  header{
+    color:#fff;
+    padding:34px 28px 26px;
+    background:
+      linear-gradient(135deg, rgba(6,26,58,.98), rgba(13,45,95,.96) 52%, rgba(140,31,45,.96)),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 18px);
+    position:relative;
+  }
+  header:after{
+    content:"";
+    position:absolute;
+    inset:auto 0 0;
+    height:7px;
+    background:linear-gradient(90deg, var(--red), #fff, var(--gold), #fff, var(--navy2));
+    opacity:.88;
+  }
+  .brandline{display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .seal{
+    width:54px; height:54px; border-radius:50%; flex:0 0 auto;
+    display:grid; place-items:center;
+    border:2px solid rgba(255,255,255,.75);
+    background:radial-gradient(circle, rgba(255,255,255,.22), rgba(255,255,255,.03));
+    box-shadow:0 8px 20px rgba(0,0,0,.25);
+    font-size:27px;
+  }
+  .brand{display:flex; gap:13px; align-items:center}
+  h1{font-size:clamp(2rem, 5vw, 4.2rem); line-height:.96; letter-spacing:-.06em; margin:0}
+  .subtitle{max-width:830px; margin:18px 0 0; font-size:1.03rem; color:rgba(255,255,255,.9); line-height:1.65}
+  .badgeRow{display:flex; gap:10px; flex-wrap:wrap; margin-top:18px}
+  .badge{
+    border:1px solid rgba(255,255,255,.24);
+    background:rgba(255,255,255,.09);
+    color:#fff;
+    border-radius:999px;
+    padding:8px 11px;
+    font-size:.82rem;
+    font-weight:750;
+  }
+  .topActions{display:flex; gap:9px; flex-wrap:wrap; justify-content:flex-end}
+  .btn{
+    border:0; cursor:pointer; border-radius:999px;
+    padding:11px 15px; font-weight:850;
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    text-decoration:none; transition:.18s transform ease, .18s box-shadow ease, .18s background ease;
+    min-height:42px;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn.primary{background:linear-gradient(135deg, var(--red2), var(--red)); color:#fff; box-shadow:0 10px 23px rgba(140,31,45,.25)}
+  .btn.navy{background:linear-gradient(135deg, var(--navy2), var(--navy)); color:#fff; box-shadow:0 10px 23px rgba(6,26,58,.18)}
+  .btn.light{background:rgba(255,255,255,.92); color:var(--navy)}
+  .btn.ghost{background:#fff; color:var(--navy); border:1px solid var(--line)}
+  .btn.gold{background:linear-gradient(135deg, #f6d98b, var(--gold)); color:#281b04}
+  .btn.small{padding:8px 11px; min-height:34px; font-size:.82rem}
+  main{padding:20px; display:grid; gap:18px}
+  .grid{display:grid; grid-template-columns: 1.06fr .94fr; gap:18px; align-items:start}
+  .panel{
+    background:rgba(255,255,255,.93);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:0 10px 30px rgba(6,26,58,.07);
+    overflow:hidden;
+  }
+  .panelHead{padding:18px 18px 12px; border-bottom:1px solid var(--line); background:linear-gradient(180deg,#fff,rgba(244,247,251,.75))}
+  .panelHead h2{margin:0; font-size:1.1rem; letter-spacing:-.02em; color:var(--navy)}
+  .panelHead p{margin:8px 0 0; color:var(--muted); font-size:.92rem; line-height:1.5}
+  .panelBody{padding:18px}
+  label{font-weight:850; color:var(--navy); font-size:.86rem; display:block; margin:0 0 7px}
+  input, select, textarea{
+    width:100%; border:1px solid var(--line); border-radius:16px; padding:12px 13px;
+    background:#fff; color:var(--ink); outline:none; min-height:46px;
+  }
+  textarea{min-height:126px; resize:vertical; line-height:1.48}
+  input:focus, select:focus, textarea:focus{border-color:rgba(13,45,95,.55); box-shadow:0 0 0 4px rgba(13,45,95,.08)}
+  .formGrid{display:grid; grid-template-columns:1fr 1fr; gap:13px}
+  .wide{grid-column:1/-1}
+  .checkGrid{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px}
+  .check{
+    display:flex; align-items:flex-start; gap:9px; padding:10px; border-radius:15px; border:1px solid var(--line); background:var(--paper);
+    cursor:pointer; min-height:44px;
+  }
+  .check input{width:18px; min-height:18px; margin:2px 0 0; accent-color:var(--red2)}
+  .check span{font-size:.85rem; font-weight:780; line-height:1.3}
+  .notice{
+    border:1px solid rgba(215,169,72,.45);
+    background:linear-gradient(135deg, rgba(255,248,236,.98), rgba(255,255,255,.95));
+    border-radius:18px; padding:13px; line-height:1.5; color:#392a09; font-size:.9rem;
+  }
+  .resultHero{
+    background:linear-gradient(135deg, rgba(6,26,58,.96), rgba(13,45,95,.93));
+    color:#fff; border-radius:22px; padding:18px; margin-bottom:14px;
+  }
+  .resultHero h3{font-size:1.3rem; margin:0 0 8px; letter-spacing:-.03em}
+  .resultHero p{margin:0; color:rgba(255,255,255,.88); line-height:1.5}
+  .metrics{display:grid; grid-template-columns:repeat(3, 1fr); gap:9px; margin-top:14px}
+  .metric{border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08); border-radius:18px; padding:12px; text-align:center}
+  .metric b{font-size:1.25rem; display:block}
+  .metric span{font-size:.74rem; color:rgba(255,255,255,.8)}
+  .tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:13px}
+  .tab{background:#fff; border:1px solid var(--line); border-radius:999px; padding:9px 12px; cursor:pointer; font-weight:850; color:var(--navy)}
+  .tab.active{background:var(--navy); color:#fff}
+  .resourceList{display:grid; gap:11px}
+  .resource{
+    border:1px solid var(--line); border-radius:20px; padding:14px; background:linear-gradient(180deg,#fff,#fffdf8);
+    display:grid; gap:9px;
+  }
+  .resourceTop{display:flex; gap:10px; justify-content:space-between; align-items:flex-start}
+  .resource h3{margin:0; font-size:1rem; color:var(--navy); letter-spacing:-.02em}
+  .resource p{margin:0; color:var(--muted); line-height:1.45; font-size:.9rem}
+  .chips{display:flex; flex-wrap:wrap; gap:6px}
+  .chip{font-size:.72rem; font-weight:850; color:var(--navy); background:#eef3ff; border:1px solid rgba(13,45,95,.12); border-radius:999px; padding:5px 8px}
+  .confidence{min-width:86px; text-align:right; color:var(--navy); font-weight:900; font-size:.82rem}
+  .bar{height:8px; border-radius:999px; background:#edf1f7; overflow:hidden}
+  .bar span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--red2), var(--gold), var(--navy2)); border-radius:999px}
+  .why{font-size:.82rem; line-height:1.45; background:#f7f9fc; border:1px dashed rgba(6,26,58,.18); border-radius:14px; padding:9px; color:#334155}
+  .empty{padding:20px; text-align:center; border:1px dashed var(--line); border-radius:18px; background:#fff; color:var(--muted); line-height:1.5}
+  .actionPlan{display:grid; gap:9px; counter-reset:step}
+  .step{display:flex; gap:10px; align-items:flex-start; border:1px solid var(--line); background:#fff; border-radius:17px; padding:12px}
+  .step:before{counter-increment:step; content:counter(step); width:28px; height:28px; border-radius:50%; background:var(--navy); color:#fff; display:grid; place-items:center; flex:0 0 auto; font-weight:900; font-size:.84rem}
+  .step b{color:var(--navy)}
+  .step div{line-height:1.45; font-size:.9rem}
+  .toolbar{display:flex; gap:9px; flex-wrap:wrap; align-items:center; justify-content:space-between}
+  .searchRow{display:grid; grid-template-columns:1fr 210px; gap:10px; width:100%}
+  .miniStats{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}
+  .mini{background:var(--paper); border:1px solid var(--line); border-radius:18px; padding:13px; text-align:center}
+  .mini b{display:block; color:var(--navy); font-size:1.28rem}.mini span{font-size:.74rem; color:var(--muted); font-weight:800}
+  .modalOverlay{position:fixed; inset:0; background:rgba(6,26,58,.66); display:none; align-items:center; justify-content:center; padding:16px; z-index:50}
+  .modalOverlay.show{display:flex}
+  .modal{width:min(760px,100%); max-height:88vh; overflow:auto; background:#fff; border-radius:24px; box-shadow:0 24px 80px rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.3)}
+  .modalHead{padding:18px; background:linear-gradient(135deg,var(--navy),var(--red)); color:#fff; display:flex; justify-content:space-between; gap:12px; align-items:flex-start}
+  .modalHead h2{margin:0; font-size:1.2rem}.modalHead p{margin:6px 0 0; color:rgba(255,255,255,.85); line-height:1.45}
+  .modalBody{padding:18px; line-height:1.55}.modalBody h3{color:var(--navy)}
+  .close{background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.24); color:#fff; border-radius:999px; width:38px; height:38px; cursor:pointer; font-weight:900}
+  footer{padding:20px; color:var(--muted); text-align:center; font-size:.84rem; line-height:1.55}
+  .printOnly{display:none}
+  @media (max-width:900px){
+    .grid{grid-template-columns:1fr}
+    .searchRow{grid-template-columns:1fr}
+  }
+  @media (max-width:680px){
+    .wrap{padding:0}.shell{border-radius:0; min-height:100vh}.brandline{justify-content:center; text-align:center}.brand{justify-content:center; flex-direction:column}.topActions{justify-content:center; width:100%}
+    header{padding:28px 16px 22px; text-align:center}.subtitle{margin-inline:auto}.badgeRow{justify-content:center}
+    main{padding:12px}.panelHead,.panelBody{padding:14px}.formGrid{grid-template-columns:1fr}.checkGrid{grid-template-columns:1fr}.metrics{grid-template-columns:1fr}.miniStats{grid-template-columns:repeat(2,1fr)}
+    .btn{width:100%; border-radius:16px}.tabs .tab{flex:1 1 100%; text-align:center}.resourceTop{display:block}.confidence{text-align:left; margin-top:8px}.resource .btn{width:100%}
+  }
+  @media print{
+    body{background:#fff}.wrap{width:100%; padding:0}.shell{box-shadow:none; border:0}.topActions,.tabs,.toolbar,.btn,.modalOverlay{display:none!important}.panel{break-inside:avoid}.grid{grid-template-columns:1fr}.printOnly{display:block}header{color:#000;background:#fff;border-bottom:2px solid #000}header:after{display:none}.subtitle,.badge{color:#000}.badge{border-color:#000}.seal{border-color:#000}.resultHero{color:#000;background:#fff;border:1px solid #000}.metric{border:1px solid #000}.metric span{color:#000}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="shell">
+    <header>
+      <div class="brandline">
+        <div class="brand">
+          <div class="seal" aria-hidden="true">✦</div>
+          <div>
+            <h1>Verve N Veda<br>Entrepreneur Incubator</h1>
+            <p class="subtitle">A sovereign, sandboxed founder guidance tool that turns a business idea, stage, preferences, and constraints into a practical resource pathway. No login. No tracking. No external code. Your planning data stays in this browser unless you export it.</p>
+          </div>
+        </div>
+        <div class="topActions" aria-label="Quick actions">
+          <button class="btn light" onclick="openModal('guideModal')">How it Works</button>
+          <button class="btn gold" onclick="window.print()">Print / Save PDF</button>
+        </div>
+      </div>
+      <div class="badgeRow" aria-label="App features">
+        <span class="badge">Monte Carlo-style guidance</span>
+        <span class="badge">Official national resource links</span>
+        <span class="badge">Local-first storage</span>
+        <span class="badge">Exportable founder plan</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="panelHead">
+          <h2>Welcome, Founder</h2>
+          <p>This incubator helps you move from “I have an idea” to “I know my next steps.” Enter your concept, choose what matters most, and run the sandbox engine. The app will recommend business planning, registration, funding, mentoring, market research, intellectual property, compliance, contracting, and growth resources based on your profile.</p>
+        </div>
+        <div class="panelBody miniStats" id="miniStats">
+          <div class="mini"><b>40+</b><span>Resource pathways</span></div>
+          <div class="mini"><b>900</b><span>Scenario runs</span></div>
+          <div class="mini"><b>0</b><span>External scripts</span></div>
+          <div class="mini"><b>100%</b><span>Local planning</span></div>
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="panel" id="intakePanel">
+          <div class="panelHead">
+            <h2>Founder Intake</h2>
+            <p>Tell the incubator what you are building. You can keep this broad, then refine it later.</p>
+          </div>
+          <div class="panelBody">
+            <form id="founderForm" class="formGrid">
+              <div class="wide">
+                <label for="ideaName">Idea or business name</label>
+                <input id="ideaName" placeholder="Example: Mobile eco-cleaning service, AI tutoring studio, artisan marketplace" />
+              </div>
+              <div class="wide">
+                <label for="ideaText">Describe the idea</label>
+                <textarea id="ideaText" placeholder="What problem does it solve? Who does it help? What will you sell or provide?"></textarea>
+              </div>
+              <div>
+                <label for="stage">Current stage</label>
+                <select id="stage">
+                  <option value="idea">Idea only</option>
+                  <option value="validation">Testing / validating</option>
+                  <option value="startup">Ready to launch</option>
+                  <option value="operating">Already operating</option>
+                  <option value="growth">Growth / expansion</option>
+                  <option value="contracting">Government contracting</option>
+                </select>
+              </div>
+              <div>
+                <label for="industry">Primary industry</label>
+                <select id="industry">
+                  <option value="general">General / not sure yet</option>
+                  <option value="technology">Technology / AI / software</option>
+                  <option value="creative">Creative / art / media</option>
+                  <option value="education">Education / training</option>
+                  <option value="food">Food / hospitality</option>
+                  <option value="retail">Retail / ecommerce</option>
+                  <option value="health">Health / wellness</option>
+                  <option value="construction">Construction / trades</option>
+                  <option value="agriculture">Agriculture / rural</option>
+                  <option value="nonprofit">Nonprofit / community impact</option>
+                  <option value="professional">Professional services</option>
+                </select>
+              </div>
+              <div>
+                <label for="state">State / territory</label>
+                <input id="state" maxlength="40" placeholder="Example: Florida" />
+              </div>
+              <div>
+                <label for="zip">ZIP code</label>
+                <input id="zip" maxlength="10" placeholder="Optional, helps with locator links" />
+              </div>
+              <div>
+                <label for="budget">Startup budget</label>
+                <select id="budget">
+                  <option value="micro">$0–$500</option>
+                  <option value="small">$500–$5,000</option>
+                  <option value="medium">$5,000–$25,000</option>
+                  <option value="large">$25,000+</option>
+                </select>
+              </div>
+              <div>
+                <label for="time">Time available weekly</label>
+                <select id="time">
+                  <option value="light">1–5 hours</option>
+                  <option value="steady">5–15 hours</option>
+                  <option value="strong">15–30 hours</option>
+                  <option value="full">Full-time focus</option>
+                </select>
+              </div>
+              <div>
+                <label for="model">Business model</label>
+                <select id="model">
+                  <option value="service">Service-based</option>
+                  <option value="product">Product-based</option>
+                  <option value="digital">Digital product / app</option>
+                  <option value="marketplace">Marketplace / platform</option>
+                  <option value="retail">Retail / ecommerce</option>
+                  <option value="nonprofit">Nonprofit / social enterprise</option>
+                  <option value="b2g">Government contracting</option>
+                </select>
+              </div>
+              <div>
+                <label for="audience">Primary customer</label>
+                <select id="audience">
+                  <option value="consumers">Consumers / families</option>
+                  <option value="businesses">Businesses</option>
+                  <option value="government">Government / institutions</option>
+                  <option value="schools">Schools / students</option>
+                  <option value="community">Community / nonprofit audience</option>
+                </select>
+              </div>
+
+              <div class="wide">
+                <label>What do you need help with?</label>
+                <div class="checkGrid" id="needsGrid"></div>
+              </div>
+
+              <div class="wide">
+                <label>Optional preference flags</label>
+                <div class="checkGrid" id="flagsGrid"></div>
+              </div>
+
+              <div class="wide notice">
+                <b>Privacy note:</b> this is a local planning tool. It uses localStorage only when you click save. It does not send your idea anywhere. External links open official resources in a new tab only when you choose to visit them.
+              </div>
+
+              <div class="wide toolbar">
+                <button type="button" class="btn primary" onclick="runIncubator()">Run Incubator Simulation</button>
+                <button type="button" class="btn navy" onclick="saveProfile()">Save Profile</button>
+                <button type="button" class="btn ghost" onclick="loadProfile()">Load Saved</button>
+                <button type="button" class="btn ghost" onclick="clearProfile()">Clear</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <aside class="panel" id="resultsPanel">
+          <div class="panelHead">
+            <h2>Guidance Engine</h2>
+            <p>Your recommendation report will appear here after the sandbox simulation runs.</p>
+          </div>
+          <div class="panelBody" id="resultsBody">
+            <div class="empty">Complete the intake and click <b>Run Incubator Simulation</b>. The engine will score resource matches across repeated scenario runs and produce your strongest pathways.</div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel">
+        <div class="panelHead">
+          <h2>National Resource Directory</h2>
+          <p>Search or filter trusted resource pathways. These links are intentionally national and locator-based so founders can find current support in their own state, county, or city.</p>
+        </div>
+        <div class="panelBody">
+          <div class="searchRow">
+            <input id="resourceSearch" placeholder="Search: funding, mentor, trademark, EIN, grants, nonprofit, veteran..." oninput="renderDirectory()" />
+            <select id="resourceFilter" onchange="renderDirectory()">
+              <option value="all">All categories</option>
+              <option value="plan">Planning</option>
+              <option value="mentor">Mentoring</option>
+              <option value="register">Registration</option>
+              <option value="funding">Funding</option>
+              <option value="ip">IP / brand protection</option>
+              <option value="compliance">Compliance</option>
+              <option value="contracting">Contracting</option>
+              <option value="market">Market research</option>
+              <option value="special">Specialized support</option>
+            </select>
+          </div>
+          <div class="tabs" style="margin-top:13px">
+            <button class="tab active" id="tabAll" onclick="setView('all')">Directory</button>
+            <button class="tab" id="tabFavorites" onclick="setView('favorites')">Saved Favorites</button>
+            <button class="tab" id="tabPlan" onclick="setView('plan')">Founder Plan</button>
+          </div>
+          <div id="directoryBody" class="resourceList"></div>
+        </div>
+      </section>
+
+      <footer>
+        Verve N Veda Entrepreneur Incubator is an educational planning tool, not legal, tax, financial, or professional advice. Always confirm current requirements with official agencies and qualified professionals before filing, paying fees, signing contracts, or applying for funding.
+      </footer>
+    </main>
+  </div>
+</div>
+
+<div class="modalOverlay" id="guideModal" role="dialog" aria-modal="true" aria-label="How the incubator works">
+  <div class="modal">
+    <div class="modalHead">
+      <div>
+        <h2>How the Incubator Works</h2>
+        <p>The engine simulates many possible founder priorities, then looks for resources that repeatedly rise to the top.</p>
+      </div>
+      <button class="close" onclick="closeModal('guideModal')" aria-label="Close modal">×</button>
+    </div>
+    <div class="modalBody">
+      <h3>1. Intake</h3>
+      <p>Enter your idea, stage, industry, budget, model, and areas where you need help.</p>
+      <h3>2. Monte Carlo-style scoring</h3>
+      <p>The app runs repeated randomized scoring passes. Each pass gives slightly different weight to your stage, budget, industry, identity flags, needs, and customer type. Resources that keep ranking highly receive stronger confidence scores.</p>
+      <h3>3. Pathway report</h3>
+      <p>You receive a recommended action plan, top resource cards, and a founder checklist. You can save your profile locally, export a JSON backup, or print the plan.</p>
+      <h3>4. Sovereign sandbox rules</h3>
+      <p>This file contains all app logic inside one HTML file. It uses no CDN, no external libraries, no analytics, and no server calls. Links open only when clicked.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  const STORE_KEY = "verve_n_veda_entrepreneur_incubator_v1";
+  const FAVORITE_KEY = "verve_n_veda_incubator_favorites_v1";
+  const PLAN_KEY = "verve_n_veda_incubator_founder_plan_v1";
+  let currentView = "all";
+  let lastPlan = safeJSON(PLAN_KEY, null);
+
+  const NEEDS = [
+    ["business_plan", "Business plan"],
+    ["market_research", "Market research"],
+    ["mentor", "Mentor / coach"],
+    ["register", "Registration / structure"],
+    ["ein_tax", "EIN / taxes"],
+    ["funding", "Funding / loans"],
+    ["grants", "Grants"],
+    ["brand_ip", "Name / trademark / IP"],
+    ["website", "Website / digital presence"],
+    ["compliance", "Licenses / compliance"],
+    ["contracting", "Government contracts"],
+    ["hiring", "Hiring / employees"],
+    ["nonprofit", "Nonprofit setup"],
+    ["export", "Export / international"],
+    ["accounting", "Bookkeeping / finance"],
+    ["marketing", "Marketing / sales"]
+  ];
+  const FLAGS = [
+    ["woman", "Women-focused support"],
+    ["veteran", "Veteran / military spouse support"],
+    ["rural", "Rural business support"],
+    ["minority", "Disadvantaged / underserved business support"],
+    ["disabled", "Disability-inclusive resources"],
+    ["green", "Sustainability / climate focus"],
+    ["low_budget", "Needs free or low-cost help"],
+    ["fast_launch", "Needs a fast launch path"]
+  ];
+
+  const RESOURCES = [
+    {
+      id:"sba_business_guide", title:"SBA Business Guide", category:"plan", type:"Official guide",
+      url:"https://www.sba.gov/business-guide",
+      desc:"Step-by-step federal guide for planning, launching, managing, and growing a small business.",
+      tags:["business_plan","market_research","register","funding","startup","idea","validation","general"],
+      stages:["idea","validation","startup","operating","growth"], needs:["business_plan","market_research","register","funding","accounting","marketing"], models:["service","product","digital","marketplace","retail","nonprofit"], flags:["low_budget"]
+    },
+    {
+      id:"sba_local", title:"SBA Local Assistance Locator", category:"mentor", type:"Locator",
+      url:"https://www.sba.gov/local-assistance/find",
+      desc:"Find SBA district offices and resource partners near you, including counseling and training options.",
+      tags:["mentor","local","sbdc","wbc","score","vboc"], stages:["idea","validation","startup","operating","growth","contracting"], needs:["mentor","business_plan","funding","compliance"], models:["service","product","digital","marketplace","retail","nonprofit","b2g"], flags:["woman","veteran","low_budget"]
+    },
+    {
+      id:"score_mentor", title:"SCORE Mentor Search", category:"mentor", type:"Mentorship",
+      url:"https://www.score.org/mentors/",
+      desc:"Search for free business mentors by expertise, industry, and location.",
+      tags:["mentor","coach","business_plan","marketing","sales"], stages:["idea","validation","startup","operating","growth"], needs:["mentor","business_plan","marketing","accounting"], models:["service","product","digital","marketplace","retail","nonprofit"], flags:["low_budget","fast_launch"]
+    },
+    {
+      id:"sbdc", title:"America’s SBDC Locator", category:"mentor", type:"Consulting",
+      url:"https://americassbdc.org/find-your-sbdc/",
+      desc:"Find a Small Business Development Center for free business consulting and low-cost training.",
+      tags:["sbdc","mentor","consulting","market_research","startup"], stages:["idea","validation","startup","operating","growth"], needs:["mentor","business_plan","market_research","funding","accounting"], models:["service","product","digital","retail","professional","b2g"], flags:["low_budget"]
+    },
+    {
+      id:"wbc", title:"SBA Women’s Business Centers", category:"special", type:"Specialized support",
+      url:"https://www.sba.gov/local-assistance/resource-partners/womens-business-centers",
+      desc:"Free to low-cost counseling and training focused on women who want to start, grow, or expand a business.",
+      tags:["women","mentor","training","startup"], stages:["idea","validation","startup","operating","growth"], needs:["mentor","business_plan","funding","marketing"], models:["service","product","digital","retail","nonprofit"], flags:["woman","low_budget"]
+    },
+    {
+      id:"vboc", title:"Veterans Business Outreach Centers", category:"special", type:"Specialized support",
+      url:"https://www.sba.gov/local-assistance/resource-partners/veterans-business-outreach-center-vboc-program",
+      desc:"Entrepreneurship training, business plan support, and growth assistance for veterans, service members, and military spouses.",
+      tags:["veteran","military","mentor","business_plan"], stages:["idea","validation","startup","operating","growth"], needs:["mentor","business_plan","funding","contracting"], models:["service","product","b2g","retail","professional"], flags:["veteran","low_budget"]
+    },
+    {
+      id:"mbda_centers", title:"MBDA Business Centers", category:"special", type:"Specialized support",
+      url:"https://www.mbda.gov/business-resources/business-centers",
+      desc:"Business center network focused on business growth, capital access, customer development, and contracting opportunities.",
+      tags:["minority","underserved","capital","contracting","growth"], stages:["operating","growth","contracting"], needs:["funding","contracting","marketing","mentor"], models:["service","product","retail","professional","b2g"], flags:["minority"]
+    },
+    {
+      id:"irs_ein", title:"IRS Employer Identification Number", category:"register", type:"Official filing",
+      url:"https://www.irs.gov/businesses/small-businesses-self-employed/get-an-employer-identification-number",
+      desc:"Apply for an EIN directly through the IRS. The IRS states that you never have to pay a fee for an EIN.",
+      tags:["ein","tax","registration","irs"], stages:["startup","operating","growth"], needs:["ein_tax","register","accounting"], models:["service","product","digital","marketplace","retail","nonprofit","b2g"], flags:["fast_launch","low_budget"]
+    },
+    {
+      id:"irs_smallbiz", title:"IRS Small Business & Self-Employed Tax Center", category:"compliance", type:"Taxes",
+      url:"https://www.irs.gov/businesses/small-businesses-self-employed",
+      desc:"Federal tax information for small businesses, self-employed people, independent contractors, and employers.",
+      tags:["tax","irs","compliance","accounting"], stages:["startup","operating","growth"], needs:["ein_tax","accounting","compliance","hiring"], models:["service","product","digital","retail","professional","b2g"], flags:[]
+    },
+    {
+      id:"sba_register", title:"SBA Register Your Business", category:"register", type:"Launch step",
+      url:"https://www.sba.gov/business-guide/launch-your-business/register-your-business",
+      desc:"Learn common registration pathways for businesses, including federal, state, local, and entity-related steps.",
+      tags:["register","structure","llc","corporation","launch"], stages:["startup"], needs:["register","ein_tax","compliance"], models:["service","product","digital","marketplace","retail","nonprofit","b2g"], flags:["fast_launch"]
+    },
+    {
+      id:"sba_structure", title:"SBA Choose a Business Structure", category:"register", type:"Decision guide",
+      url:"https://www.sba.gov/business-guide/launch-your-business/choose-business-structure",
+      desc:"Compare common business structures and how they can affect liability, taxes, operations, and registration.",
+      tags:["structure","legal","llc","sole proprietor","corporation"], stages:["idea","validation","startup"], needs:["register","ein_tax","business_plan"], models:["service","product","digital","retail","professional","nonprofit"], flags:[]
+    },
+    {
+      id:"sba_plan", title:"SBA Write Your Business Plan", category:"plan", type:"Planning",
+      url:"https://www.sba.gov/business-guide/plan-your-business/write-your-business-plan",
+      desc:"Business plan guidance with formats for traditional plans and lean startup plans.",
+      tags:["business_plan","lean","startup","pitch"], stages:["idea","validation","startup","growth"], needs:["business_plan","funding","mentor"], models:["service","product","digital","marketplace","retail","nonprofit","b2g"], flags:["low_budget"]
+    },
+    {
+      id:"sba_market", title:"SBA Market Research & Competitive Analysis", category:"market", type:"Research",
+      url:"https://www.sba.gov/business-guide/plan-your-business/market-research-competitive-analysis",
+      desc:"Use market research and competitive analysis to find customers and understand industry demand.",
+      tags:["market_research","competitors","customers","validation"], stages:["idea","validation","startup","growth"], needs:["market_research","business_plan","marketing"], models:["service","product","digital","marketplace","retail","professional"], flags:[]
+    },
+    {
+      id:"census_data", title:"Census Data for Market Research", category:"market", type:"Data",
+      url:"https://data.census.gov/",
+      desc:"Use population, income, business, and demographic data to evaluate markets and customer segments.",
+      tags:["market_research","data","demographics","location"], stages:["idea","validation","startup","growth"], needs:["market_research","business_plan"], models:["service","product","retail","professional","nonprofit"], flags:["low_budget"]
+    },
+    {
+      id:"sba_costs", title:"SBA Calculate Startup Costs", category:"plan", type:"Finance planning",
+      url:"https://www.sba.gov/business-guide/plan-your-business/calculate-your-startup-costs",
+      desc:"Estimate startup expenses before launch so you can plan funding, pricing, and runway.",
+      tags:["startup_costs","funding","budget","finance"], stages:["idea","validation","startup"], needs:["business_plan","funding","accounting"], models:["service","product","digital","marketplace","retail","food","professional"], flags:["low_budget"]
+    },
+    {
+      id:"sba_funding", title:"SBA Fund Your Business", category:"funding", type:"Funding guide",
+      url:"https://www.sba.gov/business-guide/plan-your-business/fund-your-business",
+      desc:"Compare self-funding, investors, loans, crowdfunding, and other funding options.",
+      tags:["funding","loans","investors","crowdfunding"], stages:["idea","validation","startup","operating","growth"], needs:["funding","business_plan","accounting"], models:["service","product","digital","marketplace","retail","professional","b2g"], flags:[]
+    },
+    {
+      id:"sba_loans", title:"SBA Loan Programs", category:"funding", type:"Loans",
+      url:"https://www.sba.gov/funding-programs/loans",
+      desc:"Explore SBA-backed loan options and lender matching pathways.",
+      tags:["funding","loans","capital","growth"], stages:["startup","operating","growth"], needs:["funding","accounting","business_plan"], models:["service","product","retail","professional","construction","food"], flags:[]
+    },
+    {
+      id:"grants", title:"Grants.gov", category:"funding", type:"Federal grants",
+      url:"https://www.grants.gov/",
+      desc:"Search federal grant opportunities. Best for eligible organizations and funded programs, not guaranteed personal startup money.",
+      tags:["grants","nonprofit","federal","research","programs"], stages:["startup","operating","growth"], needs:["grants","nonprofit","funding"], models:["nonprofit","education","community"], flags:["green","rural","minority"]
+    },
+    {
+      id:"sam_entity", title:"SAM.gov Entity Registration", category:"contracting", type:"Federal system",
+      url:"https://sam.gov/content/entity-registration",
+      desc:"Register an entity to do business with the federal government or apply for certain federal assistance programs.",
+      tags:["sam","contracting","federal","entity registration"], stages:["contracting","operating","growth"], needs:["contracting","register","compliance"], models:["b2g","service","product","professional","construction"], flags:["veteran","minority"]
+    },
+    {
+      id:"sam_contracting", title:"SAM.gov Contract Opportunities", category:"contracting", type:"Procurement",
+      url:"https://sam.gov/contracting",
+      desc:"Search and research federal contracting opportunities and procurement notices.",
+      tags:["contracts","federal","bidding","procurement"], stages:["contracting","growth"], needs:["contracting","marketing"], models:["b2g","service","product","professional","construction","technology"], flags:["veteran","minority"]
+    },
+    {
+      id:"apex", title:"APEX Accelerators", category:"contracting", type:"Contracting assistance",
+      url:"https://www.apexaccelerators.us/",
+      desc:"Find assistance for businesses interested in government contracting, bidding, and procurement readiness.",
+      tags:["contracting","bidding","procurement","mentor"], stages:["contracting","operating","growth"], needs:["contracting","mentor","compliance"], models:["b2g","service","product","professional","construction","technology"], flags:["veteran","minority","low_budget"]
+    },
+    {
+      id:"uspto_trademark", title:"USPTO Trademark Basics", category:"ip", type:"Brand protection",
+      url:"https://www.uspto.gov/trademarks/basics",
+      desc:"Learn how trademarks work, what they protect, and the federal registration process.",
+      tags:["trademark","brand","logo","name","ip"], stages:["validation","startup","operating","growth"], needs:["brand_ip","marketing","register"], models:["service","product","digital","marketplace","retail","professional"], flags:["fast_launch"]
+    },
+    {
+      id:"uspto_search", title:"USPTO Trademark Search", category:"ip", type:"Search tool",
+      url:"https://www.uspto.gov/trademarks/search",
+      desc:"Search existing trademark records before investing heavily in a name, logo, or brand identity.",
+      tags:["trademark","search","brand","ip"], stages:["idea","validation","startup"], needs:["brand_ip","market_research"], models:["service","product","digital","marketplace","retail","professional"], flags:["low_budget"]
+    },
+    {
+      id:"copyright", title:"U.S. Copyright Office Registration", category:"ip", type:"Creative protection",
+      url:"https://www.copyright.gov/registration/",
+      desc:"Register eligible creative works such as writing, music, visual art, photographs, software code, and other authorship.",
+      tags:["copyright","creative","software","art","writing","media"], stages:["validation","startup","operating","growth"], needs:["brand_ip"], models:["creative","digital","product","education"], flags:[]
+    },
+    {
+      id:"patent", title:"USPTO Patent Basics", category:"ip", type:"Invention protection",
+      url:"https://www.uspto.gov/patents/basics",
+      desc:"Learn basics of patents and patent application pathways for inventions and technical innovations.",
+      tags:["patent","invention","technology","ip"], stages:["validation","startup","growth"], needs:["brand_ip","business_plan"], models:["product","digital","technology"], flags:[]
+    },
+    {
+      id:"ftc_business", title:"FTC Business Guidance", category:"compliance", type:"Consumer protection",
+      url:"https://www.ftc.gov/business-guidance",
+      desc:"Guidance on advertising, privacy, consumer protection, endorsements, online sales, and business compliance.",
+      tags:["compliance","privacy","advertising","consumer protection","marketing"], stages:["startup","operating","growth"], needs:["compliance","marketing","website"], models:["service","product","digital","marketplace","retail"], flags:[]
+    },
+    {
+      id:"privacy", title:"FTC Privacy & Security Guidance", category:"compliance", type:"Privacy",
+      url:"https://www.ftc.gov/business-guidance/privacy-security",
+      desc:"Consumer privacy and data security guidance useful for websites, apps, ecommerce, and digital businesses.",
+      tags:["privacy","security","website","digital","compliance"], stages:["startup","operating","growth"], needs:["website","compliance"], models:["digital","marketplace","retail","service"], flags:[]
+    },
+    {
+      id:"dol_wage", title:"U.S. Department of Labor Wage & Hour", category:"compliance", type:"Employment",
+      url:"https://www.dol.gov/agencies/whd",
+      desc:"Federal wage, overtime, child labor, family leave, and employment standards information.",
+      tags:["hiring","employees","wage","labor","compliance"], stages:["operating","growth"], needs:["hiring","compliance"], models:["service","product","retail","food","professional","construction"], flags:[]
+    },
+    {
+      id:"osha_small", title:"OSHA Small Business Resources", category:"compliance", type:"Workplace safety",
+      url:"https://www.osha.gov/smallbusiness",
+      desc:"Safety and health resources for small businesses and workplaces.",
+      tags:["safety","osha","employees","workplace","compliance"], stages:["startup","operating","growth"], needs:["hiring","compliance"], models:["construction","food","retail","product","service"], flags:[]
+    },
+    {
+      id:"benefits", title:"Benefits.gov Business & Career Benefits", category:"special", type:"Benefits locator",
+      url:"https://www.benefits.gov/categories/Business%20and%20Career%20Development",
+      desc:"Browse federal and state benefit programs related to business, career, and workforce development.",
+      tags:["benefits","training","career","funding"], stages:["idea","validation","startup","operating"], needs:["funding","mentor","hiring"], models:["service","product","professional"], flags:["disabled","veteran","low_budget"]
+    },
+    {
+      id:"usda_rural", title:"USDA Rural Development Business Programs", category:"special", type:"Rural support",
+      url:"https://www.rd.usda.gov/programs-services/business-programs",
+      desc:"Rural business programs supporting economic development, energy, agriculture, and community prosperity.",
+      tags:["rural","agriculture","funding","green","energy"], stages:["startup","operating","growth"], needs:["funding","grants","business_plan"], models:["product","agriculture","service","nonprofit"], flags:["rural","green"]
+    },
+    {
+      id:"energy", title:"DOE Small Business Innovation Research", category:"funding", type:"Innovation funding",
+      url:"https://science.osti.gov/sbir",
+      desc:"Federal innovation funding pathway for eligible technology and research-driven small businesses.",
+      tags:["technology","research","innovation","grants","green"], stages:["validation","startup","growth"], needs:["grants","funding","brand_ip"], models:["digital","product","technology"], flags:["green"]
+    },
+    {
+      id:"nih_sbir", title:"NIH Small Business Programs", category:"funding", type:"Health innovation",
+      url:"https://seed.nih.gov/small-business-funding",
+      desc:"Funding and support for eligible small businesses developing health and life-science innovations.",
+      tags:["health","research","innovation","grants","technology"], stages:["validation","startup","growth"], needs:["grants","funding","brand_ip"], models:["product","digital","technology"], flags:[]
+    },
+    {
+      id:"export", title:"Export.gov / International Trade Administration", category:"special", type:"Export support",
+      url:"https://www.trade.gov/export-solutions",
+      desc:"Tools and services for businesses exploring exporting, global markets, trade leads, and international expansion.",
+      tags:["export","international","sales","growth"], stages:["operating","growth"], needs:["export","marketing","market_research"], models:["product","retail","technology","professional"], flags:[]
+    },
+    {
+      id:"sba_learning", title:"SBA Learning Platform", category:"plan", type:"Training",
+      url:"https://www.sba.gov/sba-learning-platform",
+      desc:"Online training and development resources to help small business owners build knowledge and confidence.",
+      tags:["training","learning","startup","growth","low cost"], stages:["idea","validation","startup","operating","growth"], needs:["business_plan","mentor","marketing","accounting"], models:["service","product","digital","retail","nonprofit"], flags:["low_budget"]
+    },
+    {
+      id:"commerce_data", title:"Commerce Data Hub", category:"market", type:"Federal data",
+      url:"https://data.commerce.gov/",
+      desc:"Commerce Department data resources useful for market, industry, and economic research.",
+      tags:["data","market_research","commerce","economy"], stages:["validation","startup","growth"], needs:["market_research","business_plan"], models:["service","product","digital","retail","professional","b2g"], flags:["low_budget"]
+    },
+    {
+      id:"chamber", title:"U.S. Chamber CO— Startup Resources", category:"plan", type:"Business education",
+      url:"https://www.uschamber.com/co/start/startup",
+      desc:"Plain-language startup articles and guides from the U.S. Chamber’s small business education platform.",
+      tags:["startup","licenses","permits","business education"], stages:["idea","validation","startup"], needs:["business_plan","compliance","register","marketing"], models:["service","product","digital","retail","professional"], flags:["low_budget"]
+    },
+    {
+      id:"eda", title:"Economic Development Administration", category:"special", type:"Economic development",
+      url:"https://www.eda.gov/funding/programs",
+      desc:"Federal economic development funding programs often relevant to regional, community, and innovation initiatives.",
+      tags:["economic development","grants","community","innovation"], stages:["operating","growth"], needs:["grants","funding","nonprofit"], models:["nonprofit","community","education","technology"], flags:["rural","green","minority"]
+    },
+    {
+      id:"nonprofit_irs", title:"IRS Charities and Nonprofits", category:"register", type:"Nonprofit",
+      url:"https://www.irs.gov/charities-non-profits",
+      desc:"Federal tax information for charities, nonprofits, exempt organizations, and related filings.",
+      tags:["nonprofit","501c3","tax exempt","irs"], stages:["idea","validation","startup","operating"], needs:["nonprofit","ein_tax","register","compliance"], models:["nonprofit"], flags:["low_budget"]
+    },
+    {
+      id:"state_sos", title:"State Business Registration Search Path", category:"register", type:"Local step",
+      url:"https://www.usa.gov/state-business-registration",
+      desc:"Use state-level resources to find business registration requirements and official filing offices.",
+      tags:["state","registration","licenses","permits"], stages:["startup","operating"], needs:["register","compliance"], models:["service","product","digital","retail","professional","nonprofit"], flags:["fast_launch"]
+    },
+    {
+      id:"accessibility", title:"ADA Small Business Resources", category:"compliance", type:"Accessibility",
+      url:"https://www.ada.gov/resources/small-businesses/",
+      desc:"Accessibility guidance for small businesses serving the public or operating public accommodations.",
+      tags:["accessibility","ada","compliance","disability"], stages:["startup","operating","growth"], needs:["compliance","website"], models:["service","retail","food","education","health","professional"], flags:["disabled"]
+    },
+    {
+      id:"sba_disaster", title:"SBA Disaster Assistance", category:"funding", type:"Recovery",
+      url:"https://www.sba.gov/funding-programs/disaster-assistance",
+      desc:"Business and home disaster loan information for recovery after declared disasters.",
+      tags:["disaster","loans","recovery","resilience"], stages:["operating","growth"], needs:["funding"], models:["service","product","retail","food","professional"], flags:["rural"]
+    }
+  ];
+
+  function safeJSON(key, fallback){
+    try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }catch(e){ return fallback; }
+  }
+  function setJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  function $(id){ return document.getElementById(id); }
+  function normalize(str){ return String(str || "").toLowerCase().trim(); }
+  function tokenize(str){ return normalize(str).split(/[^a-z0-9]+/).filter(Boolean); }
+  function escapeHTML(str){ return String(str || "").replace(/[&<>'"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c])); }
+  function linkWithZip(url){
+    const zip = $("zip") ? $("zip").value.trim() : "";
+    if(!zip) return url;
+    if(url.includes("sba.gov/local-assistance/find")) return url + "?address=" + encodeURIComponent(zip);
+    return url;
+  }
+  function openModal(id){ $(id).classList.add("show"); }
+  function closeModal(id){ $(id).classList.remove("show"); }
+  window.openModal = openModal; window.closeModal = closeModal;
+
+  function initChecks(){
+    const needsGrid = $("needsGrid"); const flagsGrid = $("flagsGrid");
+    needsGrid.innerHTML = NEEDS.map(([id,label]) => `<label class="check"><input type="checkbox" value="${id}" name="needs"><span>${label}</span></label>`).join("");
+    flagsGrid.innerHTML = FLAGS.map(([id,label]) => `<label class="check"><input type="checkbox" value="${id}" name="flags"><span>${label}</span></label>`).join("");
+  }
+
+  function getProfile(){
+    return {
+      ideaName: $("ideaName").value.trim(), ideaText: $("ideaText").value.trim(), stage: $("stage").value, industry: $("industry").value,
+      state: $("state").value.trim(), zip: $("zip").value.trim(), budget: $("budget").value, time: $("time").value,
+      model: $("model").value, audience: $("audience").value,
+      needs: Array.from(document.querySelectorAll('input[name="needs"]:checked')).map(i=>i.value),
+      flags: Array.from(document.querySelectorAll('input[name="flags"]:checked')).map(i=>i.value),
+      savedAt: new Date().toISOString()
+    };
+  }
+  function setProfile(p){
+    if(!p) return;
+    ["ideaName","ideaText","stage","industry","state","zip","budget","time","model","audience"].forEach(id=>{ if($(id) && p[id] !== undefined) $(id).value = p[id]; });
+    document.querySelectorAll('input[name="needs"]').forEach(i=>i.checked = (p.needs||[]).includes(i.value));
+    document.querySelectorAll('input[name="flags"]').forEach(i=>i.checked = (p.flags||[]).includes(i.value));
+  }
+  function saveProfile(){
+    const p = getProfile(); setJSON(STORE_KEY, p); toast("Founder profile saved locally.");
+  }
+  function loadProfile(){
+    const p = safeJSON(STORE_KEY, null); if(!p){ toast("No saved profile found yet."); return; }
+    setProfile(p); toast("Saved profile loaded.");
+  }
+  function clearProfile(){
+    if(!confirm("Clear the visible intake form? Saved exports will not be affected.")) return;
+    $("founderForm").reset(); toast("Intake form cleared.");
+  }
+  window.saveProfile = saveProfile; window.loadProfile = loadProfile; window.clearProfile = clearProfile;
+
+  function seedFromProfile(p){
+    const source = [p.ideaName,p.ideaText,p.stage,p.industry,p.state,p.budget,p.time,p.model,p.audience,p.needs.join("|"),p.flags.join("|")].join("~~");
+    let h = 2166136261;
+    for(let i=0;i<source.length;i++){ h ^= source.charCodeAt(i); h += (h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24); }
+    return h >>> 0;
+  }
+  function rng(seed){
+    let a = seed >>> 0;
+    return function(){ a += 0x6D2B79F5; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
+  function hasAny(arr, targets){ return (arr||[]).some(x => (targets||[]).includes(x)); }
+  function textMatchesResource(profile, r){
+    const words = tokenize((profile.ideaName||"") + " " + (profile.ideaText||""));
+    let score = 0;
+    words.forEach(w => { if((r.tags||[]).some(t => String(t).toLowerCase().includes(w) || w.includes(String(t).toLowerCase()))) score += 0.7; });
+    return Math.min(5, score);
+  }
+  function scoreResource(profile, r, random){
+    let score = 8;
+    const noise = () => .65 + random() * .7;
+    if((r.stages||[]).includes(profile.stage)) score += 10 * noise();
+    if((r.needs||[]).some(n => profile.needs.includes(n))) score += 9 * noise();
+    if((r.models||[]).includes(profile.model)) score += 5 * noise();
+    if((r.tags||[]).includes(profile.industry) || (r.models||[]).includes(profile.industry)) score += 4 * noise();
+    if((r.flags||[]).some(f => profile.flags.includes(f))) score += 9 * noise();
+    if(profile.flags.includes("low_budget") && (r.flags||[]).includes("low_budget")) score += 8 * noise();
+    if(profile.flags.includes("fast_launch") && (r.flags||[]).includes("fast_launch")) score += 5 * noise();
+    score += textMatchesResource(profile, r) * noise();
+
+    if(profile.budget === "micro" && ["funding","mentor","plan","market"].includes(r.category)) score += 3 * noise();
+    if(profile.budget === "large" && ["funding","contracting","ip","compliance"].includes(r.category)) score += 3 * noise();
+    if(profile.time === "light" && ["mentor","plan"].includes(r.category)) score += 2 * noise();
+    if(profile.audience === "government" && r.category === "contracting") score += 10 * noise();
+    if(profile.model === "nonprofit" && (r.needs||[]).includes("nonprofit")) score += 10 * noise();
+    if(profile.model === "digital" && hasAny(r.needs,["website","brand_ip","compliance"])) score += 3 * noise();
+    if(profile.industry === "creative" && hasAny(r.tags,["copyright","creative","trademark"])) score += 6 * noise();
+    if(profile.industry === "technology" && hasAny(r.tags,["technology","privacy","patent","innovation"])) score += 6 * noise();
+    if(profile.industry === "food" && hasAny(r.tags,["licenses","permits","osha","employees","compliance"])) score += 4 * noise();
+    if(profile.industry === "agriculture" && hasAny(r.tags,["rural","agriculture","usda"])) score += 8 * noise();
+    if(profile.stage === "idea" && ["plan","market","mentor","ip"].includes(r.category)) score += 3 * noise();
+    if(profile.stage === "startup" && ["register","compliance","funding"].includes(r.category)) score += 4 * noise();
+    if(profile.stage === "growth" && ["funding","contracting","special","market"].includes(r.category)) score += 4 * noise();
+    return score;
+  }
+
+  function runIncubator(){
+    const profile = getProfile();
+    if(!profile.ideaName && !profile.ideaText){
+      $("resultsBody").innerHTML = '<div class="empty">Add at least an idea name or a short description first. The simulation needs a little context to guide you.</div>';
+      return;
+    }
+    if(profile.needs.length === 0){
+      profile.needs = inferNeeds(profile);
+    }
+    const simulations = 900;
+    const rnd = rng(seedFromProfile(profile));
+    const tally = Object.fromEntries(RESOURCES.map(r => [r.id, {top:0,total:0,max:0}]));
+    for(let i=0;i<simulations;i++){
+      const scores = RESOURCES.map(r => ({id:r.id, score: scoreResource(profile, r, rnd)})).sort((a,b)=>b.score-a.score);
+      scores.forEach(s => { tally[s.id].total += s.score; tally[s.id].max = Math.max(tally[s.id].max, s.score); });
+      scores.slice(0,8).forEach(s => tally[s.id].top++);
+    }
+    const ranked = RESOURCES.map(r => ({
+      ...r,
+      confidence: Math.round((tally[r.id].top / simulations) * 100),
+      average: tally[r.id].total / simulations,
+      why: whyRecommended(profile, r)
+    })).sort((a,b)=> (b.confidence - a.confidence) || (b.average - a.average));
+    const top = ranked.slice(0,8);
+    const plan = buildPlan(profile, top, ranked);
+    lastPlan = {profile, top: top.map(({id,title,confidence,why,url,category,desc,type})=>({id,title,confidence,why,url,category,desc,type})), plan, createdAt:new Date().toISOString()};
+    setJSON(PLAN_KEY, lastPlan);
+    renderResults(profile, top, plan);
+    renderDirectory();
+    $("resultsPanel").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  window.runIncubator = runIncubator;
+
+  function inferNeeds(p){
+    const needs = ["business_plan","market_research","mentor"];
+    if(["startup","operating","growth"].includes(p.stage)) needs.push("register","ein_tax","compliance");
+    if(["startup","growth","contracting"].includes(p.stage)) needs.push("funding");
+    if(p.model === "b2g" || p.audience === "government") needs.push("contracting");
+    if(p.model === "nonprofit") needs.push("nonprofit","grants");
+    if(["creative","technology","digital","marketplace"].includes(p.industry) || ["digital","marketplace"].includes(p.model)) needs.push("brand_ip","website");
+    return Array.from(new Set(needs));
+  }
+  function whyRecommended(p, r){
+    const reasons = [];
+    if((r.stages||[]).includes(p.stage)) reasons.push("fits your current stage");
+    if((r.needs||[]).some(n => p.needs.includes(n))) reasons.push("matches your selected needs");
+    if((r.models||[]).includes(p.model)) reasons.push("aligns with your business model");
+    if((r.flags||[]).some(f => p.flags.includes(f))) reasons.push("supports one of your optional preference flags");
+    if(p.audience === "government" && r.category === "contracting") reasons.push("supports government/customer procurement goals");
+    if(p.industry === "technology" && hasAny(r.tags,["technology","privacy","patent","innovation"])) reasons.push("has technology or innovation relevance");
+    if(p.industry === "creative" && hasAny(r.tags,["creative","copyright","trademark"])) reasons.push("helps protect or build creative assets");
+    if(!reasons.length) reasons.push("offers a useful general founder pathway");
+    return "Recommended because it " + reasons.slice(0,3).join(", ") + ".";
+  }
+  function buildPlan(p, top, ranked){
+    const steps = [];
+    steps.push({title:"Clarify the offer", text:`Write a one-sentence promise for ${p.ideaName || "your idea"}: who it helps, what problem it solves, and what outcome it creates.`});
+    if(p.stage === "idea" || p.stage === "validation") steps.push({title:"Validate before spending heavily", text:"Interview 5–10 potential customers, identify the strongest pain point, and compare competitors before filing, ordering inventory, or buying software."});
+    if(p.needs.includes("business_plan") || p.stage === "idea") steps.push({title:"Create a lean business plan", text:"Use a lean plan first: customer, problem, solution, pricing, expenses, marketing channels, and next 30-day test."});
+    if(p.needs.includes("market_research") || ["idea","validation"].includes(p.stage)) steps.push({title:"Research demand and competitors", text:"Use Census/data resources and local research to estimate who buys, where they are, what they pay, and who already serves them."});
+    if(p.needs.includes("mentor") || p.flags.includes("low_budget")) steps.push({title:"Book free counseling", text:"Contact SCORE, an SBDC, or an SBA local assistance partner. Bring your idea summary, budget, and top three questions."});
+    if(p.needs.includes("brand_ip") || ["creative","technology"].includes(p.industry)) steps.push({title:"Check the name before building the brand", text:"Search existing names and marks before buying domains, printing materials, or launching public accounts."});
+    if(p.needs.includes("register") || p.stage === "startup") steps.push({title:"Map your registration path", text:`Confirm state and local registration steps${p.state ? " for " + p.state : " for your state"}, choose a structure, and separate personal and business finances.`});
+    if(p.needs.includes("ein_tax") || p.stage === "startup") steps.push({title:"Use the official IRS EIN pathway", text:"Apply only through the IRS if you need an EIN. Avoid paid lookalike sites that charge for a free federal process."});
+    if(p.needs.includes("funding")) steps.push({title:"Calculate runway before seeking money", text:"Estimate startup costs, monthly expenses, break-even sales, and what the funds will specifically purchase."});
+    if(p.needs.includes("contracting") || p.model === "b2g") steps.push({title:"Prepare for contracting", text:"Get your registration, capability statement, NAICS codes, and procurement profile organized before chasing bids."});
+    if(p.needs.includes("compliance") || p.needs.includes("hiring")) steps.push({title:"Confirm rules before operations scale", text:"Check licenses, consumer protection, privacy, wage/hour, insurance, workplace safety, and accessibility requirements."});
+    steps.push({title:"Build a 7-day founder sprint", text:"Choose the top three recommended resources, open them, and turn them into one call, one document, and one decision this week."});
+    return steps.slice(0,9);
+  }
+  function renderResults(profile, top, plan){
+    const confidenceAvg = Math.round(top.reduce((s,r)=>s+r.confidence,0)/Math.max(1,top.length));
+    const topNeed = (profile.needs[0] || inferNeeds(profile)[0] || "business_plan").replace(/_/g," ");
+    $("resultsBody").innerHTML = `
+      <div class="resultHero">
+        <h3>${escapeHTML(profile.ideaName || "Founder Pathway")}</h3>
+        <p>${escapeHTML(profile.ideaText || "A practical founder pathway has been generated from your selected preferences.")}</p>
+        <div class="metrics">
+          <div class="metric"><b>${top.length}</b><span>Top pathways</span></div>
+          <div class="metric"><b>${confidenceAvg}%</b><span>Avg. confidence</span></div>
+          <div class="metric"><b>${escapeHTML(topNeed)}</b><span>First focus</span></div>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="showResultTab('recos')">Recommendations</button>
+        <button class="tab" onclick="showResultTab('steps')">Action Plan</button>
+        <button class="tab" onclick="exportPlan()">Export JSON</button>
+      </div>
+      <div id="resultTabContent">${renderResourceCards(top, true)}</div>
+    `;
+    window._resultTabs = {recos: renderResourceCards(top, true), steps: renderSteps(plan)};
+  }
+  function showResultTab(which){
+    document.querySelectorAll('#resultsBody .tabs .tab').forEach(btn => btn.classList.remove('active'));
+    const labels = {recos:"Recommendations",steps:"Action Plan"};
+    document.querySelectorAll('#resultsBody .tabs .tab').forEach(btn => { if(btn.textContent.trim() === labels[which]) btn.classList.add('active'); });
+    $("resultTabContent").innerHTML = window._resultTabs[which] || "";
+  }
+  window.showResultTab = showResultTab;
+
+  function renderResourceCards(list, includeConfidence){
+    if(!list.length) return '<div class="empty">No matching resources found. Try broadening your filters.</div>';
+    return `<div class="resourceList">${list.map(r => `
+      <article class="resource">
+        <div class="resourceTop">
+          <div><h3>${escapeHTML(r.title)}</h3><p>${escapeHTML(r.desc)}</p></div>
+          ${includeConfidence ? `<div class="confidence">${r.confidence}% match</div>` : ""}
+        </div>
+        ${includeConfidence ? `<div class="bar" aria-label="Match confidence"><span style="width:${Math.max(8, Math.min(100, r.confidence))}%"></span></div>` : ""}
+        ${r.why ? `<div class="why">${escapeHTML(r.why)}</div>` : ""}
+        <div class="chips"><span class="chip">${escapeHTML(r.category)}</span><span class="chip">${escapeHTML(r.type)}</span>${(r.tags||[]).slice(0,4).map(t=>`<span class="chip">${escapeHTML(t)}</span>`).join("")}</div>
+        <div class="toolbar">
+          <a class="btn navy small" href="${escapeHTML(linkWithZip(r.url))}" target="_blank" rel="noopener">Open Resource</a>
+          <button class="btn ghost small" onclick="toggleFavorite('${r.id}')">${isFavorite(r.id) ? "Remove Favorite" : "Save Favorite"}</button>
+        </div>
+      </article>`).join("")}</div>`;
+  }
+  function renderSteps(plan){
+    return `<div class="actionPlan">${plan.map(s => `<div class="step"><div><b>${escapeHTML(s.title)}</b><br>${escapeHTML(s.text)}</div></div>`).join("")}</div>`;
+  }
+
+  function getFavorites(){ return safeJSON(FAVORITE_KEY, []); }
+  function isFavorite(id){ return getFavorites().includes(id); }
+  function toggleFavorite(id){
+    const favs = getFavorites();
+    const next = favs.includes(id) ? favs.filter(x=>x!==id) : favs.concat(id);
+    setJSON(FAVORITE_KEY, next); renderDirectory(); toast(next.includes(id) ? "Resource saved to favorites." : "Resource removed from favorites.");
+  }
+  window.toggleFavorite = toggleFavorite;
+
+  function setView(view){
+    currentView = view;
+    document.querySelectorAll('.tabs .tab').forEach(t=>t.classList.remove('active'));
+    if(view === 'all') $('tabAll').classList.add('active');
+    if(view === 'favorites') $('tabFavorites').classList.add('active');
+    if(view === 'plan') $('tabPlan').classList.add('active');
+    renderDirectory();
+  }
+  window.setView = setView;
+
+  function renderDirectory(){
+    const body = $("directoryBody");
+    if(currentView === "plan"){
+      if(!lastPlan){ body.innerHTML = '<div class="empty">No founder plan has been generated yet. Run the incubator simulation first.</div>'; return; }
+      body.innerHTML = `<div class="notice"><b>Generated:</b> ${new Date(lastPlan.createdAt).toLocaleString()}<br><b>Idea:</b> ${escapeHTML(lastPlan.profile.ideaName || "Untitled")}</div>${renderSteps(lastPlan.plan)}<div class="toolbar" style="margin-top:12px"><button class="btn navy" onclick="exportPlan()">Export Plan JSON</button><button class="btn ghost" onclick="importPlanPrompt()">Import Plan JSON</button></div>`;
+      return;
+    }
+    const q = normalize($("resourceSearch").value);
+    const cat = $("resourceFilter").value;
+    let list = RESOURCES.slice();
+    if(currentView === "favorites") list = list.filter(r => isFavorite(r.id));
+    if(cat !== "all") list = list.filter(r => r.category === cat);
+    if(q){
+      list = list.filter(r => normalize([r.title,r.desc,r.category,r.type,(r.tags||[]).join(' ')].join(' ')).includes(q));
+    }
+    body.innerHTML = renderResourceCards(list.map(r=>({...r,confidence:0,why:""})), false);
+  }
+  window.renderDirectory = renderDirectory;
+
+  function exportPlan(){
+    if(!lastPlan){ toast("Run a simulation first, then export the plan."); return; }
+    const blob = new Blob([JSON.stringify(lastPlan, null, 2)], {type:"application/json"});
+    const a = document.createElement("a");
+    const date = new Date().toISOString().slice(0,10);
+    a.href = URL.createObjectURL(blob);
+    a.download = `verve-n-veda-founder-plan-${date}.json`;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+  }
+  window.exportPlan = exportPlan;
+
+  function importPlanPrompt(){
+    const input = document.createElement("input");
+    input.type = "file"; input.accept = "application/json";
+    input.onchange = () => {
+      const file = input.files && input.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const plan = JSON.parse(reader.result);
+          if(!plan.profile || !plan.plan) throw new Error("Invalid plan file");
+          lastPlan = plan; setJSON(PLAN_KEY, plan); setProfile(plan.profile); renderDirectory(); toast("Founder plan imported.");
+        }catch(e){ toast("Could not import that file. Please choose a valid exported founder plan."); }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+  window.importPlanPrompt = importPlanPrompt;
+
+  function toast(msg){
+    let el = document.getElementById("toast");
+    if(!el){
+      el = document.createElement("div"); el.id = "toast";
+      el.style.cssText = "position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#061a3a;color:#fff;padding:12px 16px;border-radius:999px;box-shadow:0 12px 30px rgba(0,0,0,.22);z-index:80;font-weight:850;max-width:min(92vw,620px);text-align:center;opacity:0;transition:.2s ease";
+      document.body.appendChild(el);
+    }
+    el.textContent = msg; el.style.opacity = "1";
+    clearTimeout(window._toastTimer); window._toastTimer = setTimeout(()=>{el.style.opacity="0";}, 2300);
+  }
+
+  window.addEventListener("keydown", e => { if(e.key === "Escape") document.querySelectorAll('.modalOverlay.show').forEach(m=>m.classList.remove('show')); });
+  window.addEventListener("click", e => { if(e.target.classList && e.target.classList.contains("modalOverlay")) e.target.classList.remove("show"); });
+
+  initChecks();
+  const saved = safeJSON(STORE_KEY, null); if(saved) setProfile(saved);
+  renderDirectory();
+})();
+</script>
+</body>
+</html>
