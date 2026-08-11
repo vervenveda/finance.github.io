@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Small Business Budget Engine</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7fb;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #2e6e5f;
+    }
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .category {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .category span {
+      width: 33%;
+    }
+    .category-result {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .result {
+      font-weight: bold;
+    }
+    #businessChart {
+      margin-top: 30px;
+      width: 100%;
+      height: 300px;
+    }
+    .profit-loss {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .profit-loss span {
+      font-size: 18px;
+    }
+    .custom-category, .debt-tracker, .cash-flow {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Small Business Budget Engine</h1>
+
+    <label for="businessIncome">Enter Monthly Revenue:</label>
+    <input type="number" id="businessIncome" placeholder="e.g., 10000" />
+
+    <button id="calculateBusinessBudget">Calculate Budget</button>
+
+    <div class="category">
+      <span><strong>Revenue</strong></span>
+      <span><strong>Operating Expenses</strong></span>
+      <span><strong>Capital Expenses</strong></span>
+    </div>
+
+    <div class="category-result">
+      <span id="revenueResult">-</span>
+      <span id="operatingExpensesResult">-</span>
+      <span id="capitalExpensesResult">-</span>
+    </div>
+
+    <div id="businessDetails"></div>
+    <div id="businessChart"></div>
+
+    <div class="profit-loss">
+      <span><strong>Net Profit:</strong> <span id="netProfitResult">-</span></span>
+    </div>
+
+    <!-- Debt Tracker -->
+    <div class="debt-tracker">
+      <label for="debtAmount">Enter Debt Amount:</label>
+      <input type="number" id="debtAmount" placeholder="e.g., 5000" />
+
+      <label for="debtInterest">Enter Debt Interest Rate (Annual %):</label>
+      <input type="number" id="debtInterest" placeholder="e.g., 5" />
+
+      <label for="debtRepayment">Enter Monthly Repayment:</label>
+      <input type="number" id="debtRepayment" placeholder="e.g., 500" />
+      
+      <button id="calculateDebt">Calculate Debt Repayment</button>
+
+      <div id="debtResult"></div>
+    </div>
+
+    <!-- Cash Flow Tracker -->
+    <div class="cash-flow">
+      <label for="cashInflow">Enter Monthly Cash Inflow:</label>
+      <input type="number" id="cashInflow" placeholder="e.g., 12000" />
+
+      <label for="cashOutflow">Enter Monthly Cash Outflow:</label>
+      <input type="number" id="cashOutflow" placeholder="e.g., 8000" />
+
+      <button id="calculateCashFlow">Calculate Cash Flow</button>
+
+      <div id="cashFlowResult"></div>
+    </div>
+
+    <div class="custom-category">
+      <label for="customCategoryName">Add Custom Expense Category:</label>
+      <input type="text" id="customCategoryName" placeholder="e.g., Marketing" />
+      <input type="number" id="customCategoryAmount" placeholder="Amount" />
+      <button id="addCustomCategory">Add Category</button>
+      <ul id="customCategoriesList"></ul>
+    </div>
+
+    <button id="exportCSV">Export to CSV</button>
+    <button id="exportPDF">Export to PDF</button>
+  </div>
+
+  <script>
+    let businessIncome, revenue, operatingExpenses, capitalExpenses, netProfit;
+    let customCategories = [];
+    let debtAmount, debtInterest, debtRepayment;
+    let cashInflow, cashOutflow;
+
+    // Calculate Budget
+    document.getElementById("calculateBusinessBudget").addEventListener("click", function() {
+      businessIncome = parseFloat(document.getElementById("businessIncome").value);
+
+      if (isNaN(businessIncome) || businessIncome <= 0) {
+        alert("Please enter a valid income.");
+        return;
+      }
+
+      // Define default expense percentages
+      revenue = businessIncome;
+      operatingExpenses = businessIncome * 0.40;  // 40% of income for operating expenses
+      capitalExpenses = businessIncome * 0.10;   // 10% of income for capital expenses
+      netProfit = revenue - operatingExpenses - capitalExpenses;
+
+      // Update results
+      document.getElementById("revenueResult").textContent = `$${revenue.toFixed(2)}`;
+      document.getElementById("operatingExpensesResult").textContent = `$${operatingExpenses.toFixed(2)}`;
+      document.getElementById("capitalExpensesResult").textContent = `$${capitalExpenses.toFixed(2)}`;
+      document.getElementById("netProfitResult").textContent = `$${netProfit.toFixed(2)}`;
+
+      // Show business details
+      document.getElementById("businessDetails").innerHTML = `
+        <label for="operatingExpensesInput">Enter Operating Expenses:</label>
+        <input type="number" id="operatingExpensesInput" placeholder="e.g., 4000" />
+        
+        <label for="capitalExpensesInput">Enter Capital Expenses:</label>
+        <input type="number" id="capitalExpensesInput" placeholder="e.g., 1000" />
+        
+        <button id="checkBudgetBtn">Check Budget</button>
+      `;
+
+      // Pie chart to visualize the budget
+      renderBusinessPieChart(revenue, operatingExpenses, capitalExpenses);
+      
+      document.getElementById("checkBudgetBtn").addEventListener("click", function() {
+        const operatingSpent = parseFloat(document.getElementById("operatingExpensesInput").value);
+        const capitalSpent = parseFloat(document.getElementById("capitalExpensesInput").value);
+
+        if (isNaN(operatingSpent) || isNaN(capitalSpent)) {
+          alert("Please enter valid expense values.");
+          return;
+        }
+
+        let message = "Budget is balanced!";
+        if (operatingSpent > operatingExpenses) message = "You exceeded your Operating Expenses!";
+        if (capitalSpent > capitalExpenses) message = "You exceeded your Capital Expenses!";
+
+        alert(message);
+      });
+    });
+
+    // Render Pie Chart for Business Budget
+    function renderBusinessPieChart(revenue, operatingExpenses, capitalExpenses) {
+      const ctx = document.getElementById('businessChart').getContext('2d');
+      const businessChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Revenue', 'Operating Expenses', 'Capital Expenses'],
+          datasets: [{
+            data: [revenue, operatingExpenses, capitalExpenses],
+            backgroundColor: ['#4caf50', '#ff9800', '#2196f3'],
+            borderColor: ['#fff', '#fff', '#fff'],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(tooltipItem) {
+                  return `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Add Custom Categories for Expenses
+    document.getElementById("addCustomCategory").addEventListener("click", function() {
+      const categoryName = document.getElementById("customCategoryName").value;
+      const categoryAmount = parseFloat(document.getElementById("customCategoryAmount").value);
+
+      if (!categoryName || isNaN(categoryAmount) || categoryAmount <= 0) {
+        alert("Please enter a valid category and amount.");
+        return;
+      }
+
+      customCategories.push({ category: categoryName, amount: categoryAmount });
+      updateCustomCategoryList();
+    });
+
+    // Update Custom Category List
+    function updateCustomCategoryList() {
+      const listElement = document.getElementById("customCategoriesList");
+      listElement.innerHTML = "";
+      
+      customCategories.forEach(function(cat) {
+        const listItem = document.createElement("li");
+        listItem.textContent = `${cat.category}: $${cat.amount.toFixed(2)}`;
+        listElement.appendChild(listItem);
+      });
+    }
+
+    // Debt Repayment Calculation
+    document.getElementById("calculateDebt").addEventListener("click", function() {
+      debtAmount = parseFloat(document.getElementById("debtAmount").value);
+      debtInterest = parseFloat(document.getElementById("debtInterest").value);
+      debtRepayment = parseFloat(document.getElementById("debtRepayment").value);
+
+      if (isNaN(debtAmount) || isNaN(debtInterest) || isNaN(debtRepayment) || debtAmount <= 0 || debtRepayment <= 0) {
+        alert("Please enter valid debt details.");
+        return;
+      }
+
+      const monthlyInterestRate = (debtInterest / 100) / 12;
+      const remainingDebt = debtAmount;
+      const totalMonths = Math.ceil(remainingDebt / debtRepayment);
+
+      const monthlyInterest = debtAmount * monthlyInterestRate;
+      const totalRepayment = debtRepayment * totalMonths;
+
+      document.getElementById("debtResult").innerHTML = `
+        <strong>Remaining Debt:</strong> $${remainingDebt.toFixed(2)} <br>
+        <strong>Monthly Repayment:</strong> $${debtRepayment.toFixed(2)} <br>
+        <strong>Months to Pay Off:</strong> ${totalMonths} months <br>
+        <strong>Interest Per Month:</strong> $${monthlyInterest.toFixed(2)}
+      `;
+    });
+
+    // Cash Flow Calculation
+    document.getElementById("calculateCashFlow").addEventListener("click", function() {
+      cashInflow = parseFloat(document.getElementById("cashInflow").value);
+      cashOutflow = parseFloat(document.getElementById("cashOutflow").value);
+
+      if (isNaN(cashInflow) || isNaN(cashOutflow)) {
+        alert("Please enter valid cash flow values.");
+        return;
+      }
+
+      const cashFlow = cashInflow - cashOutflow;
+      const cashFlowMessage = cashFlow >= 0 ? "Positive Cash Flow" : "Negative Cash Flow";
+
+      document.getElementById("cashFlowResult").innerHTML = `
+        <strong>Cash Flow:</strong> $${cashFlow.toFixed(2)} <br>
+        <strong>Status:</strong> ${cashFlowMessage}
+      `;
+    });
+
+    // Export Budget to CSV
+    document.getElementById("exportCSV").addEventListener("click", function() {
+      const data = [
+        ['Category', 'Amount'],
+        ['Revenue', revenue.toFixed(2)],
+        ['Operating Expenses', operatingExpenses.toFixed(2)],
+        ['Capital Expenses', capitalExpenses.toFixed(2)],
+        ['Net Profit', netProfit.toFixed(2)]
+      ];
+
+      customCategories.forEach(cat => {
+        data.push([cat.category, cat.amount.toFixed(2)]);
+      });
+
+      let csvContent = "data:text/csv;charset=utf-8,";
+      data.forEach(function(rowArray) {
+        let row = rowArray.join(',');
+        csvContent += row + "\r\n";
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "business_budget.csv");
+      link.click();
+    });
+
+    // Export Budget to PDF (Simple Version)
+    document.getElementById("exportPDF").addEventListener("click", function() {
+      const doc = new jsPDF();
+      doc.text('Small Business Budget Report', 20, 20);
+      doc.text(`Revenue: $${revenue.toFixed(2)}`, 20, 30);
+      doc.text(`Operating Expenses: $${operatingExpenses.toFixed(2)}`, 20, 40);
+      doc.text(`Capital Expenses: $${capitalExpenses.toFixed(2)}`, 20, 50);
+      doc.text(`Net Profit: $${netProfit.toFixed(2)}`, 20, 60);
+
+      customCategories.forEach((cat, index) => {
+        doc.text(`${cat.category}: $${cat.amount.toFixed(2)}`, 20, 70 + (index * 10));
+      });
+
+      doc.save("business_budget_report.pdf");
+    });
+
+  </script>
+</body>
+</html>
