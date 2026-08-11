@@ -1,0 +1,965 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>6-Week Budgeting Workshop</title>
+<style>
+:root{
+  --bg:#08162f; --card:#0b1220; --ink:#fffefc; --muted:rgba(255,255,255,.75);
+  --accent:#7dd3fc; --accent2:#60a5fa; --glass:rgba(255,255,255,.05);
+}
+html,body{margin:0;background:linear-gradient(180deg,#061025 0%, #08162f 60%);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Arial}
+.wrap{max-width:1120px;margin:28px auto;padding:16px}
+header{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+h1{margin:0;font-size:34px;line-height:1.1}
+.muted{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
+@media (max-width:880px){.grid{grid-template-columns:1fr}}
+aside{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+main{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);border-radius:14px;padding:16px;min-height:360px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{background:var(--accent);border:none;color:#03131f;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600}
+button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,.2)}
+button.pill{border-radius:999px;padding:6px 12px}
+.bar{height:12px;background:#0a1926;border-radius:10px;overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.card{background:var(--glass);border-radius:12px;padding:14px;margin-bottom:12px}
+.card h2,.card h3{text-align:center;margin-top:6px}
+.card .body{line-height:1.5}
+input[type=text],input[type=number],textarea,select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:var(--ink);border-radius:10px;padding:8px}
+input[type=checkbox]{transform:scale(1.2);margin-right:6px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.12);text-align:left}
+.small{font-size:12px}
+.badge{padding:2px 8px;border:1px solid rgba(255,255,255,.2);border-radius:999px;font-size:12px}
+.hidden{display:none}
+.resources{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;margin-top:10px}
+.res-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.res-list a{color:#eaf6ff}
+footer{margin-top:14px;text-align:center;color:var(--muted);font-size:12px}
+
+/* modal */
+.modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);z-index:50}
+.modal.show{display:flex}
+.modal .box{max-width:460px;width:100%}
+
+/* tools grids */
+.toolgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.toolcard{background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px}
+.totals{display:flex;gap:10px;flex-wrap:wrap}
+.totals .t{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg width="40" height="40" viewBox="0 0 44 44" style="border-radius:12px"><rect rx="12" width="44" height="44" fill="#7dd3fc"/><text x="22" y="26" text-anchor="middle" font-size="20" font-family="Arial" fill="#021b2c">$</text></svg>
+    <div>
+      <h1>6-Week Budgeting Workshop</h1>
+      <div class="muted">Local-only saves • No external dependencies • Printable certificate</div>
+    </div>
+    <div style="margin-left:auto;min-width:220px">
+      <div class="muted">Participant</div>
+      <input id="participantName" placeholder="Your name…"/>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside>
+      <div class="row" style="justify-content:space-between">
+        <div><strong>Progress</strong> <span id="pct" class="muted">0%</span></div>
+        <button id="saveBtn" class="pill">Save</button>
+      </div>
+      <div class="bar" style="margin:8px 0 10px"><i id="bar" style="width:0%"></i></div>
+      <div class="row">
+        <button id="resetBtn" class="ghost">Reset</button>
+        <button id="exportNotesBtn" class="ghost">Export Notes</button>
+        <button id="exportBtn" class="ghost">Export JSON</button>
+        <button id="certBtn" class="ghost">Certificate</button>
+      </div>
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:12px 0"/>
+      <div><strong>Weeks</strong></div>
+      <div id="weekList" class="small" style="max-height:50vh;overflow:auto;margin-top:6px"></div>
+    </aside>
+
+    <main>
+      <div id="lessonView" class="card">
+        <h2 id="lessonTitle">Welcome</h2>
+        <div id="lessonBody" class="body">
+          <p>This 6-week workshop walks individuals or families from first principles to a working, realistic budget. You’ll choose categories, build a monthly plan, evaluate debt strategies, set savings goals, and design a resilient system.</p>
+          <div class="row" style="margin-top:8px"><button id="startBtn">Start Week 1</button></div>
+        </div>
+      </div>
+
+      <!-- Collapsible Resources -->
+      <div id="resWrap" class="resources hidden">
+        <div id="resHead" class="res-head">
+          <strong>Resources</strong>
+          <button id="toggleRes" class="pill ghost" aria-expanded="false">Show</button>
+        </div>
+        <div id="resList" class="res-list"></div>
+      </div>
+
+      <!-- Quiz Modal -->
+      <div id="quizModal" class="modal">
+        <div class="card box">
+          <h3 id="quizTitle">Pop Quiz</h3>
+          <div id="quizQ" class="body"></div>
+          <div id="quizA" style="margin-top:8px"></div>
+          <div class="row" style="margin-top:10px">
+            <button id="quizSubmit">Submit</button>
+            <button id="quizSkip" class="ghost">Skip</button>
+          </div>
+          <div id="quizFb" class="muted small" style="margin-top:6px"></div>
+        </div>
+      </div>
+
+      <!-- Week Test -->
+      <div id="testWrap" class="card hidden">
+        <h3 id="testTitle">Week Test</h3>
+        <div id="testBody"></div>
+        <div class="row" style="margin-top:10px">
+          <button id="testSubmit">Submit Test</button>
+          <button id="testClose" class="ghost">Close</button>
+        </div>
+        <div id="testResult" class="small muted" style="margin-top:6px"></div>
+      </div>
+
+      <!-- Tools Surface (stays on page; sections toggle) -->
+      <div id="toolsSurface" class="card hidden">
+        <h3>Interactive Budget Tools</h3>
+        <div class="toolgrid">
+          <div class="toolcard">
+            <h4>1) Category Selector → Budget Builder</h4>
+            <div class="small muted">Check categories, then “Add Selected to Budget”.</div>
+            <div style="max-height:220px;overflow:auto;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px;margin-top:6px" id="categoryList"></div>
+            <div class="row" style="margin-top:8px">
+              <button id="addCatsBtn">Add Selected to Budget</button>
+              <button id="clearCatsBtn" class="ghost">Clear Checks</button>
+            </div>
+          </div>
+
+          <div class="toolcard">
+            <h4>2) Monthly Budget</h4>
+            <div class="row small">
+              <select id="methodSelect">
+                <option value="zero">Zero-based</option>
+                <option value="503020">50/30/20 Guide</option>
+                <option value="custom">Custom</option>
+              </select>
+              <input id="monthlyIncome" type="number" step="0.01" placeholder="Monthly take-home (e.g., 4000)"/>
+              <button id="recalcBtn" class="ghost">Recalc</button>
+            </div>
+            <div class="totals" style="margin:6px 0">
+              <div class="t">Income: $<span id="tIncome">0</span></div>
+              <div class="t">Planned: $<span id="tPlanned">0</span></div>
+              <div class="t">Variance: $<span id="tVariance">0</span></div>
+              <div class="t" id="guideHint" title="Guide only" style="display:none">50/30/20 targets shown in hints</div>
+            </div>
+            <table id="budgetTable">
+              <thead><tr><th>Category</th><th style="width:120px">Planned ($)</th><th></th></tr></thead>
+              <tbody id="budgetBody"></tbody>
+            </table>
+            <div class="row" style="margin-top:6px">
+              <input id="newCatName" placeholder="Add custom category…"/>
+              <button id="addCatRow" class="ghost">Add Row</button>
+              <button id="clearBudget" class="ghost">Clear Budget</button>
+            </div>
+          </div>
+
+          <div class="toolcard">
+            <h4>3) Debt Planner</h4>
+            <div class="small muted">Enter balances, APR, and minimums. Choose Snowball or Avalanche.</div>
+            <table>
+              <thead><tr><th>Debt</th><th>Balance</th><th>APR %</th><th>Min</th><th></th></tr></thead>
+              <tbody id="debtBody"></tbody>
+            </table>
+            <div class="row" style="margin-top:6px">
+              <input id="dName" placeholder="Name (e.g., Card A)"/>
+              <input id="dBal" type="number" step="0.01" placeholder="Balance"/>
+              <input id="dApr" type="number" step="0.01" placeholder="APR %"/>
+              <input id="dMin" type="number" step="0.01" placeholder="Min"/>
+              <button id="addDebt" class="ghost">Add</button>
+            </div>
+            <div class="row" style="margin-top:6px">
+              <select id="debtMode">
+                <option value="snowball">Snowball (smallest balance first)</option>
+                <option value="avalanche">Avalanche (highest APR first)</option>
+              </select>
+              <button id="planDebtBtn">Plan Payoff</button>
+            </div>
+            <pre id="debtPlan" class="small" style="white-space:pre-wrap"></pre>
+          </div>
+
+          <div class="toolcard">
+            <h4>4) Savings & Sinking Funds</h4>
+            <div class="row">
+              <input id="svGoal" type="number" step="0.01" placeholder="Target amount (e.g., 1200)"/>
+              <input id="svMonths" type="number" step="1" placeholder="Months (e.g., 12)"/>
+              <button id="svCalc" class="ghost">Plan</button>
+            </div>
+            <div class="small">Needed per month: $<span id="svPerMo">0</span></div>
+            <div style="margin-top:8px">
+              <div class="small muted">Sinking funds (recurring irregulars)</div>
+              <table>
+                <thead><tr><th>Name</th><th>Annual $</th><th>Monthly $</th><th></th></tr></thead>
+                <tbody id="sinkBody"></tbody>
+              </table>
+              <div class="row" style="margin-top:6px">
+                <input id="skName" placeholder="e.g., Car insurance"/>
+                <input id="skAnnual" type="number" step="0.01" placeholder="Annual cost"/>
+                <button id="addSink" class="ghost">Add</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="toolcard">
+            <h4>5) Subscription Audit</h4>
+            <div class="small muted">List recurring subscriptions to include in budget.</div>
+            <table>
+              <thead><tr><th>Service</th><th>Monthly $</th><th></th></tr></thead>
+              <tbody id="subBody"></tbody>
+            </table>
+            <div class="row" style="margin-top:6px">
+              <input id="subName" placeholder="Netflix, Gym, Cloud…"/>
+              <input id="subAmt" type="number" step="0.01" placeholder="$/mo"/>
+              <button id="addSub" class="ghost">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificate -->
+      <div id="certWrap" class="card hidden">
+        <h3>Completion Certificate</h3>
+        <div id="certBody" class="body"></div>
+        <div class="row" style="margin-top:8px"><button onclick="window.print()" class="ghost">Print / Save</button></div>
+      </div>
+    </main>
+  </div>
+
+  <footer>Local-only save. Extend questions/links in code as needed.</footer>
+</div>
+
+<script>
+/* ===== Helpers & State ===== */
+const $=id=>document.getElementById(id);
+const STORE="budget_workshop_v1";
+const state={
+  name:"", week:1, lesson:0,
+  notes:{}, quizzes:[], tests:{}, doneWeeks:[],
+  // tools state:
+  catChecks:{}, // label -> checked
+  budgetRows:[], // [{name, amt}]
+  method:"zero", income:0,
+  debts:[], // [{name,balance,apr,min}]
+  sinks:[], // [{name, annual}]
+  subs:[]   // [{name, amt}]
+};
+function money(n){ if(isNaN(n)||!isFinite(n)) return 0; return Math.round(n*100)/100; }
+function load(){
+  try{
+    Object.assign(state, JSON.parse(localStorage.getItem(STORE)||"{}"));
+  }catch(e){}
+  if(!state.notes || typeof state.notes!=="object") state.notes={};
+  if(!Array.isArray(state.doneWeeks)) state.doneWeeks=[];
+  $("participantName").value=state.name||"";
+  progressUI();
+}
+function save(silent=false){
+  state.name=$("participantName").value.trim()||"Participant";
+  try{
+    localStorage.setItem(STORE,JSON.stringify(state));
+    if(!silent) alert("Saved locally.");
+  }catch(e){
+    if(!silent) alert("Save failed (storage blocked).");
+  }
+}
+function resetAll(){
+  if(!confirm("Reset all local progress?")) return;
+  localStorage.removeItem(STORE);
+  location.reload();
+}
+
+/* ===== Curriculum (6 Weeks) ===== */
+const resourcesCommon=[
+  {label:"Budgeting basics (consumer.gov)", url:"https://consumer.gov/budgeting"},
+  {label:"Debt payoff methods overview", url:"https://www.consumerfinance.gov/ask-cfpb/what-is-the-debt-snowball-method-en-1457/"},
+  {label:"50/30/20 overview", url:"https://www.consumerfinance.gov/consumer-tools/budgeting/"},
+];
+const curriculum=[
+  {week:1,title:"Foundations & Set-Up",
+   lessons:[
+     {title:"Why Budget? Goals & Reality Check",
+      contentHtml:`<p><strong>Mini-lesson.</strong> A budget is a plan for your money that matches what you value with what you earn. Start by writing 3 goals (e.g., build $1,000 emergency fund, pay off Card X, cash-flow a trip) and gathering last 1–3 months of bank/cc statements for a reality check.</p>
+      <p><em>Activity.</em> Write your 3 goals and list all income sources + pay frequencies.</p>`,
+      resources:[...resourcesCommon]},
+     {title:"Pick a Method & Prepare Categories",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Popular methods: <em>Zero-based</em> (every dollar assigned), <em>50/30/20</em> (needs/wants/saving guide), or a <em>Custom hybrid</em>. Use a comprehensive categories list so you don’t miss irregulars (insurance, subscriptions, gifts).</p>
+      <p><em>Activity.</em> Use the Category Selector to choose all that apply; add any custom ones; then open Monthly Budget.</p>`,
+      resources:[...resourcesCommon]
+     }],
+   test:[
+     {q:"A budget is best described as…",choices:["a money diary only","a plan aligning money with priorities","a loan"],a:1},
+     {q:"Zero-based means…",choices:["spend zero","assign every dollar a job","save 20%"],a:1},
+     {q:"A good first step is…",choices:["ignore statements","collect past spending","close all accounts"],a:1},
+     {q:"The 50/30/20 rule is…",choices:["a law","a guideline","insurance"],a:1},
+     {q:"Irregulars should be…",choices:["ignored","planned via sinking funds","put on credit"],a:1},
+     {q:"Budgeting works best when tied to…",choices:["clear goals","guesswork","luck"],a:0},
+     {q:"A comprehensive categories list helps…",choices:["forget bills","catch blind spots","double spending"],a:1},
+     {q:"Pick a method that…",choices:["fits your lifestyle","is trendy only","none"],a:0}
+   ]},
+  {week:2,title:"Track & Measure",
+   lessons:[
+     {title:"Income, Fixed & Variable",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Separate <em>income</em>, <em>fixed expenses</em> (rent, insurance), and <em>variable</em> (groceries, fuel). Track for a month to reveal patterns and leaks.</p>
+      <p><em>Activity.</em> Enter take-home income and begin filling planned amounts for fixed categories first.</p>`,
+      resources:[...resourcesCommon]},
+     {title:"Reality vs Plan: Variance",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Your plan meets reality via <em>variance</em> (income − planned). Positive variance can go to goals; negative means trim and reassign.</p>
+      <p><em>Activity.</em> Use the totals above the table; adjust categories until variance is near $0 (zero-based) or meeting 50/30/20 guidance.</p>`,
+      resources:[...resourcesCommon]}],
+   test:[
+     {q:"Fixed expenses are…",choices:["highly predictable","random daily","tips"],a:0},
+     {q:"Variable examples include…",choices:["rent","groceries","mortgage"],a:1},
+     {q:"Variance is…",choices:["planned−income","income−planned","APR"],a:1},
+     {q:"If variance is negative…",choices:["increase spending","trim or shift","ignore"],a:1},
+     {q:"Track at least…",choices:["one month","one day","one year first"],a:0},
+     {q:"Guidelines like 50/30/20 are…",choices:["mandatory","reference points","unrelated"],a:1},
+     {q:"Sinking funds help with…",choices:["recurring irregulars","investing only","debt interest"],a:0},
+     {q:"Use categories list to…",choices:["forget items","cover blind spots","add debt"],a:1}
+   ]},
+  {week:3,title:"Methods in Practice",
+   lessons:[
+     {title:"Zero-Based vs 50/30/20 vs Custom",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Zero-based maximizes intention; 50/30/20 offers quick calibration; custom blends rules of thumb with your goals.</p>
+      <p><em>Activity.</em> Switch the method selector and note target hints; adjust categories to fit your context.</p>`,
+      resources:[...resourcesCommon]},
+     {title:"Envelope Thinking & Automation",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Digital “envelopes” (separate rows/sinking funds) and automatic transfers reduce friction and decision fatigue.</p>
+      <p><em>Activity.</em> Create at least three sinking funds (e.g., auto insurance, gifts, travel) and note monthly amounts.</p>`,
+      resources:[...resourcesCommon]}],
+   test:[
+     {q:"Zero-based focuses on…",choices:["assigning each dollar","cutting all wants","only cash"],a:0},
+     {q:"50/30/20 splits into…",choices:["needs/wants/saving","bills/fees/tips","unknown"],a:0},
+     {q:"Automation helps by…",choices:["adding friction","reducing missed actions","increasing debt"],a:1},
+     {q:"Envelopes are…",choices:["physical only","category buckets","credit limits"],a:1},
+     {q:"Custom method…",choices:["is illegal","mixes rules and goals","means no plan"],a:1},
+     {q:"Sinking funds are good for…",choices:["annual costs","monthly rent only","random"],a:0},
+     {q:"Target hints are…",choices:["binding","guides","ads"],a:1},
+     {q:"Decision fatigue …",choices:["helps","hurts consistency","is APR"],a:1}
+   ]},
+  {week:4,title:"Debt Strategy",
+   lessons:[
+     {title:"Snowball vs Avalanche",
+      contentHtml:`<p><strong>Mini-lesson.</strong> <em>Snowball</em>: pay smallest balance first for momentum. <em>Avalanche</em>: highest APR first for math-optimal interest savings. Both require paying minimums on others.</p>
+      <p><em>Activity.</em> Enter your debts, select a strategy, and generate an order and rough payoff timeline.</p>`,
+      resources:[...resourcesCommon]},
+     {title:"Refinance & Behavior Traps",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Consider consolidation/refi only if rate and term reduce total interest and behavior stays disciplined. Avoid balance-transfer traps (reverting rates, fees).</p>
+      <p><em>Activity.</em> Note at least one habit change to keep balances from rising again.</p>`,
+      resources:[...resourcesCommon]}],
+   test:[
+     {q:"Snowball prioritizes…",choices:["highest APR","smallest balance","random"],a:1},
+     {q:"Avalanche prioritizes…",choices:["highest APR","lowest payment","largest credit line"],a:0},
+     {q:"Always pay…",choices:["only the top debt","minimums on all","nothing"],a:1},
+     {q:"Refi makes sense when…",choices:["total interest falls","fees explode","term doubles costs"],a:0},
+     {q:"Balance transfers can hide…",choices:["no fees","revert rates/fees","guaranteed 0% forever"],a:1},
+     {q:"Debt plans work with…",choices:["discipline & budget fit","luck","daily switches"],a:0},
+     {q:"Momentum benefit is tied to…",choices:["snowball","avalanche","roulette"],a:0},
+     {q:"Math savings is tied to…",choices:["snowball","avalanche","dice"],a:1}
+   ]},
+  {week:5,title:"Savings, Buffers & Big Rocks",
+   lessons:[
+     {title:"Emergency Funds & Time Horizons",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Build a starter buffer (e.g., $1,000) then 1–3 months expenses, adjusting for stability/risk. Match goals to horizons: short-term cash, medium-term conservative mix.</p>
+      <p><em>Activity.</em> Use the Savings planner to set monthly amounts to reach a target within a time.</p>`,
+      resources:[...resourcesCommon]},
+     {title:"Sinking Funds for Irregulars",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Annual/quarterly costs sink budgets when unplanned. Break them into monthly set-asides so they’re ready on time.</p>
+      <p><em>Activity.</em> Add 3–5 sinking funds and include their monthly amounts in your budget.</p>`,
+      resources:[...resourcesCommon]}],
+   test:[
+     {q:"A starter emergency fund is often…",choices:["$1,000","$10","$100,000"],a:0},
+     {q:"3-month buffer depends on…",choices:["risk & stability","luck only","color"],a:0},
+     {q:"Short-term goals generally fit…",choices:["cash/low-risk","speculative assets","unplanned"],a:0},
+     {q:"Sinking funds prevent…",choices:["surprises","savings","budgets"],a:0},
+     {q:"Monthly set-aside equals…",choices:["annual/12","annual*12","annual/3"],a:0},
+     {q:"Buffers reduce…",choices:["resilience","stress","income"],a:1},
+     {q:"Time horizon = …",choices:["when needed","APR","ZIP"],a:0},
+     {q:"Big purchases should be…",choices:["planned","ignored","financed blindly"],a:0}
+   ]},
+  {week:6,title:"Review, Iterate, Resilience",
+   lessons:[
+     {title:"Quarterly Review & Life Changes",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Update categories, renegotiate bills, and re-aim dollars as life changes (moves, raises, new dependents). Keep a rolling 90-day review habit.</p>
+      <p><em>Activity.</em> Schedule a review date and list 2 bills to renegotiate.</p>`,
+      resources:[...resourcesCommon]},
+     {title:"Protect the Plan",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Safeguards: adequate insurance, identity monitoring, fraud alerts, and separating savings from spending account to reduce temptation.</p>
+      <p><em>Activity.</em> Write three guardrails for yourself (alerts, separate account, spending cap).</p>`,
+      resources:[...resourcesCommon]}],
+   test:[
+     {q:"A review cadence could be…",choices:["every 90 days","never","random years"],a:0},
+     {q:"Bills can sometimes be…",choices:["renegotiated","only increased","secret"],a:0},
+     {q:"Separating savings helps…",choices:["temptation","clarity & discipline","fees"],a:1},
+     {q:"Identity/fraud alerts…",choices:["are useless","protect accounts","increase risk"],a:1},
+     {q:"Insurance supports…",choices:["risk transfer","higher spending","none"],a:0},
+     {q:"Budgets should…",choices:["never change","adapt to life","vanish"],a:1},
+     {q:"Guardrails are…",choices:["practical limits/rules","decorations","loans"],a:0},
+     {q:"Quarterly reviews help…",choices:["drift","stick the plan","randomness"],a:1}
+   ]}
+];
+
+/* ===== Budget Categories Master List ===== */
+const CATEGORY_GROUPS=[
+  {name:"Housing", items:["Mortgage or rent","Property taxes","Household repairs","HOA fees"]},
+  {name:"Transportation", items:["Car payment","Car warranty","Gas","Tires","Maintenance and oil changes","Parking fees","Repairs","Registration and DMV Fees"]},
+  {name:"Food", items:["Groceries","Restaurants","Pet food"]},
+  {name:"Utilities", items:["Electricity","Water","Garbage","Phones","Cable","Internet"]},
+  {name:"Clothing", items:["Adults’ clothing","Adults’ shoes","Children’s clothing","Children’s shoes"]},
+  {name:"Medical/Healthcare", items:["Primary care","Dental care","Specialty care","Urgent care","Medications","Medical devices"]},
+  {name:"Insurance", items:["Health insurance","Homeowner’s or renter’s insurance","Home warranty or protection plan","Auto insurance","Life insurance","Disability insurance"]},
+  {name:"Household Items/Supplies", items:["Toiletries","Laundry detergent","Dishwasher detergent","Cleaning supplies","Tools"]},
+  {name:"Personal", items:["Gym memberships","Haircuts","Salon services","Cosmetics","Babysitter","Subscriptions"]},
+  {name:"Debt", items:["Personal loans","Student loans","Credit cards"]},
+  {name:"Retirement", items:["Financial planning","Investing"]},
+  {name:"Education", items:["Children’s college","Your college","School supplies","Books"]},
+  {name:"Savings", items:["Emergency fund","Big purchases","Other savings"]},
+  {name:"Gifts/Donations", items:["Birthday","Anniversary","Wedding","Christmas","Special occasion","Charities"]},
+  {name:"Entertainment", items:["Alcohol and/or bars","Games","Movies","Concerts","Vacations","Subscriptions (Netflix, Amazon, Hulu, etc.)"]}
+];
+
+/* ===== Rendering: Weeks & Lessons ===== */
+function buildWeekList(){
+  const box=$("weekList"); box.innerHTML="";
+  curriculum.forEach(w=>{
+    const wrap=document.createElement("div");
+    wrap.className="card";
+    wrap.style.background="rgba(255,255,255,.03)";
+    wrap.innerHTML=`
+      <div><strong>Week ${w.week}: ${w.title}</strong> ${state.doneWeeks.includes(w.week)?'<span class="badge">✓ Done</span>':''}</div>
+      <div class="muted small">${w.lessons.length} lessons • Test included</div>
+      <div id="wk${w.week}Btns" class="row" style="margin-top:8px"></div>`;
+    box.appendChild(wrap);
+    const btns=wrap.querySelector("#wk"+w.week+"Btns");
+    w.lessons.forEach((l,li)=>{
+      const b=document.createElement("button");
+      b.textContent=`W${w.week}: ${l.title}`;
+      b.onclick=()=>startLesson(w.week,li);
+      btns.appendChild(b);
+    });
+    const t=document.createElement("button");
+    t.className="ghost"; t.textContent=`Week ${w.week} Test`;
+    t.onclick=()=>openTest(w.week);
+    btns.appendChild(t);
+  });
+}
+function startLesson(week, li){
+  state.week=week; state.lesson=li; save(true);
+  const W=curriculum.find(x=>x.week===week), L=W.lessons[li];
+  const existingNotes = state.notes[week] || "";
+  $("lessonTitle").textContent=`Week ${week} — ${L.title}`;
+  $("lessonBody").innerHTML=`
+    ${L.contentHtml}
+    <div class="row" style="margin-top:10px">
+      <button id="openTools">Open Activities & Tools</button>
+      <button id="openRes" class="ghost">Resources</button>
+      <button id="takeTest" class="ghost">Week ${week} Test</button>
+    </div>
+    <div style="margin-top:12px">
+      <div class="small" style="margin-bottom:4px;color:var(--muted)">
+        Week ${week} notes (local only — for your reflections, questions, and action steps)
+      </div>
+      <textarea id="weekNotes" rows="4" placeholder="Jot down what you learned this week..."></textarea>
+    </div>`;
+  const notesBox=$("weekNotes");
+  notesBox.value=existingNotes;
+  notesBox.addEventListener("input",()=>{
+    state.notes[week]=notesBox.value;
+    save(true);
+  });
+  renderResources(L.resources||[]);
+  $("resWrap").classList.add("hidden");
+  $("toggleRes").textContent="Show";
+  $("toggleRes").setAttribute("aria-expanded","false");
+  $("openTools").onclick=()=>showTools();
+  $("openRes").onclick=()=>toggleResources(true);
+  $("takeTest").onclick=()=>openTest(week);
+}
+
+/* ===== Resources Collapsible ===== */
+function renderResources(arr){
+  const res=$("resList"); res.innerHTML="";
+  if(!arr||!arr.length){
+    res.innerHTML=`<div class="small muted">No links provided for this lesson.</div>`;
+    return;
+  }
+  const ul=document.createElement("ul");
+  ul.style.margin="6px 0 0 18px";
+  arr.forEach(r=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<a href="${r.url}" target="_blank" rel="noopener">${r.label}</a>`;
+    ul.appendChild(li);
+  });
+  res.appendChild(ul);
+}
+function toggleResources(forceOpen){
+  const w=$("resWrap"); const btn=$("toggleRes");
+  const isOpen=!w.classList.contains("hidden");
+  const wantOpen = forceOpen ? true : !isOpen;
+  if(wantOpen){
+    w.classList.remove("hidden");
+    btn.textContent="Hide";
+    btn.setAttribute("aria-expanded","true");
+  } else {
+    w.classList.add("hidden");
+    btn.textContent="Show";
+    btn.setAttribute("aria-expanded","false");
+  }
+}
+$("toggleRes").onclick=()=>toggleResources();
+
+/* ===== Quizzes ===== */
+function launchQuiz(week, li){
+  const L=curriculum.find(x=>x.week===week).lessons[li];
+  const qs=(L.quiz||defaultQuiz(L.title)).slice(0,3);
+  let idx=0, ok=0;
+  $("quizModal").classList.add("show");
+  function draw(){
+    const q=qs[idx];
+    $("quizTitle").textContent=`Pop Quiz — Week ${week} • Q${idx+1}/${qs.length}`;
+    $("quizQ").textContent=q.q;
+    const box=$("quizA"); box.innerHTML="";
+    q.choices.forEach((c,i)=>{
+      const d=document.createElement("div");
+      d.innerHTML=`<label><input type="radio" name="qa" value="${i}"> ${c}</label>`;
+      box.appendChild(d);
+    });
+    $("quizFb").textContent="";
+  }
+  draw();
+  $("quizSubmit").onclick=()=>{
+    const sel=document.querySelector('input[name="qa"]:checked');
+    if(!sel){
+      $("quizFb").textContent="Choose an answer.";
+      return;
+    }
+    const q=qs[idx];
+    if(parseInt(sel.value,10)===q.a){
+      ok++;
+      $("quizFb").textContent="Correct!";
+    } else {
+      $("quizFb").textContent=`Answer: ${q.choices[q.a]}`;
+    }
+    idx++;
+    if(idx<qs.length){
+      setTimeout(draw,500);
+    } else {
+      state.quizzes.push({w:week,l:li,ok});
+      save(true);
+      setTimeout(()=>{
+        $("quizModal").classList.remove("show");
+        $("quizFb").textContent="";
+      },500);
+    }
+  };
+  $("quizSkip").onclick=()=>{$("quizModal").classList.remove("show");};
+}
+function defaultQuiz(title){
+  return [
+    {q:`Why does "${title}" matter?`,choices:["It doesn’t","It supports a working plan","It’s random"],a:1},
+    {q:"Best time to adjust a budget is…",choices:["never","when variance shows issues","yearly only"],a:1},
+    {q:"Sinking funds help with…",choices:["surprises","fun only","APR"],a:0},
+  ];
+}
+
+/* ===== Tests ===== */
+function openTest(week){
+  $("testWrap").classList.remove("hidden");
+  $("certWrap").classList.add("hidden");
+  const W=curriculum.find(x=>x.week===week);
+  $("testTitle").textContent=`Week ${week} Test — ${W.title}`;
+  const body=$("testBody"); body.innerHTML="";
+  W.test.forEach((t,i)=>{
+    const b=document.createElement("div");
+    b.className="qblock";
+    b.innerHTML=`<div><strong>Q${i+1}.</strong> ${t.q}</div>`;
+    t.choices.forEach((c,ci)=>{
+      const r=document.createElement("div");
+      r.innerHTML=`<label><input type="radio" name="t${i}" value="${ci}"> ${c}</label>`;
+      b.appendChild(r);
+    });
+    body.appendChild(b);
+  });
+  $("testSubmit").onclick=()=>submitTest(week);
+  $("testClose").onclick=()=>$("testWrap").classList.add("hidden");
+}
+function submitTest(week){
+  const W=curriculum.find(x=>x.week===week);
+  let right=0;
+  W.test.forEach((t,i)=>{
+    const sel=document.querySelector(`input[name="t${i}"]:checked`);
+    if(sel && parseInt(sel.value,10)===t.a) right++;
+  });
+  const pct=Math.round((right/W.test.length)*100);
+  $("testResult").textContent=`Score: ${pct}% (${right}/${W.test.length})`;
+  state.tests["w"+week]=pct;
+  if(pct>=70 && !state.doneWeeks.includes(week)) state.doneWeeks.push(week);
+  save(true);
+  progressUI();
+  buildWeekList();
+}
+
+/* ===== Certificate ===== */
+function maybeCert(){
+  if(state.doneWeeks.length!==curriculum.length){
+    alert("Finish all week tests (≥70%) to unlock certificate.");
+    return;
+  }
+  const list=Object.entries(state.tests).map(([k,v])=>`${k.toUpperCase()}: ${v}%`).join(" · ");
+  $("certBody").innerHTML=`<p><strong>Certificate of Completion</strong></p>
+    <p>This certifies that <strong>${state.name||"Participant"}</strong> successfully completed all 6 weeks of the Budgeting Workshop.</p>
+    <p class="small">Scores — ${list}</p>
+    <p class="small">Coach/Facilitator: ____________________</p>`;
+  $("certWrap").classList.remove("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ===== Tools: UI ===== */
+function showTools(){
+  $("toolsSurface").classList.remove("hidden");
+  buildCategoryList();
+  drawBudget();
+  drawDebts();
+  drawSinks();
+  drawSubs();
+}
+function buildCategoryList(){
+  const box=$("categoryList"); box.innerHTML="";
+  CATEGORY_GROUPS.forEach(g=>{
+    const grp=document.createElement("div");
+    grp.style.marginBottom="6px";
+    grp.innerHTML=`<div style="font-weight:700;margin:6px 0">${g.name}</div>`;
+    g.items.forEach(item=>{
+      const id=`cat_${g.name}_${item}`.replace(/\W+/g,"_");
+      const row=document.createElement("div");
+      row.className="small";
+      const chk=document.createElement("input");
+      chk.type="checkbox";
+      chk.id=id;
+      chk.checked=!!state.catChecks[item];
+      chk.onchange=()=>{
+        state.catChecks[item]=chk.checked;
+        save(true);
+      };
+      const label=document.createElement("label");
+      label.htmlFor=id;
+      label.textContent=" "+item;
+      row.appendChild(chk);
+      row.appendChild(label);
+      grp.appendChild(row);
+    });
+    box.appendChild(grp);
+  });
+}
+function addSelectedCats(){
+  const selected=Object.keys(state.catChecks).filter(k=>state.catChecks[k]);
+  selected.forEach(name=>{
+    if(!state.budgetRows.find(r=>r.name===name)){
+      state.budgetRows.push({name,amt:0});
+    }
+  });
+  save(true);
+  drawBudget();
+}
+function clearChecks(){
+  state.catChecks={};
+  save(true);
+  buildCategoryList();
+}
+
+/* Budget table */
+function drawBudget(){
+  $("methodSelect").value=state.method||"zero";
+  $("monthlyIncome").value=state.income||"";
+  $("guideHint").style.display=(state.method==="503020")?"block":"none";
+  const body=$("budgetBody"); body.innerHTML="";
+  state.budgetRows.forEach((r,idx)=>{
+    const tr=document.createElement("tr");
+    const nameCell=document.createElement("td");
+    nameCell.textContent=r.name;
+    const amtCell=document.createElement("td");
+    const inp=document.createElement("input");
+    inp.type="number";
+    inp.step="0.01";
+    inp.value=(r.amt||0);
+    inp.oninput=()=>{
+      r.amt=money(parseFloat(inp.value));
+      recalcBudget();
+      save(true);
+    };
+    amtCell.appendChild(inp);
+    const del=document.createElement("td");
+    const b=document.createElement("button");
+    b.className="ghost";
+    b.textContent="Remove";
+    b.onclick=()=>{
+      state.budgetRows.splice(idx,1);
+      drawBudget();
+      save(true);
+    };
+    del.appendChild(b);
+    tr.appendChild(nameCell);
+    tr.appendChild(amtCell);
+    tr.appendChild(del);
+    body.appendChild(tr);
+  });
+  recalcBudget();
+}
+function recalcBudget(){
+  const inc=money(parseFloat($("monthlyIncome").value||state.income||0));
+  state.income=inc;
+  const planned=money(state.budgetRows.reduce((s,r)=>s+(r.amt||0),0));
+  $("tIncome").textContent=inc.toFixed(2);
+  $("tPlanned").textContent=planned.toFixed(2);
+  $("tVariance").textContent=(inc-planned).toFixed(2);
+}
+function addCustomRow(){
+  const name=$("newCatName").value.trim();
+  if(!name) return;
+  if(!state.budgetRows.find(r=>r.name===name)){
+    state.budgetRows.push({name,amt:0});
+    save(true);
+    drawBudget();
+  }
+  $("newCatName").value="";
+}
+function clearBudget(){
+  if(!confirm("Clear all budget rows?")) return;
+  state.budgetRows=[];
+  save(true);
+  drawBudget();
+}
+
+/* Debt planner */
+function drawDebts(){
+  const body=$("debtBody"); body.innerHTML="";
+  state.debts.forEach((d,idx)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${d.name}</td>
+      <td>$${money(d.balance).toFixed(2)}</td>
+      <td>${money(d.apr).toFixed(2)}</td>
+      <td>$${money(d.min).toFixed(2)}</td>
+      <td><button class="ghost" data-i="${idx}">Remove</button></td>`;
+    body.appendChild(tr);
+  });
+  body.querySelectorAll("button[data-i]").forEach(btn=>{
+    btn.onclick=()=>{
+      state.debts.splice(parseInt(btn.dataset.i,10),1);
+      save(true);
+      drawDebts();
+    };
+  });
+}
+function addDebt(){
+  const name=$("dName").value.trim();
+  const bal=money(parseFloat($("dBal").value));
+  const apr=money(parseFloat($("dApr").value));
+  const min=money(parseFloat($("dMin").value));
+  if(!name||bal<=0||apr<0||min<=0){
+    alert("Enter name, balance, APR, and minimum.");
+    return;
+  }
+  state.debts.push({name,balance:bal,apr,min});
+  save(true);
+  drawDebts();
+  ["dName","dBal","dApr","dMin"].forEach(id=>$(id).value="");
+}
+function planDebt(){
+  if(!state.debts.length){
+    $("debtPlan").textContent="No debts entered.";
+    return;
+  }
+  const mode=$("debtMode").value;
+  const items=state.debts.map(d=>({...d}));
+  items.sort((a,b)=> mode==="snowball" ? a.balance-b.balance : b.apr-a.apr);
+  let txt=`Strategy: ${mode==="snowball"?"Snowball (smallest balance first)":"Avalanche (highest APR first)"}\nOrder:\n`;
+  items.forEach((d,i)=>{
+    txt+=`${i+1}. ${d.name} — Bal $${d.balance.toFixed(2)} @ ${d.apr.toFixed(2)}% (Min $${d.min.toFixed(2)})\n`;
+  });
+  txt+="\nTip: After a payoff, roll its payment to the next debt to accelerate.\n";
+  $("debtPlan").textContent=txt;
+}
+
+/* Savings & sinking */
+function planSavings(){
+  const goal=money(parseFloat($("svGoal").value));
+  const m=parseInt($("svMonths").value||"0",10);
+  if(goal<=0||m<=0){
+    $("svPerMo").textContent="0";
+    return;
+  }
+  $("svPerMo").textContent=(goal/m).toFixed(2);
+}
+function drawSinks(){
+  const body=$("sinkBody"); body.innerHTML="";
+  state.sinks.forEach((s,idx)=>{
+    const mo=money(s.annual/12);
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${s.name}</td><td>$${money(s.annual).toFixed(2)}</td><td>$${mo.toFixed(2)}</td>
+      <td><button class="ghost" data-i="${idx}">Remove</button></td>`;
+    body.appendChild(tr);
+  });
+  body.querySelectorAll("button[data-i]").forEach(b=>{
+    b.onclick=()=>{
+      state.sinks.splice(parseInt(b.dataset.i,10),1);
+      save(true);
+      drawSinks();
+    };
+  });
+}
+function addSink(){
+  const name=$("skName").value.trim();
+  const annual=money(parseFloat($("skAnnual").value));
+  if(!name||annual<=0){
+    alert("Enter name and annual cost.");
+    return;
+  }
+  state.sinks.push({name,annual});
+  save(true);
+  drawSinks();
+  $("skName").value="";
+  $("skAnnual").value="";
+}
+
+/* Subscriptions */
+function drawSubs(){
+  const body=$("subBody"); body.innerHTML="";
+  state.subs.forEach((s,idx)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${s.name}</td><td>$${money(s.amt).toFixed(2)}</td><td><button class="ghost" data-i="${idx}">Remove</button></td>`;
+    body.appendChild(tr);
+  });
+  body.querySelectorAll("button[data-i]").forEach(b=>{
+    b.onclick=()=>{
+      state.subs.splice(parseInt(b.dataset.i,10),1);
+      save(true);
+      drawSubs();
+    };
+  });
+}
+function addSub(){
+  const name=$("subName").value.trim();
+  const amt=money(parseFloat($("subAmt").value));
+  if(!name||amt<=0){
+    alert("Enter service and monthly amount.");
+    return;
+  }
+  state.subs.push({name,amt});
+  save(true);
+  drawSubs();
+  $("subName").value="";
+  $("subAmt").value="";
+}
+
+/* ===== Progress & Cert ===== */
+function progressUI(){
+  const total=curriculum.length;
+  const done=state.doneWeeks.length;
+  const pct = total? Math.round((done/total)*100):0;
+  $("pct").textContent=pct+"%";
+  $("bar").style.width=pct+"%";
+}
+
+/* ===== Export (JSON + Notes Text) ===== */
+function exportJSON(){
+  const data=JSON.stringify(state,null,2);
+  const blob=new Blob([data],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=`${state.name||"participant"}_budget_workshop.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportNotesTxt(){
+  const lines=[];
+  lines.push("Khaemaegis Financial Academy — 6-Week Budgeting Workshop");
+  lines.push("Participant: " + (state.name || "Participant"));
+  lines.push("Export date: " + new Date().toLocaleString());
+  lines.push("");
+  lines.push("=== WEEK NOTES ===");
+  curriculum.forEach(w=>{
+    lines.push("");
+    lines.push("Week " + w.week + ": " + w.title);
+    lines.push("Notes:");
+    const note = (state.notes[w.week] || "").trim();
+    lines.push(note ? note : "(none)");
+  });
+  const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=`${state.name||"participant"}_budget_workshop_notes.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+/* ===== Wire Up ===== */
+window.addEventListener("load",()=>{
+  load();
+  buildWeekList();
+  $("startBtn").onclick=()=>startLesson(state.week||1, state.lesson||0);
+  $("saveBtn").onclick=()=>save();
+  $("resetBtn").onclick=()=>resetAll();
+  $("exportBtn").onclick=()=>exportJSON();
+  $("exportNotesBtn").onclick=()=>exportNotesTxt();
+  $("certBtn").onclick=()=>maybeCert();
+
+  // resources toggle header
+  $("resHead").onclick=()=>toggleResources();
+
+  // tools buttons
+  $("addCatsBtn").onclick=addSelectedCats;
+  $("clearCatsBtn").onclick=clearChecks;
+
+  $("methodSelect").onchange=()=>{
+    state.method=$("methodSelect").value;
+    save(true);
+    drawBudget();
+  };
+  $("monthlyIncome").oninput=()=>{
+    state.income=money(parseFloat($("monthlyIncome").value));
+    recalcBudget();
+    save(true);
+  };
+  $("recalcBtn").onclick=recalcBudget;
+  $("addCatRow").onclick=addCustomRow;
+  $("clearBudget").onclick=clearBudget;
+
+  $("addDebt").onclick=addDebt;
+  $("planDebtBtn").onclick=planDebt;
+
+  $("svCalc").onclick=planSavings;
+  $("addSink").onclick=addSink;
+
+  $("addSub").onclick=addSub;
+
+  // Keyboard: Ctrl+Q for quiz on current lesson
+  document.addEventListener("keydown",e=>{
+    if(e.ctrlKey && e.key.toLowerCase()==="q"){
+      e.preventDefault();
+      launchQuiz(state.week||1, state.lesson||0);
+    }
+  });
+});
+</script>
+</body>
+</html>
