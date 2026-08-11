@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Grant & Aid Matcher — Khaemenes Academy</title>
+<style>
+  :root{
+    --ink:#0b1220; --paper:#0f172a; --muted:#cdd6f4; --accent:#7dd3fc; --ok:#22c55e; --warn:#f59e0b;
+  }
+  html,body{margin:0;background:linear-gradient(180deg,#071229 0%,#0b1220 70%);color:#fff;font-family:Inter,system-ui,Segoe UI,Arial}
+  .app{max-width:1050px;margin:24px auto;padding:16px}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:16px}
+  h1{font-size:28px;margin:0}
+  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:840px){.grid{grid-template-columns:1fr}}
+  label{display:block;margin:8px 0 4px}
+  input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.2);color:#fff}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .btn{background:var(--accent);border:none;padding:10px 14px;border-radius:12px;color:#06202f;cursor:pointer;font-weight:600}
+  .btn.outline{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  .pill{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+  .program{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.18);margin-bottom:10px}
+  .program h3{margin:0 0 4px;font-size:16px}
+  .program p{margin:4px 0}
+  a{color:#a5e3ff}
+  .muted{color:#cbd5e1;font-size:13px}
+  .success{color:var(--ok)}
+  .warn{color:var(--warn)}
+  .right{justify-content:flex-end}
+  .sticky{position:sticky;top:8px}
+  .small{font-size:12px;color:#cbd5e1}
+  .footer{margin-top:16px;text-align:center;color:#cbd5e1}
+
+  /* Tabs */
+  .tabs{display:flex;gap:8px;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12)}
+  .tab{background:transparent;border:none;color:#cbd5e1;padding:10px 12px;cursor:pointer;border-bottom:2px solid transparent;font-weight:600}
+  .tab.active{color:#fff;border-bottom-color:var(--accent)}
+  .pane{display:none}
+  .pane.show{display:block}
+
+  /* Safety lists */
+  .checklist{margin:8px 0 0 0; padding-left:0; list-style:none}
+  .checklist li{margin:6px 0; display:flex; gap:8px; align-items:flex-start}
+  .checklist input[type=checkbox]{transform:scale(1.2); margin-top:2px}
+  .hint{background:rgba(125,211,252,.08);border:1px solid rgba(125,211,252,.35);border-radius:10px;padding:10px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <svg width="42" height="42" viewBox="0 0 44 44" style="border-radius:10px">
+      <rect rx="10" width="44" height="44" fill="#7dd3fc"/>
+      <text x="22" y="27" text-anchor="middle" font-size="20" font-family="Arial" fill="#021b2c">$</text>
+    </svg>
+    <div>
+      <h1>Grant & Aid Matcher</h1>
+      <div class="small">Private, local-only survey → tailored scholarships, grants & community help.</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- Survey -->
+    <section class="card sticky">
+      <h2 style="margin-top:0">Tell us a bit about you</h2>
+      <div class="row">
+        <div style="flex:1 1 220px">
+          <label>Full name (optional)</label>
+          <input id="name" placeholder="e.g., Jordan Lee" />
+        </div>
+        <div style="flex:1 1 160px">
+          <label>State/Region</label>
+          <input id="region" placeholder="e.g., Florida or CA" />
+        </div>
+      </div>
+
+      <label>Role</label>
+      <select id="role">
+        <option value="">Select…</option>
+        <option>High school student</option>
+        <option>Undergraduate student</option>
+        <option>Graduate/professional student</option>
+        <option>Adult/returning learner</option>
+        <option>Parent/guardian</option>
+        <option>Veteran / active-duty / spouse</option>
+      </select>
+
+      <label>Household income (rough)</label>
+      <select id="income">
+        <option value="">Prefer not to say</option>
+        <option>< $30k</option><option>$30k–$60k</option>
+        <option>$60k–$100k</option><option>$100k+</option>
+      </select>
+
+      <label>Interests (check any)</label>
+      <div class="row">
+        <label class="pill"><input type="checkbox" value="certificate" class="interest"> Career certificate/short-term training</label>
+        <label class="pill"><input type="checkbox" value="college" class="interest"> College degree</label>
+        <label class="pill"><input type="checkbox" value="service" class="interest"> National service (AmeriCorps)</label>
+        <label class="pill"><input type="checkbox" value="food" class="interest"> Food help</label>
+        <label class="pill"><input type="checkbox" value="housing" class="interest"> Rent/housing help</label>
+        <label class="pill"><input type="checkbox" value="utilities" class="interest"> Utilities help</label>
+        <label class="pill"><input type="checkbox" value="childcare" class="interest"> Child/family support</label>
+      </div>
+
+      <label>Student status</label>
+      <select id="studentStatus">
+        <option value="">Not a current student</option>
+        <option>HS junior/senior</option>
+        <option>Current undergrad</option>
+        <option>Current grad/professional</option>
+        <option>Prospective student</option>
+      </select>
+
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="matchBtn">Find Matches</button>
+        <button class="btn outline" id="resetBtn">Reset</button>
+        <button class="btn outline" id="exportBtn">Export Results</button>
+        <button class="btn outline" id="printBtn">Print</button>
+      </div>
+      <div id="saveMsg" class="muted" style="margin-top:6px"></div>
+    </section>
+
+    <!-- Right side: Tabs -->
+    <section class="card">
+      <div class="tabs">
+        <button class="tab active" data-tab="matchesTab">Matches</button>
+        <button class="tab" data-tab="safetyTab">Scam Safety</button>
+      </div>
+
+      <!-- Matches Pane -->
+      <div id="matchesTab" class="pane show">
+        <h2 style="margin-top:0">Your Matches</h2>
+        <div id="results"></div>
+        <div class="footer small">Links open official pages. Data is stored only in your browser.</div>
+      </div>
+
+      <!-- Safety Pane -->
+      <div id="safetyTab" class="pane">
+        <h2 style="margin-top:0">Spotting Grant/Scholarship Scams</h2>
+        <div class="hint">
+          <p><strong>Plain-language rules:</strong></p>
+          <ul>
+            <li><strong>No fees.</strong> Legit scholarships/grants don’t charge application or “processing” fees.</li>
+            <li><strong>No guarantees.</strong> “Guaranteed approval” or “everyone qualifies” = red flag.</li>
+            <li><strong>Verify the sender & site.</strong> Prefer official domains (e.g., <code>.gov</code>, schools, known nonprofits). Be cautious with look-alike URLs.</li>
+            <li><strong>Protect your SSN & bank info.</strong> Don’t share sensitive data just to “check eligibility.”</li>
+            <li><strong>Beware urgency & pressure.</strong> “Act now” countdowns are classic scam tactics.</li>
+          </ul>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div style="flex:1" class="card" >
+            <h3 style="margin-top:0">Student Checklist</h3>
+            <ul class="checklist" id="studentList">
+              <li><input type="checkbox" data-k="st_domain"> <span>I confirmed the website is an official domain (school, trusted nonprofit, or <code>.gov</code>).</span></li>
+              <li><input type="checkbox" data-k="st_no_fee"> <span>No application or “processing” fees requested.</span></li>
+              <li><input type="checkbox" data-k="st_no_ssn"> <span>No SSN/bank info required just to apply.</span></li>
+              <li><input type="checkbox" data-k="st_contact"> <span>There’s a real contact (school office or org with phone/address).</span></li>
+              <li><input type="checkbox" data-k="st_terms"> <span>I read the eligibility/terms (award amount, renewal rules, deadlines).</span></li>
+            </ul>
+          </div>
+          <div style="flex:1" class="card">
+            <h3 style="margin-top:0">Family Checklist</h3>
+            <ul class="checklist" id="familyList">
+              <li><input type="checkbox" data-k="fa_source"> <span>Source is verified (state agency, school district, known nonprofit, or <code>.gov</code>).</span></li>
+              <li><input type="checkbox" data-k="fa_fee"> <span>No upfront fees, gift-card requests, or wire transfers.</span></li>
+              <li><input type="checkbox" data-k="fa_docs"> <span>Requested documents make sense (income proof for benefits, transcripts for scholarships).</span></li>
+              <li><input type="checkbox" data-k="fa_phishing"> <span>Email looks legit (no typos, matches the org domain, links preview to the same site).</span></li>
+              <li><input type="checkbox" data-k="fa_records"> <span>I saved copies of the listing, application, and confirmations.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="hint">
+          <p><strong>If something feels off:</strong> stop and verify with a counselor, school aid office, or the program’s official phone line. You can also search the program name + “scam” and check government consumer alerts.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "ka_grant_matcher_v1";
+const SAFETY_KEY  = "ka_grant_safety_v1";
+
+/* ---------------- Catalog (editable) ---------------- */
+const PROGRAMS = [
+  // STUDENT AID
+  { id:"faFafsa", name:"FAFSA — Federal Student Aid",
+    url:"https://studentaid.gov/h/apply-for-aid/fafsa",
+    desc:"One application unlocks federal grants (e.g., Pell), work-study, and federal student loans.",
+    tags:["student","undergrad","grad","college","certificate"],
+    show:(f)=> ["High school student","Undergraduate student","Graduate/professional student","Adult/returning learner","Parent/guardian"].includes(f.role)
+  },
+  { id:"pell", name:"Federal Pell Grant",
+    url:"https://studentaid.gov/understand-aid/types/grants/pell",
+    desc:"Need-based grant for undergraduates—money you don’t repay.",
+    tags:["student","undergrad","college"],
+    show:(f)=> f.role==="Undergraduate student" || f.studentStatus==="Current undergrad" || f.studentStatus==="Prospective student"
+  },
+  { id:"dolScholar", name:"CareerOneStop Scholarship Finder (US Dept. of Labor)",
+    url:"https://www.careeronestop.org/Toolkit/Training/find-scholarships.aspx",
+    desc:"Search thousands of scholarships and fellowships; filter by background, major, deadline.",
+    tags:["student","scholarships","undergrad","grad","adult"],
+    show:(f)=> true
+  },
+  { id:"bigFuture", name:"College Board BigFuture — Scholarship Search",
+    url:"https://bigfuture.collegeboard.org/scholarship-search",
+    desc:"Directory of 23k+ scholarships with robust filters and deadlines.",
+    tags:["student","scholarships"],
+    show:(f)=> ["High school student","Undergraduate student","Graduate/professional student","Adult/returning learner"].includes(f.role)
+  },
+  { id:"schAmerica", name:"Scholarship America — National/Partner Scholarships",
+    url:"https://scholarshipamerica.org/students/browse-scholarships/",
+    desc:"Rotating national awards; many open to current college students and adult learners.",
+    tags:["student","scholarships","undergrad","adult"],
+    show:(f)=> true
+  },
+  { id:"trio", name:"TRIO (U.S. Dept. of Education) — EOC, SSS, McNair, etc.",
+    url:"https://www.ed.gov/grants-and-programs/grants-higher-education/federal-trio-programs",
+    desc:"Advising, tutoring, and aid navigation for low-income, first-gen, and students with disabilities.",
+    tags:["student","support"],
+    show:(f)=> ["High school student","Undergraduate student","Adult/returning learner","Graduate/professional student"].includes(f.role)
+  },
+  { id:"gearup", name:"GEAR UP — College Readiness Partnerships",
+    url:"https://www.ed.gov/grants-and-programs/grants-economically-disadvantaged-students/gaining-early-awareness-and-readiness-undergraduate-programs-gear",
+    desc:"State/district partnerships serving cohorts from middle school through high school; check local availability.",
+    tags:["student","k12"],
+    show:(f)=> f.role==="High school student"
+  },
+  { id:"ameriCorps", name:"AmeriCorps — Segal Education Award",
+    url:"https://my.americorps.gov/trust/help/member_portal/eli_segal_americorps_education_award.htm",
+    desc:"Complete a service term to earn an education award for tuition or student loan repayment.",
+    tags:["service","award","undergrad","adult"],
+    show:(f)=> f.interests.includes("service") || ["Adult/returning learner","Undergraduate student","Graduate/professional student"].includes(f.role)
+  },
+
+  // COMMUNITY BENEFITS
+  { id:"benefits", name:"USA.gov — Benefit Finder",
+    url:"https://www.usa.gov/benefit-finder",
+    desc:"Government meta-wizard to screen eligibility across hundreds of programs.",
+    tags:["benefits","all"],
+    show:(f)=> true
+  },
+  { id:"uw211", name:"United Way 211 — Local Assistance",
+    url:"https://www.211.org/",
+    desc:"Real people help you find rent, utilities, childcare, food and more in your ZIP code.",
+    tags:["community","housing","utilities","food","childcare"],
+    show:(f)=> ["food","housing","utilities","childcare"].some(x=>f.interests.includes(x))
+  },
+  { id:"snap", name:"SNAP — Food Assistance (USDA FNS)",
+    url:"https://www.usa.gov/food-stamps",
+    desc:"Monthly EBT for groceries; eligibility and application by state (rules vary by state).",
+    tags:["food","benefits"],
+    show:(f)=> f.interests.includes("food")
+  },
+  { id:"wic", name:"WIC — Women, Infants, & Children",
+    url:"https://www.fns.usda.gov/wic",
+    desc:"Nutrition support for pregnant/postpartum people, infants, and kids under 5.",
+    tags:["food","childcare"],
+    show:(f)=> f.interests.includes("childcare") || f.role==="Parent/guardian"
+  },
+  { id:"liheap", name:"LIHEAP — Energy/Utility Assistance",
+    url:"https://acf.gov/ocs/programs/liheap",
+    desc:"Help with heating/cooling bills; see the official eligibility screener.",
+    tags:["utilities"],
+    show:(f)=> f.interests.includes("utilities")
+  },
+  { id:"section8", name:"Housing Choice Voucher (Section 8)",
+    url:"https://www.usa.gov/housing-voucher-section-8",
+    desc:"Rent support via local PHAs; waitlists open/close—watch for scams.",
+    tags:["housing"],
+    show:(f)=> f.interests.includes("housing")
+  },
+
+  // AWARENESS / CAVEATS
+  { id:"grantsgov", name:"Grants.gov — Organization Grants (eligibility varies)",
+    url:"https://www.grants.gov/quick-start-guide/applicants",
+    desc:"Most federal grants are for orgs, not individuals. Read eligibility before applying.",
+    tags:["heads-up"],
+    show:(f)=> ["Adult/returning learner","Parent/guardian","Veteran / active-duty / spouse"].includes(f.role)
+  }
+];
+
+/* ---------------- Helpers ---------------- */
+const $ = (id)=>document.getElementById(id);
+const getForm = ()=> {
+  const interests = [...document.querySelectorAll(".interest:checked")].map(i=>i.value);
+  return {
+    name: $("name").value.trim(),
+    region: $("region").value.trim(),
+    role: $("role").value,
+    income: $("income").value,
+    interests,
+    studentStatus: $("studentStatus").value
+  };
+};
+const saveState = (f)=> localStorage.setItem(STORAGE_KEY, JSON.stringify(f));
+const loadState = ()=> {
+  try{
+    const f = JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");
+    if(!f || typeof f!=="object") return;
+    $("name").value = f.name||"";
+    $("region").value = f.region||"";
+    $("role").value = f.role||"";
+    $("income").value = f.income||"";
+    $("studentStatus").value = f.studentStatus||"";
+    (f.interests||[]).forEach(val=>{
+      const el = [...document.querySelectorAll(".interest")].find(x=>x.value===val);
+      if(el) el.checked = true;
+    });
+  }catch{}
+};
+const copy = (txt)=> navigator.clipboard?.writeText(txt);
+
+/* ---------------- Match & Render ---------------- */
+function score(program, f){
+  if(!program.show(f)) return -1;
+  let s = 1;
+  if(["< $30k","$30k–$60k"].includes(f.income)) s+=1;
+  (program.tags||[]).forEach(t=> { if(f.interests.includes(t)) s+=1; });
+  if(f.role.includes("student") && program.tags?.includes("student")) s+=1;
+  return s;
+}
+
+function match(){
+  const f = getForm();
+  saveState(f);
+  $("saveMsg").textContent = "Saved locally.";
+  const ranked = PROGRAMS
+    .map(p=>({p, s:score(p,f)}))
+    .filter(x=>x.s>0)
+    .sort((a,b)=> b.s-a.s);
+
+  const res = $("results");
+  res.innerHTML = "";
+  if(!ranked.length){
+    res.innerHTML = `<p class="muted">No obvious matches yet — try selecting a role and a few interests.</p>`;
+    return;
+  }
+  ranked.forEach(({p,s})=>{
+    const div = document.createElement("div");
+    div.className="program";
+    const left = document.createElement("div");
+    left.innerHTML = `
+      <h3>${p.name}</h3>
+      <p class="muted">${p.desc}</p>
+      ${p.id==="snap" ? `<p class="warn small">Note: state SNAP rules can vary — check your state’s site.</p>` : ``}
+      ${p.id==="grantsgov" ? `<p class="warn small">Tip: most federal grants are for organizations, not individuals.</p>`:``}
+      ${p.id==="ameriCorps" && f.interests.includes("service") ? `<p class="success small">Service path detected — the Segal Education Award may fit.</p>`:``}
+    `;
+    const right = document.createElement("div");
+    right.innerHTML = `
+      <div class="row right">
+        <a class="btn" href="${p.url}" target="_blank" rel="noopener">Open</a>
+        <button class="btn outline" data-copy="${p.url}">Copy Link</button>
+      </div>`;
+    div.appendChild(left); div.appendChild(right);
+    res.appendChild(div);
+  });
+
+  // Wire copy buttons
+  res.querySelectorAll("button[data-copy]").forEach(btn=>{
+    btn.addEventListener("click", ()=> {
+      copy(btn.getAttribute("data-copy"));
+      btn.textContent="Copied!";
+      setTimeout(()=> btn.textContent="Copy Link", 900);
+    });
+  });
+}
+
+/* ---------------- Tabs ---------------- */
+function setTab(id){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("show"));
+  document.querySelector(`.tab[data-tab='${id}']`).classList.add("active");
+  document.getElementById(id).classList.add("show");
+}
+
+/* ---------------- Safety checklist state ---------------- */
+function loadSafety(){
+  try{
+    const s = JSON.parse(localStorage.getItem(SAFETY_KEY)||"{}");
+    ["studentList","familyList"].forEach(listId=>{
+      const list = document.getElementById(listId);
+      list.querySelectorAll("input[type=checkbox]").forEach(cb=>{
+        const key = cb.getAttribute("data-k");
+        if(s[key]) cb.checked = true;
+        cb.addEventListener("change", ()=>{
+          const cur = JSON.parse(localStorage.getItem(SAFETY_KEY)||"{}");
+          cur[key] = cb.checked;
+          localStorage.setItem(SAFETY_KEY, JSON.stringify(cur));
+        });
+      });
+    });
+  }catch{}
+}
+
+/* ---------------- Export & Print ---------------- */
+function exportResults(){
+  const data = {
+    profile: getForm(),
+    matches: [...$("results").querySelectorAll(".program h3")].map(h=>h.textContent),
+    safety: JSON.parse(localStorage.getItem(SAFETY_KEY)||"{}")
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "aid_matches.json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---------------- Events ---------------- */
+window.addEventListener("load", ()=>{
+  loadState();
+  loadSafety();
+  $("matchBtn").addEventListener("click", match);
+  $("resetBtn").addEventListener("click", ()=>{
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SAFETY_KEY);
+    location.reload();
+  });
+  $("exportBtn").addEventListener("click", exportResults);
+  $("printBtn").addEventListener("click", ()=> window.print());
+  // live-save on change
+  document.querySelectorAll("input,select,textarea").forEach(el=>{
+    el.addEventListener("change", ()=> saveState(getForm()));
+  });
+  // tabs
+  document.querySelectorAll(".tab").forEach(btn=>{
+    btn.addEventListener("click", ()=> setTab(btn.getAttribute("data-tab")));
+  });
+  // initial matches (optional)
+  match();
+});
+</script>
+</body>
+</html>
