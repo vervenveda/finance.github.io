@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Adult Personal Finance — 6-Week Workshop (Standalone)</title>
+<style>
+  :root{--bg:#0a1022;--card:#0f1a33;--ink:#eaf2ff;--muted:#cdd7ef;--accent:#7dd3fc;--accent2:#60a5fa;--glass:rgba(255,255,255,.04)}
+  html,body{margin:0;min-height:99%;background:linear-gradient(180deg,#071229 0%,#0a1022 60%);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial}
+  .app{max-width:1111px;margin:24px auto;padding:14px;display:flex;flex-direction:column;align-items:center}
+  header{width:100%;display:flex;flex-direction:column;align-items:center;gap:11px}
+  h1{margin:7px 11px 0;font-size:40px;text-align:center}
+  .sub{color:var(--muted);font-size:14px}
+  .grid{width:92%;display:grid;grid-template-columns:333px 1fr;gap:24px;margin-top:24px}
+  @media (max-width:777px){.grid{grid-template-columns:1fr}.sidebar{order:2}.content{order:1}}
+  .sidebar{background:var(--card);border-radius:7px;padding:14px;box-shadow:0 11px 24px rgba(0,0,0,.55)}
+  .content{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);border-radius:7px;padding:24px}
+  .lesson{background:var(--glass);border-radius:7px;padding:14px;margin-bottom:14px}
+  .small{font-size:14px;color:var(--muted)}
+  .progress{height:14px;background:#0b1427;border-radius:7px;overflow:hidden}
+  .progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  button{background:var(--accent);border:none;color:#061126;padding:11px 14px;border-radius:7px;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent);border:3px solid rgba(255,255,255,.25)}
+  button:disabled{opacity:.6;cursor:default}
+  input[type=text],textarea{width:99%;background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--ink);border-radius:7px;padding:4px}
+  textarea{resize:vertical}
+  .row{display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+  .list{max-height:33vh;overflow:auto}
+    .hidden{display:none}
+
+  
+  /* Modal */
+  #quizModal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50}
+  #quizModal:not(.hidden){display:flex}
+  #quizBox{max-width:555px;width:min(99vw,555px);background:var(--card);border-radius:14px;padding:14px;box-shadow:0 12px 34px rgba(0,0,0,.6)}
+  /* Toast */
+  #__toast{position:fixed;left:50%;transform:translateX(-50%);bottom:14px;max-width:99vw;padding:11px 14px;border-radius:7px;background:#111;color:#fff;z-index:99}
+  /* details caret */
+  details>summary{cursor:pointer;list-style:none}
+  details>summary::-webkit-details-marker{display:none}
+  a.link{color:#bfe1ff}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <img alt="logo" style="width:34px;height:34px;border-radius:7px"
+      src="data:image/svg+xml;utf8,<?xml version='1.0' encoding='UTF-8'?><svg xmlns='http://www.w3.org/2000/svg' width='44' height='44'><rect rx='10' width='44' height='44' fill='%237dd3fc'/><text x='50%25' y='55%25' font-size='22' font-family='Arial' text-anchor='middle' fill='%23021b2c'>$</text></svg>">
+    <h1>Adult Personal Finance</h1>
+    <div class="sub">6-Week Self-Paced Workshop (budgeting, credit, investing, retirement, fixed-income living)</div>
+    <div class="row">
+      <div class="sub">Name:</div>
+      <input id="participantName" type="text" placeholder="Type your name…" style="min-width:222px">
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside class="sidebar">
+      <div class="row" style="justify-content:space-between">
+        <div><strong>Progress</strong></div>
+        <div class="small" id="progressPercent">0%</div>
+      </div>
+      <div class="progress" style="margin:11px 0 14px"><i id="progressBar" style="width:0%"></i></div>
+      <div class="list" id="weeksList"></div>
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,.2);margin:14px 0">
+      <div class="row">
+        <button id="saveProgressBtn">Save</button>
+        <button id="exportBtn" class="ghost">Export (JSON)</button>
+        <button id="resetBtn" class="ghost">Reset</button>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div id="mainView">
+        <div class="lesson">
+          <h2 id="lessonTitle" style="text-align:center;margin:11px 0 11px">Welcome</h2>
+          <div id="lessonBody">
+            <p>Practical, bias-free money skills for adults: cash flow control, debt strategy, investing basics, retirement planning, and living on fixed income. Local-only saves as you type—no accounts, no trackers.</p>
+            <p class="small">References inside Resources each week (CFPB adult tools, FINRA/Investor.gov, IRS Pub 590-A, U.S. Dept. of Labor EBSA, SSA calculators, FDIC/NCUA). </p>
+            <div class="row" style="margin-top:11px">
+              <button id="startButton">Start Week 1 — Lesson 1</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz modal (5 Q session) -->
+      <div id="quizModal" class="hidden">
+        <div id="quizBox">
+          <h3 id="quizTitle" style="text-align:center;margin-top:0">Pop Quiz</h3>
+          <div id="quizQuestion" style="margin-top:11px"></div>
+          <div id="quizAnswers" style="margin-top:7px"></div>
+          <div class="row" style="margin-top:11px">
+            <button id="submitAnswer">Submit</button>
+            <button id="nextQuestion" class="ghost" disabled>Next</button>
+            <button id="skipQuiz" class="ghost">Skip Session</button>
+          </div>
+          <div id="quizFeedback" class="small" style="margin-top:7px"></div>
+          <div class="small" id="quizCounter" style="opacity:.88;margin-top:7px"></div>
+        </div>
+      </div>
+
+      <!-- Tests -->
+      <div id="testArea" class="hidden">
+        <div class="lesson">
+          <h3 id="testTitle" style="text-align:center;margin-top:3px;">End-of-Week Test</h3>
+          <div id="testBody"></div>
+          <div class="row" style="margin-top:11px;justify-content:center">
+            <button id="submitTest">Submit Test</button>
+          </div>
+          <div id="testResult" class="small" style="text-align:center;margin-top:7px"></div>
+        </div>
+      </div>
+
+      <!-- Certificate -->
+      <div id="finalCertificate" class="hidden lesson">
+        <h3>Completion Certificate</h3>
+        <div id="certBody"></div>
+        <div class="row" style="justify-content:center;margin-top:11px">
+          <button id="printCert">Print / Save Certificate</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="small" style="text-align:center;margin:24px 0 24px">
+    Built for real life: local-only, no libraries. Press <strong>Ctrl + C</strong> to check certificate anytime.
+    <button id="checkCertBtn" class="ghost" style="margin-left:7px;border-radius:7px;padding:7px 11px">Check Certificate</button>
+  </footer>
+</div>
+
+<script>
+/* ======= toast ======= */
+function toast(msg){
+  let t=document.getElementById('__toast');
+  if(!t){t=document.createElement('div');t.id='__toast';document.body.appendChild(t);}
+  t.textContent=String(msg);clearTimeout(t.__t);t.__t=setTimeout(()=>t.remove(),2200);
+}
+
+/* ======= Curriculum (6 weeks × 2 lessons; each lesson has 5-Q pop quiz; weekly test 8–10 Qs) ======= */
+const curriculum = [
+/* ---------- WEEK 1: Budgeting & Cash Flow ---------- */
+{
+  week:1,title:"Budgeting, Cash Flow & Emergency Funds",
+  lessons:[
+    {
+      id:"1.1",title:"Build a Realistic Budget (50/30/20 as a Start)",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Track inflows/outflows, then set targets: needs, wants, saving/debt. Rules of thumb like 50/30/20 are starting points—customize to your reality. Create an <em>emergency fund</em> (3–6 months basics).</p>
+      <p><em>Activity:</em> Use the worksheet below to enter monthly net income, fixed/variable expenses, and savings goals. The app estimates 50/30/20 and highlights gaps.</p>`,
+      quizzes:[
+        {q:"Best first step to budgeting:",choices:["Open a brokerage","Track income/expenses","Guess & hope"],a:1},
+        {q:"Emergency fund target (typical):",choices:["1 week","3–6 months essentials","10 years"],a:1},
+        {q:"50/30/20 means:",choices:["Needs/Invest/Debt","Needs/Wants/Saving-Debt","Housing/Food/Fun"],a:1},
+        {q:"A zero-based budget:",choices:["Leaves cash unassigned","Assigns every dollar a job","Bans dining out"],a:1},
+        {q:"To improve cash flow quickly:",choices:["Add new subscriptions","Audit & cut low-value spends","Ignore recurring charges"],a:1}
+      ]
+    },
+    {
+      id:"1.2",title:"Cash-Flow Mechanics & Sinking Funds",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Use <em>sinking funds</em> (mini savings buckets) for non-monthly costs (auto service, holidays, insurance premiums). Automate transfers the day after payday.</p>
+      <p><em>Activity:</em> List 3 irregular expenses and their annual totals; divide by 12; add those amounts to your monthly plan.</p>`,
+      quizzes:[
+        {q:"Sinking funds are:",choices:["Debt products","Pre-planned buckets for irregular costs","Brokerage margin"],a:1},
+        {q:"Automating savings is helpful because:",choices:["It reduces follow-through burden","It lowers income","It hides expenses"],a:0},
+        {q:"Cash flow improves by:",choices:["Timing bills near payday","Paying late fees","Ignoring due dates"],a:0},
+        {q:"A budget should be:",choices:["Static forever","Reviewed & adjusted","Secret"],a:1},
+        {q:"Large annual bill approach:",choices:["Ignore until due","Use sinking fund","Cash advance by default"],a:1}
+      ]
+    }
+  ],
+  test:[
+    {q:"First step to regain control:",choices:["Guess balances","Track flows & categorize","Open new credit"],a:1},
+    {q:"Emergency fund typical size:",choices:["3–6 months essentials","1 week","2 years"],a:0},
+    {q:"If wants crowd out savings:",choices:["Do nothing","Re-balance toward goal %","Hide transactions"],a:1},
+    {q:"Sinking fund purpose:",choices:["Investing only","Irregular expenses","Vacations only"],a:1},
+    {q:"Zero-based means:",choices:["Every dollar assigned","Zero expenses","Zero income"],a:0},
+    {q:"Easiest automation timing:",choices:["Before payday","Day after payday","Randomly"],a:1},
+    {q:"Quick cash-flow fix:",choices:["Cancel unused subs","Increase wants","Skip rent"],a:0},
+    {q:"Budget rule-of-thumbs are:",choices:["Universal law","Starting points to adapt","Banned"],a:1}
+  ]
+},
+
+/* ---------- WEEK 2: Credit & Debt Strategy ---------- */
+{
+  week:2,title:"Credit Scores, Reports & Debt Paydown",
+  lessons:[
+    {
+      id:"2.1",title:"Credit Reports/Scores & Rate Math",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Payment history & utilization drive scores. Pull reports; dispute errors. APR vs. APY and the power of compounding on both savings and debt.</p>
+      <p><em>Activity:</em> List debts with balance, APR, min payment. Compute interest per month on the highest APR.</p>`,
+      quizzes:[
+        {q:"Largest FICO driver:",choices:["Payment history","Hard inquiries","Credit mix"],a:0},
+        {q:"Utilization ideal target:",choices:["Under ~30%","~80%","100%"],a:0},
+        {q:"APY vs APR difference is mainly:",choices:["Compounding frequency","Currency","Issuer"],a:0},
+        {q:"Disputing errors should be:",choices:["Ignored","Done with bureaus/creditor","On social media"],a:1},
+        {q:"Missing a payment impacts score:",choices:["Lightly","Significantly","Not at all"],a:1}
+      ]
+    },
+    {
+      id:"2.2",title:"Debt Snowball vs. Avalanche (and Consolidation)",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Avalanche (highest APR first) minimizes interest; snowball (smallest balance first) maximizes momentum. Consolidation only if total cost/risk falls.</p>
+      <p><em>Activity:</em> Choose a strategy for your list; simulate months to payoff in the scratchpad.</p>`,
+      quizzes:[
+        {q:"Avalanche focuses on:",choices:["Smallest balance","Highest APR","Oldest debt"],a:1},
+        {q:"Snowball helps with:",choices:["Motivation via quick wins","Higher total interest","No progress"],a:0},
+        {q:"Consolidation works best when:",choices:["Fees/APR lower, term sensible","APR higher","No budgeting"],a:0},
+        {q:"Avoid during payoff:",choices:["New high-APR debt","Tracking progress","Automation"],a:0},
+        {q:"Refinance makes sense when:",choices:["APR drops enough after fees","Term always doubled","Credit score falls"],a:0}
+      ]
+    }
+  ],
+  test:[
+    {q:"Key score factors include:",choices:["Payment & utilization","Shoe size","Favorite color"],a:0},
+    {q:"Avalanche reduces:",choices:["Interest cost","Motivation","Disputes"],a:0},
+    {q:"Snowball reduces first:",choices:["Highest APR","Smallest balance","Mortgage"],a:1},
+    {q:"Good reason to consolidate:",choices:["Lower lifetime cost","Hide debt","Increase fees"],a:0},
+    {q:"APR measures:",choices:["Yearly rate incl. some costs","Daily late fee","Credit limit"],a:0},
+    {q:"Utilization calc:",choices:["Balance/Limit","Limit/Balance","Payments/Income"],a:0},
+    {q:"Late payments usually stay:",choices:["7 years (typical)","1 month","Forever always"],a:0},
+    {q:"Best ongoing habit:",choices:["Autopay at least minimum","Never check reports","Open random cards"],a:0}
+  ]
+},
+
+/* ---------- WEEK 3: Banking, Safety, Insurance ---------- */
+{
+  week:3,title:"Banking Safety, Insurance & Fraud Defenses",
+  lessons:[
+    {
+      id:"3.1",title:"FDIC/NCUA Insurance & Account Structure",
+      contentHtml:`<p><strong>Mini-lesson.</strong> FDIC (banks) & NCUA (credit unions) insure deposits to legal limits per ownership category. Use separate titles/beneficiaries to expand coverage.</p>
+      <p><em>Activity:</em> Sketch your accounts and coverage; identify any uninsured excess and options to fix.</p>`,
+      quizzes:[
+        {q:"FDIC covers:",choices:["Stock losses","Bank deposits within limits","Crypto wallets"],a:1},
+        {q:"NCUA covers:",choices:["Credit union deposits within limits","Bank CDs","Brokerage cash sweep always"],a:0},
+        {q:"Coverage expands by:",choices:["Multiple owners/beneficiaries categories","Unlimited accounts same owner same bank","Asking nicely"],a:0},
+        {q:"Which is NOT insured:",choices:["Checking","Savings","Mutual funds"],a:2},
+        {q:"EDIE is:",choices:["Coverage estimator","Tax form","Index fund"],a:0}
+      ]
+    },
+    {
+      id:"3.2",title:"Consumer Protection & Insurance Basics",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Use official portals (CFPB/FTC/AG). Insurance: health, auto, renters/home, disability, life—protect against big risks first.</p>
+      <p><em>Activity:</em> List your top 3 financial risks; match each to an insurance or prevention action.</p>`,
+      quizzes:[
+        {q:"Priority risks:",choices:["Small buys","Catastrophic losses","Coupons"],a:1},
+        {q:"Renters insurance covers:",choices:["Your belongings & liability","Landlord’s building only","Traffic tickets"],a:0},
+        {q:"Best fraud channel:",choices:["Random email","Official portals","Social DMs"],a:1},
+        {q:"High deductible plans:",choices:["Lower premiums generally","Always worst","Ban HSAs"],a:0},
+        {q:"Term life is usually:",choices:["Pure insurance, lower cost","Investment first","Only for wealthy"],a:0}
+      ]
+    }
+  ],
+  test:[
+    {q:"FDIC/NCUA insure:",choices:["Deposits to limits","All investments","Crypto exchanges"],a:0},
+    {q:"Increase coverage by:",choices:["New categories/beneficiaries","Same title many accts same bank","Unused checks"],a:0},
+    {q:"Not deposit-insured:",choices:["Savings","CDs","Mutual funds"],a:2},
+    {q:"Top risk focus:",choices:["Low-impact items","Catastrophic events","Minor fees only"],a:1},
+    {q:"Renters covers:",choices:["Landlord’s building","Your stuff/liability (policy)","Car damage"],a:1},
+    {q:"Report fraud via:",choices:["Official portals","Anonymous blogs","Random apps"],a:0},
+    {q:"HSA pairs with:",choices:["HDHP","Any plan","No insurance"],a:0},
+    {q:"Term life often best for:",choices:["Income replacement need","Guaranteed cash value growth","Lottery wins"],a:0}
+  ]
+},
+
+/* ---------- WEEK 4: Investing Basics & Fees ---------- */
+{
+  week:4,title:"Investing, Diversification & Costs",
+  lessons:[
+    {
+      id:"4.1",title:"Asset Allocation, Indexing & Behavior",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Diversify across stocks/bonds/cash. Low-cost index funds help capture market returns; avoid timing traps; automate contributions.</p>
+      <p><em>Activity:</em> Draft a simple policy: target stock/bond %, contribution day, and “do-nothing” rules for downturns.</p>`,
+      quizzes:[
+        {q:"Diversification reduces:",choices:["All risk","Idiosyncratic risk","Time"],a:1},
+        {q:"Index funds tend to:",choices:["Be low-cost, broad market","Guarantee outperformance","Avoid losses"],a:0},
+        {q:"Rebalancing does:",choices:["Maintain target mix","Chase winners","Increase costs only"],a:0},
+        {q:"Dollar-cost averaging:",choices:["Buys fixed $ amount regularly","Requires timing calls","Bans volatility"],a:0},
+        {q:"Behavioral risk:",choices:["Panic selling","Long horizon","Staying the course"],a:0}
+      ]
+    },
+    {
+      id:"4.2",title:"Fees, Taxes & Investor Protections",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Fees (ER, loads, trading) and taxes (ordinary vs. long-term capital gains, tax-advantaged accounts) shape real returns. Verify firms/advisers (FINRA/SEC).</p>
+      <p><em>Activity:</em> Compare two funds: 0.05% vs 1.0% ER over 25 years; discuss impact on outcomes.</p>`,
+      quizzes:[
+        {q:"Expense ratios:",choices:["Don’t matter","Compound against you","Only for bonds"],a:1},
+        {q:"Long-term cap gains rates apply when holding:",choices:[">= 1 year","Any duration","Never"],a:0},
+        {q:"Verify brokers at:",choices:["Random blog","FINRA BrokerCheck/SEC IAPD","Reddit only"],a:1},
+        {q:"Loads are:",choices:["Sales commissions","Expense ratios","12b-1 always"],a:0},
+        {q:"Tax-advantaged accounts can:",choices:["Defer/avoid some taxes","Always eliminate taxes","Ban rebalancing"],a:0}
+      ]
+    }
+  ],
+  test:[
+    {q:"Asset allocation is:",choices:["Picking single stock","Mix of assets vs. risk tolerance","Fee schedule"],a:1},
+    {q:"Diversification mainly tackles:",choices:["Market risk","Idiosyncratic risk","All risk gone"],a:1},
+    {q:"Higher ER over decades:",choices:["Tiny impact","Can greatly reduce wealth","Guaranteed alpha"],a:1},
+    {q:"Dollar-cost averaging:",choices:["Fixed $ buys over time","Perfect timing","Day trading"],a:0},
+    {q:"Verify adviser using:",choices:["FINRA/SEC tools","Unverified ads","Celebrity posts"],a:0},
+    {q:"Long-term CG tax needs:",choices:[">=1 year hold","<1 year hold","No holding"],a:0},
+    {q:"Indexing strategy:",choices:["Broad, low-fee market capture","Always beats market","Zero risk"],a:0},
+    {q:"Rebalancing:",choices:["Maintain target mix","Max taxes only","Ban contributions"],a:0}
+  ]
+},
+
+/* ---------- WEEK 5: Retirement Planning ---------- */
+{
+  week:5,title:"Retirement Accounts, Pensions & Social Security",
+  lessons:[
+    {
+      id:"5.1",title:"401(k), IRA (Traditional vs. Roth) & Rollovers",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Contribute at least to employer match. Traditional: tax-deferred now, taxed later; Roth: post-tax now, tax-free qualified later. Mind fees & investment lineup.</p>
+      <p><em>Activity:</em> Note your plan’s match policy/vesting. Choose a target contribution % and a default fund.</p>`,
+      quizzes:[
+        {q:"Roth IRA withdrawals (qualified):",choices:["Tax-free","Taxed ordinary income","10% penalty always"],a:0},
+        {q:"Traditional IRA contributions are:",choices:["Always nondeductible","May be deductible","Never allowed"],a:1},
+        {q:"401(k) match is:",choices:["Free money you should capture","A loan","Optional fee"],a:0},
+        {q:"Rollover mistakes can:",choices:["Cause taxes/penalties","Boost returns always","Erase records"],a:0},
+        {q:"Choose funds based on:",choices:["Low fees/diversification","Logo color","Ticker length"],a:0}
+      ]
+    },
+    {
+      id:"5.2",title:"Social Security Timing & Lifetime Income",
+      contentHtml:`<p><strong>Mini-lesson.</strong> SSA benefits depend on earnings history & claiming age. Delaying increases benefits to age 70. Coordinate with savings, spouse benefits, and health outlook.</p>
+      <p><em>Activity:</em> Visit SSA calculators (with a trusted adult if needed) to compare claiming at 62/FRA/70.</p>`,
+      quizzes:[
+        {q:"Claiming earlier than FRA:",choices:["Increases monthly benefit","Reduces monthly benefit","No impact"],a:1},
+        {q:"Delaying to 70:",choices:["Usually reduces","Usually increases monthly amount","No change"],a:1},
+        {q:"SSA benefits based on:",choices:["Random draw","Earnings history & age","Only last job"],a:1},
+        {q:"Spousal benefits exist:",choices:["Yes, subject to rules","No","Only for dependents"],a:0},
+        {q:"Coordinating with savings is:",choices:["Not needed","Often beneficial","Banned"],a:1}
+      ]
+    }
+  ],
+  test:[
+    {q:"Traditional vs. Roth key difference:",choices:["When taxes are paid","Risk level","Employer ownership"],a:0},
+    {q:"Always take:",choices:["The match if available","No match","Max loans"],a:0},
+    {q:"Roth qualified withdrawals:",choices:["Tax-free","Taxed ordinary income","Always penalized"],a:0},
+    {q:"SSA claiming early:",choices:["Higher monthly","Reduced monthly","Same"],a:1},
+    {q:"Delaying to 70 typically:",choices:["No change","Increases benefit","Decreases benefit"],a:1},
+    {q:"Good rollover practice:",choices:["Direct trustee-to-trustee","Take check payable to self","Ignore fees"],a:0},
+    {q:"Annuities can provide:",choices:["Guaranteed income (varies by contract)","Index returns only","FDIC insurance"],a:0},
+    {q:"Vesting schedule affects:",choices:["Employer match ownership","Fund expense ratio","SSA credits"],a:0}
+  ]
+},
+
+/* ---------- WEEK 6: Fixed-Income Living & Risk Management ---------- */
+{
+  week:6,title:"Living on Fixed Income: Withdrawals, Healthcare & Scams",
+  lessons:[
+    {
+      id:"6.1",title:"Withdrawal Strategies & Sequence of Returns",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Guardrails (e.g., ~4% rule as a start) adjust to markets; keep cash buffer for downturns; diversify income (SSA, pensions, annuities, part-time).</p>
+      <p><em>Activity:</em> Sketch a simple “floor & upside” plan: guaranteed sources cover essentials; portfolio for wants.</p>`,
+      quizzes:[
+        {q:"Sequence risk is:",choices:["Return order risk in withdrawals","Only accumulation issue","Tax rule"],a:0},
+        {q:"Spending ‘guardrails’ aim to:",choices:["Ignore markets","Adjust withdrawals prudently","Max draw always"],a:1},
+        {q:"Cash buffer helps to:",choices:["Sell low","Avoid panic selling","Time the top"],a:1},
+        {q:"Income floor typically uses:",choices:["SSA/pension/annuities","Crypto","Margin loans"],a:0},
+        {q:"Diversification in retirement:",choices:["Still matters","No longer relevant","Banned"],a:0}
+      ]
+    },
+    {
+      id:"6.2",title:"Healthcare, Medicare Basics & Scam Defense",
+      contentHtml:`<p><strong>Mini-lesson.</strong> Understand premiums/deductibles, HSAs with HDHP before Medicare, and common scams (imposters, phishing). Use official portals to report.</p>
+      <p><em>Activity:</em> List your top 3 healthcare & fraud risks. Note the official site/phone you would use.</p>`,
+      quizzes:[
+        {q:"Medicare starts for most at:",choices:["65","59½","70"],a:0},
+        {q:"HSA contributions allowed when:",choices:["Enrolled in HDHP & eligible","On Medicare Part A","Any plan"],a:0},
+        {q:"Best place to report fraud:",choices:["Official portals","Unverified sites","Ignore"],a:0},
+        {q:"Phishing signs include:",choices:["Urgent threats/odd links","Correct domain + context","No links"],a:0},
+        {q:"Healthcare risk control:",choices:["No emergency fund","Maintain coverage & budget for OOP","Ignore deductibles"],a:1}
+      ]
+    }
+  ],
+  test:[
+    {q:"‘4% rule’ serves as:",choices:["Guaranteed law","Starting heuristic","Tax rule"],a:1},
+    {q:"Sequence risk matters when:",choices:["Withdrawing from portfolio","Accumulating only","Paying bills"],a:0},
+    {q:"Income floor sources:",choices:["SSA/pension/annuities","Penny stocks","Scratchers"],a:0},
+    {q:"HSA generally pairs with:",choices:["HDHP","PPO always","Medicare Part A"],a:0},
+    {q:"Medicare eligibility (typical age):",choices:["65","59½","70"],a:0},
+    {q:"Scam red flag:",choices:["Verified.gov domain","Pressure, gift cards, secrecy","Official callback"],a:1},
+    {q:"Cash buffer purpose:",choices:["Liquid cushion in downturns","Max returns","Fee waiver"],a:0},
+    {q:"Adjust withdrawals when:",choices:["Markets/signals require","Never","Only at age 90"],a:0}
+  ]
+}
+];
+
+/* ======= Weekly Resources (collapsible) ======= */
+const resourcesByWeek = {
+  1: [
+    {t:"CFPB: Adult financial education tools",u:"https://www.consumerfinance.gov/consumer-tools/educator-tools/adult-financial-education/tools-and-resources/"},
+    {t:"CFPB: Budgeting (guide & worksheets)",u:"https://www.consumerfinance.gov/about-us/blog/budgeting-how-to-create-a-budget-and-stick-with-it/"},
+    {t:"CFPB: Monthly budget worksheet (PDF)",u:"https://files.consumerfinance.gov/f/documents/cfpb_well-being_monthly-budget.pdf"}
+  ],
+  2: [
+    {t:"FINRA: Investor education + calculators",u:"https://www.finra.org/investors"},
+    {t:"FINRA: Courses (risk, diversification, fees)",u:"https://www.finra.org/investors/investing/investing-basics/smart-investing-courses"},
+    {t:"SEC Investor.gov: Compound interest explainer",u:"https://www.investor.gov/additional-resources/information/youth/teachers-classroom-resources/what-compound-interest"}
+  ],
+  3: [
+    {t:"FDIC: Deposit insurance resources + EDIE",u:"https://www.fdic.gov/resources/deposit-insurance"},
+    {t:"FDIC: Coverage resources page",u:"https://www.fdic.gov/financial-institution-employees-guide-deposit-insurance/deposit-insurance-coverage-resources"},
+    {t:"NCUA: Share insurance overview",u:"https://ncua.gov/consumers/share-insurance-coverage"},
+    {t:"NCUA: How your account is insured (PDF)",u:"https://ncua.gov/files/publications/guides-manuals/NCUAHowYourAcctInsured.pdf"}
+  ],
+  4: [
+    {t:"SEC Investor.gov: Investing basics & glossary",u:"https://www.investor.gov/introduction-investing/investing-basics/glossary/compound-interest"},
+    {t:"FINRA: Investor protections + BrokerCheck",u:"https://www.finra.org/rules-guidance/key-topics/investor-education-resources"}
+  ],
+  5: [
+    {t:"IRS Publication 590-A (IRAs)",u:"https://www.irs.gov/publications/p590a"},
+    {t:"IRS About Pub 590-A (current)",u:"https://www.irs.gov/forms-pubs/about-publication-590-a"},
+    {t:"U.S. Dept. of Labor EBSA: Preparing for Retirement",u:"https://www.dol.gov/agencies/ebsa/workers-and-families/preparing-for-retirement"},
+    {t:"SSA: Benefit calculators",u:"https://www.ssa.gov/benefits/calculators/"}
+  ],
+  6: [
+    {t:"SSA: Retirement Planner — Online Calculator",u:"https://www.ssa.gov/benefits/retirement/planner/AnypiaApplet.html"},
+    {t:"DOL: Top 10 Ways to Prepare for Retirement (PDF)",u:"https://www.dol.gov/sites/dolgov/files/ebsa/about-ebsa/our-activities/resource-center/publications/dol-top-10-ways-to-prepare-for-retirement-booklet-2023.pdf"}
+  ]
+};
+
+/* ======= Storage & state ======= */
+const STORAGE_KEY="adult_finance_workshop_v1";
+const state={name:"",week:1,lessonIndex:0,quizzesTaken:[],tests:{},completedWeeks:[],answers:{}};
+function getLessonState(week,lesson){
+  if(!state.answers[week]) state.answers[week] = {};
+  if(!state.answers[week][lesson]) {
+    state.answers[week][lesson] = {
+      notes:"",
+      scratch:"",
+      budget:{ net:"", fixed:"", variable:"", save:"" }
+    };
+  } else if(!state.answers[week][lesson].budget) {
+    // backward-compat for old saves
+    state.answers[week][lesson].budget = { net:"", fixed:"", variable:"", save:"" };
+  }
+  return state.answers[week][lesson];
+}
+
+function loadState(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw)Object.assign(state,JSON.parse(raw));}catch{}const n=document.getElementById("participantName");if(n)n.value=state.name||"";updateProgressUI();}
+function saveState(){const n=document.getElementById("participantName");state.name=(n&&n.value.trim())||"Participant";try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));toast("Saved locally.");}catch{toast("Storage blocked.");}}
+function saveSilently(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch{}}
+function resetState(){if(confirm("Reset all progress?")){localStorage.removeItem(STORAGE_KEY);location.reload();}}
+
+/* ======= Sidebar weeks ======= */
+function buildWeeks(){const box=document.getElementById("weeksList");if(!box)return;box.innerHTML="";curriculum.forEach(w=>{const wrap=document.createElement("div");wrap.style.background="rgba(255,255,255,.05)";wrap.style.borderRadius="10px";wrap.style.padding="8px";wrap.style.marginBottom="10px";const done=state.completedWeeks.includes(w.week);const head=document.createElement("div");head.innerHTML=`<strong>Week ${w.week}: ${w.title}</strong> ${done?'<span style="font-size:12px;margin-left:6px;opacity:.85">✓ Done</span>':''}<div class="small">${w.lessons.length} lessons • Test included</div>`;wrap.appendChild(head);const list=document.createElement("div");list.style.marginTop="6px";w.lessons.forEach((L,idx)=>{const b=document.createElement("button");b.textContent=`W${w.week} • ${L.title}`;b.style.width="100%";b.style.marginTop="6px";b.onclick=()=>startLesson(w.week,idx);list.appendChild(b);});const tb=document.createElement("button");tb.textContent=`Week ${w.week} Test`;tb.className="ghost";tb.style.width="100%";tb.style.marginTop="8px";tb.onclick=()=>startTest(w.week);list.appendChild(tb);wrap.appendChild(list);box.appendChild(wrap);});}
+
+/* ======= Collapsible resources ======= */
+function collapseResources(){const box=document.getElementById("resourcesBox");if(!box)return;if(box.tagName==="DETAILS")box.open=false;else box.classList.add("hidden");}
+function openResources(week){const body=document.getElementById("lessonBody");if(!body)return;let det=document.getElementById("resourcesBox");if(!det){det=document.createElement("details");det.id="resourcesBox";det.className="lesson";body.appendChild(det);}if(det.open){det.open=false;return;}const list=resourcesByWeek[week]||[];const title=curriculum.find(w=>w.week===week)?.title||"";det.innerHTML=`<summary class="row" style="justify-content:space-between"><span><strong>Week ${week} Resources — ${title}</strong></span><span class="small" style="opacity:.85">click to collapse</span></summary><div class="small" style="margin-top:6px">Official references and calculators. Open in a new tab.</div><ul id="resList" class="small" style="margin:8px 0 0 18px"></ul>`;const ul=det.querySelector("#resList");ul.innerHTML="";list.forEach(r=>{const li=document.createElement("li");const a=document.createElement("a");a.href=r.u;a.target="_blank";a.rel="noopener";a.textContent=r.t;a.className="link";li.appendChild(a);ul.appendChild(li);});det.open=true;const y=det.getBoundingClientRect().top+window.scrollY-40;window.scrollTo({top:y,behavior:"smooth"});}
+
+/* ======= Lesson start & Activities (Notes + Scratchpad + Budget worksheet for Week 1) ======= */
+function startLesson(week,lessonIndex){state.week=week;state.lessonIndex=lessonIndex;hideAll();const W=curriculum.find(w=>w.week===week);if(!W)return;const L=W.lessons[lessonIndex];const titleEl=document.getElementById("lessonTitle");const bodyEl=document.getElementById("lessonBody");if(titleEl)titleEl.textContent=`Week ${week} — ${L.title}`;if(bodyEl){bodyEl.innerHTML=`${L.contentHtml||""}<div class="row" style="margin-top:10px"><button id="beginLessonBtn">Begin Activities</button><button id="resourcesBtn" class="ghost">Open Resources</button><button id="weekTestBtn">Week ${week} Test</button></div><div id="activityArea" style="margin-top:10px"></div>`;}document.getElementById("beginLessonBtn").onclick=()=>beginActivities(week,lessonIndex);document.getElementById("resourcesBtn").onclick=()=>openResources(week);document.getElementById("weekTestBtn").onclick=()=>startTest(week);const s=document.getElementById("startButton");if(s)s.textContent="Resume last lesson";updateProgressUI();}
+
+function beginActivities(week,lessonIndex){
+  collapseResources();
+  const area=document.getElementById("activityArea");if(!area)return;const Ls=getLessonState(week,lessonIndex);area.innerHTML="";
+
+  // Notes
+  const h3a=document.createElement("h3");h3a.textContent="Notes";area.appendChild(h3a);
+  const p1=document.createElement("p");p1.className="small";p1.textContent="Capture decisions, numbers, and links here.";area.appendChild(p1);
+  const notes=document.createElement("textarea");notes.rows=5;notes.placeholder="Type your notes…";notes.value=Ls.notes||"";notes.oninput=()=>{Ls.notes=notes.value;saveSilently();};area.appendChild(notes);
+
+  // Scratchpad
+  const h3b=document.createElement("h3");h3b.textContent="Scratchpad (quick math / plan)";h3b.style.marginTop="14px";area.appendChild(h3b);
+  const scratch=document.createElement("textarea");scratch.rows=4;scratch.placeholder="Ex: Interest/month on your highest APR, target contribution %, cushion needed, etc.";scratch.value=Ls.scratch||"";scratch.oninput=()=>{Ls.scratch=scratch.value;saveSilently();};area.appendChild(scratch);
+
+  // Budget worksheet only for Week 1
+  if(week===1){
+    const h3c=document.createElement("h3");h3c.textContent="Budget Worksheet (50/30/20 helper)";h3c.style.marginTop="11px";area.appendChild(h3c);
+    const row=document.createElement("div");row.className="row";row.style.gap="7px";area.appendChild(row);
+    function fld(label,ph,id){const box=document.createElement("div");box.style.minWidth="144px";box.style.flex="1";const lab=document.createElement("label");lab.textContent=label;const inp=document.createElement("input");inp.type="text";inp.placeholder=ph;inp.id=id;box.appendChild(lab);box.appendChild(inp);row.appendChild(box);return inp;}
+    const net=fld(" Net Income","e.g., 4200","b_net");
+    const fix=fld("Fixed Expenses","e.g., 2100","b_fixed");
+    const varx=fld("Variable (wants)","e.g., 900","b_var");
+    const save=fld("Savings/Debt Paydown","e.g., 300","b_save");
+    function toNum(v){const n=parseFloat(String(v||"").replace(/[^0-9.\-]/g,""));return isNaN(n)?0:n;}
+    const out=document.createElement("p");out.className="small";out.style.marginTop="6px";area.appendChild(out);
+    function recalc(){
+      const N=toNum(net.value),F=toNum(fix.value),V=toNum(varx.value),S=toNum(save.value);
+      const total=F+V+S; const gap=N-total;
+      const n50=(N*0.50).toFixed(0), n30=(N*0.30).toFixed(0), n20=(N*0.20).toFixed(0);
+      out.innerHTML=`Target (50/30/20): <strong>$${n50}</strong> needs • <strong>$${n30}</strong> wants • <strong>$${n20}</strong> saving/debt. `+
+      `Your plan: needs ~ $${F} • wants ~ $${V} • saving/debt ~ $${S}. `+
+      (gap>=0?`<span style="color:#7dfc9e">Balance left $${gap.toFixed(0)}</span>`:`<span style="color:#ff9c9c">Short $${Math.abs(gap).toFixed(0)}</span>`);
+      saveSilently();
+    }
+    [net,fix,varx,save].forEach(i=>i.addEventListener("input",recalc));
+  }
+
+  // Auto-launch 5-Q pop quiz
+  const W=curriculum.find(w=>w.week===week);const L=W?.lessons[lessonIndex];
+  if(L && Array.isArray(L.quizzes) && L.quizzes.length>=5){setTimeout(()=>startQuizSession(week,lessonIndex,L.quizzes.slice(0,5)),700);}
+}
+
+/* ======= Multi-Q quiz session ======= */
+let quizState={list:[],idx:0,correct:0,total:0};
+function startQuizSession(week,lessonIndex,questions){const modal=document.getElementById("quizModal");if(!modal)return;quizState={list:questions,idx:0,correct:0,total:questions.length};renderQuizQ(week,lessonIndex);modal.classList.remove("hidden");}
+function renderQuizQ(week,lessonIndex){
+  const q=quizState.list[quizState.idx];const qT=document.getElementById("quizTitle"),qQ=document.getElementById("quizQuestion"),qA=document.getElementById("quizAnswers"),fb=document.getElementById("quizFeedback"),ctr=document.getElementById("quizCounter");
+  if(qT)qT.textContent=`Pop Quiz — Week ${week} (Q ${quizState.idx+1} of ${quizState.total})`;
+  if(qQ)qQ.innerHTML=`<strong>${q.q}</strong>`;
+  if(qA){qA.innerHTML="";q.choices.forEach((c,i)=>{const row=document.createElement("div");const lab=document.createElement("label");const inp=document.createElement("input");inp.type="radio";inp.name="qchoice";inp.value=String(i);lab.appendChild(inp);lab.appendChild(document.createTextNode(" "+c));row.appendChild(lab);qA.appendChild(row);});}
+  if(fb)fb.textContent="";if(ctr)ctr.textContent=`Score so far: ${quizState.correct}/${quizState.idx}`;
+  const submit=document.getElementById("submitAnswer"),next=document.getElementById("nextQuestion"),skip=document.getElementById("skipQuiz");next.disabled=true;
+  submit.onclick=()=>{const sel=document.querySelector('input[name="qchoice"]:checked');if(!sel){toast("Choose an answer or skip.");return;}const chosen=parseInt(sel.value,10);const ok=chosen===q.a;if(ok)quizState.correct++;if(fb)fb.textContent=ok?"Correct!":`Answer: ${q.choices[q.a]}`;next.disabled=false;};
+  next.onclick=()=>{quizState.idx++;if(quizState.idx>=quizState.total){state.quizzesTaken.push({week,lesson:lessonIndex,correctCount:quizState.correct,total:quizState.total});saveSilently();document.getElementById("quizModal").classList.add("hidden");toast(`Quiz: ${quizState.correct}/${quizState.total}`);updateProgressUI();}else{renderQuizQ(week,lessonIndex);}};
+  skip.onclick=()=>{document.getElementById("quizModal").classList.add("hidden");};
+}
+
+/* ======= Tests ======= */
+function startTest(week){hideAll();collapseResources();state.week=week;const W=curriculum.find(w=>w.week===week);if(!W)return;const testArea=document.getElementById("testArea");const testTitle=document.getElementById("testTitle");const body=document.getElementById("testBody");const result=document.getElementById("testResult");if(testArea)testArea.classList.remove("hidden");if(testTitle)testTitle.textContent=`Week ${week} Test`;if(body){body.innerHTML="";W.test.forEach((t,idx)=>{const blk=document.createElement("div");const lab=document.createElement("label");lab.innerHTML=`<strong>Q${idx+1}.</strong> ${t.q}`;blk.appendChild(lab);t.choices.forEach((c,i)=>{const row=document.createElement("div");const L=document.createElement("label");const I=document.createElement("input");I.type="radio";I.name=`test_q${idx}`;I.value=String(i);L.appendChild(I);L.appendChild(document.createTextNode(" "+c));row.appendChild(L);blk.appendChild(row);});body.appendChild(blk);});}
+  if(result)result.textContent="";const y=testArea.getBoundingClientRect().top+window.scrollY-40;window.scrollTo({top:y,behavior:"smooth"});}
+function submitTest(){const week=state.week;const W=curriculum.find(w=>w.week===week);if(!W)return;let score=0;W.test.forEach((t,idx)=>{const sel=document.querySelector(`input[name="test_q${idx}"]:checked`);if(sel&&parseInt(sel.value,10)===t.a)score++;});const pct=W.test.length?Math.round(100*score/W.test.length):0;const out=document.getElementById("testResult");if(out)out.textContent=`Score: ${pct}% (${score}/${W.test.length})`;state.tests["week"+week]=pct;if(pct>=70&&!state.completedWeeks.includes(week))state.completedWeeks.push(week);saveSilently();updateProgressUI();buildWeeks();}
+
+/* ======= Utilities ======= */
+function hideAll(){const m=document.getElementById("quizModal"),t=document.getElementById("testArea"),c=document.getElementById("finalCertificate");if(m)m.classList.add("hidden");if(t)t.classList.add("hidden");if(c)c.classList.add("hidden");}
+function updateProgress(){const done=state.completedWeeks.length,total=curriculum.length,pct=total?Math.round(100*done/total):0;document.getElementById("progressBar").style.width=pct+"%";document.getElementById("progressPercent").textContent=pct+"%";saveSilently();}
+function updateProgressUI(){updateProgress();}
+
+/* ======= Export & Certificate ======= */
+function exportJSON(){const data=JSON.stringify(state,null,2);const blob=new Blob([data],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=(state.name||"participant")+"_adult_finance_report.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+function maybeShowCertificate(){const allDone=state.completedWeeks.length===curriculum.length;if(!allDone){toast("Finish all week tests (≥70%) to unlock the certificate.");return;}const certBody=document.getElementById("certBody");certBody.innerHTML=`<p><strong>Certificate of Completion</strong></p><p>This certifies that <strong>${state.name||"Participant"}</strong> completed all ${curriculum.length} weeks of the Adult Personal Finance Workshop.</p><p class="small">Scores: ${JSON.stringify(state.tests)}</p>`;document.getElementById("finalCertificate").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
+
+/* ======= Wire up ======= */
+window.addEventListener("load",()=>{
+  loadState();buildWeeks();
+  document.getElementById("saveProgressBtn").onclick=saveState;
+  document.getElementById("exportBtn").onclick=(e)=>{e.preventDefault();exportJSON();};
+  document.getElementById("resetBtn").onclick=resetState;
+  document.getElementById("submitTest").onclick=submitTest;
+  document.getElementById("printCert").onclick=()=>window.print();
+  document.getElementById("checkCertBtn").onclick=maybeShowCertificate;
+  const n=document.getElementById("participantName");if(n)n.addEventListener("input",()=>{state.name=n.value.trim();saveSilently();});
+  const startBtn=document.getElementById("startButton");if(startBtn)startBtn.onclick=()=>startLesson(state.week||1,state.lessonIndex||0);
+  document.addEventListener("keydown",(e)=>{if(e.ctrlKey&&e.key==="c"){e.preventDefault();maybeShowCertificate();}});
+});
+</script>
+</body>
+</html>
