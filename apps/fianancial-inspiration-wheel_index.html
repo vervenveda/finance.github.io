@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Financial Inspiration Wheel — Daily Money Momentum</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1322; --paper:#0f1b33; --ring:#bba06a; --ink:#eaf2ff; --muted:#9fb3d1; --accent:#7dd3fc;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:linear-gradient(180deg,#081124,#0b152c);
+    color:var(--ink);
+    font-family:'Cormorant Garamond',serif;
+    display:flex;flex-direction:column;align-items:center;
+  }
+  header{padding:18px 14px 10px; text-align:center}
+  header h1{font-family:'Cinzel',serif; margin:0; letter-spacing:.04em}
+  header p{margin:8px 0 0; color:var(--muted); font-size:1.02rem}
+  .wrap{width:min(980px,95vw); margin:24px auto; display:grid; grid-template-columns:1fr 360px; gap:16px;}
+  @media (max-width:920px){ .wrap{grid-template-columns:1fr} }
+  .card{background:var(--paper); border:1px solid rgba(255,255,255,.08); border-radius:18px; box-shadow:0 12px 30px rgba(0,0,0,.25)}
+  .left,.right{padding:12px}
+  .wheelbox{display:grid; gap:8px; padding:10px; position:relative}
+  .pointer{position:absolute; left:50%; top:-18px; transform:translateX(-50%); width:0; height:0;
+    border-left:18px solid transparent; border-right:18px solid transparent; border-bottom:24px solid var(--ring); z-index:2}
+  canvas{display:block; margin:auto; max-width:100%; border-radius:50%; background:#121e3b; border:4px solid var(--ring); box-shadow:0 4px 22px rgba(0,0,0,.35)}
+  .controls{display:flex; gap:8px; flex-wrap:wrap; justify-content:center}
+  button{
+    background:var(--accent); color:#062d44; border:none; border-radius:12px; padding:10px 14px;
+    font-weight:700; cursor:pointer; font-family:inherit;
+  }
+  button.alt{background:transparent; color:var(--ink); border:1px solid rgba(255,255,255,.2)}
+  button.ghost{background:transparent; color:var(--accent); border:1px solid rgba(125,211,252,.55)}
+  button.ok{background:#90e0a6; color:#0b2a18}
+  button:disabled{opacity:.6; cursor:default}
+  h3{margin:6px 0 10px; font-size:1.05rem; color:#dce9ff}
+  .result{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); border-radius:14px; padding:12px}
+  .badge{display:inline-block; padding:6px 10px; border-radius:999px; font-size:.85rem; background:#0f2947; color:#cfe6ff; border:1px solid rgba(125,211,252,.35)}
+  .tasks{margin:8px 0 0; padding-left:18px}
+  .pep{margin:8px 0 0; color:#ffd98a}
+  .row{display:flex; gap:8px; flex-wrap:wrap}
+  .small{font-size:.92rem; color:var(--muted)}
+  .list{display:flex; flex-direction:column; gap:10px; max-height:280px; overflow:auto}
+  .item{background:#0b1c35; border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:8px 10px}
+  .item .title{font-weight:800}
+  .stats{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+  .pill{background:#0c2140; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px; text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Financial Inspiration Wheel</h1>
+  <p>Spin for a money focus. Get quick tasks + a pep-talk. Track your streak and build daily momentum.</p>
+</header>
+
+<div class="wrap">
+  <!-- LEFT -->
+  <section class="card left">
+    <div class="wheelbox card" style="padding-top:18px">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="520" height="520" aria-label="Financial wheel"></canvas>
+      <div class="controls" style="margin-top:8px">
+        <button id="spinBtn">🎡 Spin</button>
+        <button id="rerollBtn" class="alt" disabled>🔄 Reroll Tasks</button>
+        <button id="rerollPep" class="ghost" disabled>💬 Reroll Pep-Talk</button>
+        <button id="favBtn" class="ghost" disabled>☆ Favorite</button>
+        <button id="doneBtn" class="ok" disabled>✅ Mark Done</button>
+      </div>
+    </div>
+
+    <div class="card" style="padding:12px">
+      <h3>Result</h3>
+      <div id="result" class="result small">Spin the wheel to begin.</div>
+    </div>
+
+    <div class="stats">
+      <div class="pill"><div class="small">Streak</div><div id="streak" style="font-weight:800;font-size:1.25rem">0</div></div>
+      <div class="pill"><div class="small">Days Completed</div><div id="days" style="font-weight:800;font-size:1.25rem">0</div></div>
+    </div>
+  </section>
+
+  <!-- RIGHT -->
+  <aside class="card right">
+    <div class="row" style="justify-content:space-between; align-items:center">
+      <h3 style="margin:0">History & Favorites</h3>
+      <div class="row">
+        <button id="clearBtn" class="alt">🧹 Clear History</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Last 10 Spins</h3>
+      <div id="history" class="list small"></div>
+    </div>
+
+    <div class="section" style="margin-top:8px">
+      <h3>Favorites</h3>
+      <div id="favs" class="list small"></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+/* ---------------- Locked Data (no end-user editing) ---------------- */
+const KEY = "fin_wheel_v1_locked";
+const DATA_DEFAULT = {
+  categories: [
+    {label:"Budget",   tasks:["zero-base today","move $5 to sinking fund","trim one bill","categorize 3 transactions","review last week spend"]},
+    {label:"Save",     tasks:["auto-transfer $5","no-spend hour","price-compare an item","fill a jar envelope","name your savings goal"]},
+    {label:"Debt",     tasks:["round-up a payment","check APRs","list snowball order","$10 extra to smallest debt","set autopay reminder"]},
+    {label:"Invest",   tasks:["read 1 page on index funds","add $10 to ETF","rebalance check","journal risk tolerance","learn expense ratios"]},
+    {label:"Earn",     tasks:["list 3 micro-gigs","improve a listing","ask for 1 referral","update resume bullet","pitch one person"]},
+    {label:"Learn",    tasks:["watch 1 short lesson","define a new term","practice compound calc","read a blog snippet","note 1 insight"]},
+    {label:"Organize", tasks:["rename files YYYY-MM","receipts folder","inbox-to-zero 10 min","calendar a money block","backup docs"]},
+    {label:"Generosity",tasks:["thank-you note","choose a cause","$1 conscious gift","donate an item","share a resource"]},
+    {label:"Mindset",  tasks:["write a money win","breathe 4-in 6-out x5","visualize 60s","affirm 3 lines","future-self postcard"]},
+    {label:"Admin",    tasks:["check credit report","update a password","audit subscriptions","verify bank alerts","scan for fees"]}
+  ],
+  history: [],
+  favs: [],
+  streak: {count:0, lastDate:null},
+  daysDone: 0
+};
+
+let store = load();
+function load(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(KEY)||"null");
+    if(!raw || !raw.categories) throw 0;
+    // harden categories by overwriting with defaults (prevents user tamper)
+    raw.categories = JSON.parse(JSON.stringify(DATA_DEFAULT.categories));
+    return raw;
+  }catch{
+    localStorage.setItem(KEY, JSON.stringify(DATA_DEFAULT));
+    return JSON.parse(JSON.stringify(DATA_DEFAULT));
+  }
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(store)); }
+
+/* ---------------- Wheel ---------------- */
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+let angle = 0, spinning = false, lastIndex = null, lastPick = null;
+
+function palette(n){
+  const base = ["#d9b878","#e3c27e","#f7f3ea","#e8d5a4","#c3a45d","#b89252","#f2e0b1","#baa060","#ad7c28","#f7eac5"];
+  return Array.from({length:n},(_,i)=>base[i%base.length]);
+}
+function drawWheel(){
+  const N = store.categories.length;
+  const colors = palette(N);
+  const W = canvas.width, H = canvas.height, R = Math.min(W,H)/2 - 8;
+  ctx.clearRect(0,0,W,H);
+  for(let i=0;i<N;i++){
+    const a0 = angle + i*(2*Math.PI/N);
+    const a1 = angle + (i+1)*(2*Math.PI/N);
+    ctx.beginPath(); ctx.moveTo(W/2,H/2); ctx.arc(W/2,H/2,R,a0,a1,false); ctx.closePath();
+    ctx.fillStyle = colors[i]; ctx.fill();
+  }
+}
+drawWheel();
+
+function sliceAtPointer(){
+  const N = store.categories.length;
+  const slice = 2*Math.PI/N;
+  const pointer = -Math.PI/2; // top
+  let rel = pointer - angle;
+  rel = (rel % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+  return Math.floor((rel + 1e-6)/slice) % N;
+}
+
+function pickTasks(cat, k=3){
+  const arr = cat.tasks.slice();
+  const out = [];
+  while(out.length<Math.min(k,arr.length)){
+    const i = Math.floor(Math.random()*arr.length);
+    out.push(arr.splice(i,1)[0]);
+  }
+  return out;
+}
+
+const PEP = [
+  "Make it tiny and winnable — momentum compounds.",
+  "Five honest minutes beats zero perfect minutes.",
+  "Lower the bar. Raise the frequency.",
+  "Future-you is cheering; give them a little gift.",
+  "Depth over breadth: one small thing well.",
+  "Clarity first, then action. You’ve got this."
+];
+function pep(){ return PEP[Math.floor(Math.random()*PEP.length)]; }
+
+/* ---------------- UI ---------------- */
+const resultEl = document.getElementById('result');
+const historyEl = document.getElementById('history');
+const favsEl = document.getElementById('favs');
+const streakEl = document.getElementById('streak');
+const daysEl = document.getElementById('days');
+
+function renderStats(){
+  streakEl.textContent = store.streak.count||0;
+  daysEl.textContent = store.daysDone||0;
+}
+function renderHistory(){
+  historyEl.innerHTML = "";
+  store.history.slice(-10).reverse().forEach(h=>{
+    const d = document.createElement('div'); d.className='item';
+    const dt = new Date(h.ts).toLocaleString();
+    d.innerHTML = `<div class="title">${h.label}</div>
+      <div class="small">${dt}</div>
+      <div>• ${h.tasks.join("<br>• ")}</div>
+      <div class="small" style="margin-top:6px;color:#ffd98a">💬 ${h.pep}</div>`;
+    historyEl.appendChild(d);
+  });
+}
+function renderFavs(){
+  favsEl.innerHTML = "";
+  if(!store.favs.length){ favsEl.innerHTML = `<div class="small" style="opacity:.7">No favorites yet.</div>`; return; }
+  store.favs.slice(-20).reverse().forEach(h=>{
+    const d = document.createElement('div'); d.className='item';
+    d.innerHTML = `<div class="title">☆ ${h.label}</div>
+      <div>• ${h.tasks.join("<br>• ")}</div>
+      <div class="small" style="margin-top:6px;color:#ffd98a">💬 ${h.pep}</div>`;
+    favsEl.appendChild(d);
+  });
+}
+renderStats(); renderHistory(); renderFavs();
+
+function showPick(label, tasks, message){
+  resultEl.innerHTML = `
+    <span class="badge">${label}</span>
+    <ol class="tasks">
+      ${tasks.map(t=>`<li>${t}</li>`).join("")}
+    </ol>
+    <div class="pep">💬 ${message}</div>
+    <div class="small" style="margin-top:6px">Tip: check off mentally now; then actually do the first one for 3–5 minutes.</div>
+  `;
+}
+
+/* ---------------- Controls ---------------- */
+const spinBtn = document.getElementById('spinBtn');
+const rerollBtn = document.getElementById('rerollBtn');
+const rerollPepBtn = document.getElementById('rerollPep');
+const favBtn = document.getElementById('favBtn');
+const doneBtn = document.getElementById('doneBtn');
+const clearBtn = document.getElementById('clearBtn');
+
+function spin(){
+  if(spinning) return;
+  spinning = true;
+  rerollBtn.disabled = rerollPepBtn.disabled = favBtn.disabled = doneBtn.disabled = true;
+
+  let v = 0.34 + Math.random()*0.22;
+  const dec = 0.992 + Math.random()*0.003;
+  let gate = 14 + Math.floor(Math.random()*6);
+
+  function step(){
+    angle += v; v *= dec; drawWheel();
+    if(v>0.003 || gate>0){ if(v<0.015) gate--; requestAnimationFrame(step); }
+    else{ spinning=false; onLanded(); }
+  }
+  step();
+}
+
+function onLanded(){
+  const idx = sliceAtPointer();
+  lastIndex = idx;
+  const cat = store.categories[idx];
+  const tasks = pickTasks(cat,3);
+  const message = pep();
+  lastPick = {label:cat.label, tasks, pep:message};
+
+  showPick(cat.label, tasks, message);
+  rerollBtn.disabled = rerollPepBtn.disabled = favBtn.disabled = doneBtn.disabled = false;
+
+  store.history.push({ts:Date.now(), ...lastPick});
+  store.history = store.history.slice(-200);
+  save(); renderHistory();
+}
+
+spinBtn.addEventListener('click', spin);
+canvas.addEventListener('click', spin);
+
+rerollBtn.addEventListener('click', ()=>{
+  if(lastIndex==null) return;
+  const cat = store.categories[lastIndex];
+  lastPick.tasks = pickTasks(cat,3);
+  showPick(cat.label, lastPick.tasks, lastPick.pep);
+  if(store.history.length){ store.history[store.history.length-1].tasks = lastPick.tasks; save(); renderHistory(); }
+});
+
+rerollPepBtn.addEventListener('click', ()=>{
+  if(!lastPick) return;
+  lastPick.pep = pep();
+  showPick(lastPick.label, lastPick.tasks, lastPick.pep);
+  if(store.history.length){ store.history[store.history.length-1].pep = lastPick.pep; save(); renderHistory(); }
+});
+
+favBtn.addEventListener('click', ()=>{
+  if(!lastPick) return;
+  store.favs.push({...lastPick}); store.favs = store.favs.slice(-100);
+  save(); renderFavs();
+});
+
+function sameDay(a,b){
+  const da=new Date(a), db=new Date(b);
+  return da.getFullYear()===db.getFullYear() && da.getMonth()===db.getMonth() && da.getDate()===db.getDate();
+}
+
+doneBtn.addEventListener('click', ()=>{
+  const now = Date.now();
+  const last = store.streak.lastDate ? new Date(store.streak.lastDate) : null;
+  if(last && sameDay(now,last)){ /* already counted today */ }
+  else{
+    if(last){
+      const diff = Math.floor((now - last)/86400000);
+      if(diff===1) store.streak.count += 1; else if(diff>1) store.streak.count = 1;
+    } else { store.streak.count = 1; }
+    store.streak.lastDate = now;
+    store.daysDone = (store.daysDone||0) + 1;
+  }
+  save(); renderStats();
+  doneBtn.disabled = true;
+});
+
+/* Clear history (keeps locked categories) */
+clearBtn.addEventListener('click', ()=>{
+  if(!confirm("Clear history and favorites?")) return;
+  store.history=[]; store.favs=[]; save(); renderHistory(); renderFavs();
+});
+</script>
+</body>
+</html>
