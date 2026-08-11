@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultimate Budgeting Tool</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f7fb;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #2e6e5f;
+    }
+    .container {
+      width: 80%;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .category {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .category span {
+      width: 33%;
+    }
+    .category-result {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .result {
+      font-weight: bold;
+    }
+    .alert {
+      background-color: #ffcc00;
+      padding: 10px;
+      margin-top: 20px;
+      text-align: center;
+      border-radius: 5px;
+      display: none;
+    }
+    #budgetChart {
+      margin-top: 30px;
+      width: 100%;
+      height: 300px;
+    }
+    .savings-goal {
+      margin-top: 20px;
+    }
+    .progress-bar {
+      width: 100%;
+      background-color: #f3f3f3;
+      border-radius: 5px;
+    }
+    .progress-bar div {
+      height: 20px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Ultimate Budgeting Tool</h1>
+    
+    <label for="income">Enter Your After-Tax Income:</label>
+    <input type="number" id="income" placeholder="e.g., 3000" />
+
+    <button id="calculateBtn">Calculate Budget</button>
+
+    <div class="category">
+      <span><strong>Needs (50%)</strong></span>
+      <span><strong>Wants (30%)</strong></span>
+      <span><strong>Savings (20%)</strong></span>
+    </div>
+
+    <div class="category-result">
+      <span id="needsResult">-</span>
+      <span id="wantsResult">-</span>
+      <span id="savingsResult">-</span>
+    </div>
+
+    <div id="budgetDetails"></div>
+    <div id="budgetChart"></div>
+
+    <div id="alertMessage" class="alert"></div>
+
+    <div class="savings-goal">
+      <label for="goalAmount">Enter Savings Goal:</label>
+      <input type="number" id="goalAmount" placeholder="e.g., 2000" />
+      <button id="setGoalBtn">Set Goal</button>
+      <div id="goalProgress" style="display:none;">
+        <label>Goal Progress:</label>
+        <div class="progress-bar">
+          <div id="progressBar" style="width: 0%; background-color: #4caf50;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let income, needs, wants, savings, goalAmount = 0;
+
+    // Budget Calculation
+    document.getElementById("calculateBtn").addEventListener("click", function() {
+      income = parseFloat(document.getElementById("income").value);
+      
+      if (isNaN(income) || income <= 0) {
+        alert("Please enter a valid income.");
+        return;
+      }
+
+      // Apply the 50/30/20 rule to the income
+      needs = income * 0.50;
+      wants = income * 0.30;
+      savings = income * 0.20;
+
+      // Update the budget categories with the calculated values
+      document.getElementById("needsResult").textContent = `$${needs.toFixed(2)}`;
+      document.getElementById("wantsResult").textContent = `$${wants.toFixed(2)}`;
+      document.getElementById("savingsResult").textContent = `$${savings.toFixed(2)}`;
+
+      // Show Expense Entry
+      document.getElementById("budgetDetails").innerHTML = `
+        <label for="needsSpent">Enter Needs Spending:</label>
+        <input type="number" id="needsSpent" placeholder="e.g., 1200" />
+        
+        <label for="wantsSpent">Enter Wants Spending:</label>
+        <input type="number" id="wantsSpent" placeholder="e.g., 800" />
+        
+        <label for="savingsSpent">Enter Savings Allocation:</label>
+        <input type="number" id="savingsSpent" placeholder="e.g., 400" />
+        
+        <button id="checkBudgetBtn">Check Budget</button>
+      `;
+
+      // Pie chart to visualize the budget
+      renderPieChart(needs, wants, savings);
+
+      document.getElementById("checkBudgetBtn").addEventListener("click", function() {
+        const needsSpent = parseFloat(document.getElementById("needsSpent").value);
+        const wantsSpent = parseFloat(document.getElementById("wantsSpent").value);
+        const savingsSpent = parseFloat(document.getElementById("savingsSpent").value);
+
+        const alertMessage = document.getElementById("alertMessage");
+        alertMessage.style.display = "none";  // Reset alert message
+
+        if (isNaN(needsSpent) || isNaN(wantsSpent) || isNaN(savingsSpent)) {
+          alert("Please enter valid spending values.");
+          return;
+        }
+
+        let message = "Budget is balanced!";
+        if (needsSpent > needs) message = "You exceeded your budget for Needs!";
+        if (wantsSpent > wants) message = "You exceeded your budget for Wants!";
+        if (savingsSpent > savings) message = "You exceeded your Savings allocation!";
+
+        alertMessage.textContent = message;
+        alertMessage.style.display = "block";
+      });
+    });
+
+    // Render Pie Chart for Budget Categories
+    function renderPieChart(needs, wants, savings) {
+      const ctx = document.getElementById('budgetChart').getContext('2d');
+      const budgetChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Needs (50%)', 'Wants (30%)', 'Savings (20%)'],
+          datasets: [{
+            data: [needs, wants, savings],
+            backgroundColor: ['#4caf50', '#ff9800', '#2196f3'],
+            borderColor: ['#fff', '#fff', '#fff'],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                label: function(tooltipItem) {
+                  return `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Savings Goal Tracker
+    document.getElementById("setGoalBtn").addEventListener("click", function() {
+      goalAmount = parseFloat(document.getElementById("goalAmount").value);
+      
+      if (isNaN(goalAmount) || goalAmount <= 0) {
+        alert("Please enter a valid savings goal.");
+        return;
+      }
+
+      document.getElementById("goalProgress").style.display = "block";
+      updateGoalProgress();
+    });
+
+    // Update Savings Goal Progress
+    function updateGoalProgress() {
+      const progressPercentage = (savings / goalAmount) * 100;
+      document.getElementById("progressBar").style.width = `${Math.min(progressPercentage, 100)}%`;
+    }
+  </script>
+
+</body>
+</html>
