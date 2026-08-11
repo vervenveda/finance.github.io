@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Crypto Literacy & Safety — 6-Week Workshop (Education Only)</title>
+<style>
+  :root{
+    --bg:#081225; --panel:#0f1d38; --ink:#eef6ff; --muted:#bcd0ef;
+    --accent:#7dd3fc; --accent2:#60a5fa; --glass:rgba(255,255,255,.05);
+  }
+  html,body{margin:0;min-height:100%;background:linear-gradient(180deg,#081225 0%,#0b1530 60%);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial}
+  .app{max-width:1111px;margin:24px auto;padding:14px}
+  header{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+  h1{margin:0;font-size:28px}
+  .sub{color:var(--muted);font-size:13px}
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:14px;margin-top:14px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .sidebar{background:var(--panel);border-radius:14px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.55)}
+  .content{background:linear-gradient(180deg,rgba(255,255,255,.04),transparent);border-radius:14px;padding:18px;min-height:360px}
+  .progress{height:12px;background:#0a1a2a;border-radius:10px;overflow:hidden}
+  .progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .pill{padding:6px 10px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer;font-size:13px}
+  input[type=text], textarea{width:100%;padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:transparent;color:var(--ink)}
+  textarea{min-height:84px;resize:vertical}
+  button{background:var(--accent);border:none;color:#031a2e;padding:10px 14px;border-radius:12px;cursor:pointer}
+  button.ghost{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+  .lesson,.quiz{background:var(--glass);border-radius:12px;padding:14px;margin-bottom:12px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .small{color:var(--muted);font-size:13px}
+  .hidden{display:none}
+  details.res{background:var(--glass);border-radius:12px;padding:10px;margin-top:10px}
+  summary{cursor:pointer;font-weight:600}
+  summary::-webkit-details-marker{display:none}
+  .badge{background:rgba(255,255,255,.08);padding:3px 8px;border-radius:999px;font-size:11px;margin-left:6px}
+  #quizModal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50}
+  #quizModal:not(.hidden){display:flex}
+  #quizBox{max-width:420px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+  footer{margin-top:12px;text-align:center;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <img alt="logo" style="width:40px;height:40px;border-radius:12px"
+      src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><rect rx='10' width='40' height='40' fill='%237dd3fc'/><text x='50%25' y='58%25' font-size='20' font-family='Arial' text-anchor='middle' fill='%2303182b'>₿</text></svg>">
+    <div>
+      <h1>Crypto Literacy & Safety — 6-Week Workshop</h1>
+      <div class="sub">Educational only • No investment advice • Focus on safety, scams, taxes, and policy awareness.</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside class="sidebar">
+      <div class="row" style="justify-content:space-between">
+        <div><strong>Progress</strong> <span id="progressPercent" class="small">0%</span></div>
+        <div class="small">Name</div>
+      </div>
+      <div class="progress" style="margin:8px 0 10px"><i id="progressBar" style="width:0%"></i></div>
+      <input id="participantName" placeholder="Type participant name…"/>
+      <div class="row" style="margin:10px 0">
+        <button id="saveProgressBtn">Save</button>
+        <button id="resetBtn" class="ghost">Reset</button>
+        <button id="exportBtn" class="ghost">Export Report</button>
+      </div>
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,.15);margin:10px 0"/>
+      <div><strong>Weeks</strong></div>
+      <div id="weeksList" style="max-height:40vh;overflow:auto;margin-top:6px"></div>
+    </aside>
+
+    <main class="content">
+      <div id="mainView">
+        <div class="lesson">
+          <h2 id="lessonTitle">Welcome</h2>
+          <div id="lessonBody">
+            <p>This workshop explains how crypto and blockchains work at a high level, the major **risks** (volatility, hacks, scams), how custody works, tax basics, and how to check firms/people and report fraud. You’ll find collapsible **Resources** inside every lesson and a **Week Test** after you study.</p>
+            <p class="small">Tip: your notes, quiz results, and test scores are saved locally in your browser.</p>
+            <div class="row">
+              <button id="startButton">Start Week 1 — Lesson 1</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quiz modal -->
+      <div id="quizModal" class="hidden">
+        <div class="quiz" id="quizBox">
+          <h3 id="quizTitle">Pop Quiz</h3>
+          <div id="quizQuestion" class="small" style="margin-bottom:6px"></div>
+          <div id="quizAnswers"></div>
+          <div class="row" style="margin-top:10px">
+            <button id="submitAnswer">Submit</button>
+            <button id="skipQuiz" class="ghost">Skip</button>
+          </div>
+          <div id="quizFeedback" class="small" style="margin-top:6px"></div>
+        </div>
+      </div>
+
+      <!-- Tests -->
+      <div id="testArea" class="hidden">
+        <div class="lesson">
+          <h3 id="testTitle">End-of-Week Test</h3>
+          <div id="testBody"></div>
+          <div class="row" style="margin-top:10px">
+            <button id="submitTest">Submit Test</button>
+            <button id="closeTest" class="ghost">Close</button>
+          </div>
+          <div id="testResult" class="small" style="margin-top:6px"></div>
+        </div>
+      </div>
+
+      <!-- Certificate -->
+      <div id="finalCertificate" class="hidden lesson">
+        <h3>Completion Certificate</h3>
+        <div id="certBody"></div>
+        <div class="row" style="margin-top:8px">
+          <button id="printCert">Print / Save</button>
+          <button id="closeCert" class="ghost">Close</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer>Khaemaegis Academy • Local-only • Last updated Jan 2, 2026</footer>
+</div>
+
+<script>
+/* =========================
+   Data model (curriculum)
+   ========================= */
+const curriculum = [
+/* ---------- Week 1: Foundations & Blockchains ---------- */
+{
+  week:1, title:"Foundations: What is Crypto? How Do Blockchains Work?",
+  lessons:[
+    {
+      id:"1.1",
+      title:"Crypto vs. Blockchain (concepts & limits)",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> “Crypto” refers to digital assets that use cryptography and distributed networks.
+        The underlying database is often a <em>blockchain</em> — a shared ledger where blocks of transactions are chained
+        using hashes. Blockchains trade central control for transparency and coordination costs. They are not magic: they
+        don’t fix bad business models, scams, or human error.</p>
+        <p><strong>Try it:</strong> In your notes, write 3 things a blockchain is good for (e.g., timestamping, transparent logs)
+        and 3 things it won’t solve (e.g., price risk, scams, lost passwords).</p>
+      `,
+      resources:[
+        {label:"NIST — Blockchain Technology Overview (IR 8202)", url:"https://nvlpubs.nist.gov/nistpubs/ir/2018/nist.ir.8202.pdf"},
+        {label:"NIST — Token Design & Management (IR 8301)", url:"https://nvlpubs.nist.gov/nistpubs/ir/2021/NIST.IR.8301.pdf"}
+      ],
+      quiz:[
+        {q:"A blockchain is best described as:", c:["A social network","A shared, append-only ledger","A PDF"], a:1},
+        {q:"Hash links between blocks primarily help with:", c:["Coloring the UI","Integrity/tamper-evidence","Speed"], a:1},
+        {q:"Blockchains automatically stop scams.", c:["True","False"], a:1},
+        {q:"Public blockchains typically offer:", c:["Central control","Decentralization trade-offs","Guaranteed profits"], a:1},
+        {q:"Crypto assets always equal company equity.", c:["True","False"], a:1}
+      ]
+    },
+    {
+      id:"1.2",
+      title:"Keys, Wallets, and Addresses",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> Your <em>private key</em> controls assets; your <em>public address</em> receives them.
+        Wallets can be software, hardware, or custodial (a company holds keys). Losing a private key can mean permanent loss.
+        Hardware wallets reduce online exposure, but you must secure recovery phrases.</p>
+        <p><strong>Try it:</strong> Draft a “backup plan” card: where/ how you would store a recovery phrase (don’t use real keys here).</p>
+      `,
+      resources:[
+        {label:"SEC Investor.gov — Crypto Asset Custody Basics", url:"https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/crypto-asset-custody-basics-retail-investors-investor-bulletin-0"}
+      ],
+      quiz:[
+        {q:"The private key is used to:", c:["View prices","Prove control of assets","Change blockchain color"], a:1},
+        {q:"Custodial wallet means:", c:["You hold keys","A third party holds keys","No keys exist"], a:1},
+        {q:"Losing a recovery phrase can mean permanent loss.", c:["True","False"], a:0},
+        {q:"Hardware wallets aim to reduce:", c:["Online key exposure","Electricity bills","Taxes"], a:0},
+        {q:"Public address is safe to share.", c:["True","False"], a:0}
+      ]
+    }
+  ],
+  test:[
+    {q:"Blockchains primarily provide:", c:["Central authority","Tamper-evident shared records","Guaranteed profits"], a:1},
+    {q:"A private key should be stored:", c:["Publicly on social media","Securely with backup strategy","Nowhere"], a:1},
+    {q:"Which is NOT solved by blockchains?", c:["Scams & human error","Distributed consensus","Public auditability"], a:0},
+    {q:"Custodial wallet risk includes:", c:["Counterparty risk","No key loss risk at all","Instant FDIC coverage for tokens"], a:0},
+    {q:"Hardware wallets:", c:["Eliminate all risk","Reduce online exposure to keys","Print money"], a:1},
+    {q:"Public address:", c:["Is same as private key","Can be shared to receive funds","Unlocks your wallet"], a:1},
+    {q:"NIST documents are:", c:["Entertainment blogs","Technical guidance/overviews","Advertisements"], a:1},
+    {q:"A ‘ledger’ means:", c:["A video site","A transaction record","A wallet brand"], a:1},
+    {q:"Losing keys:", c:["Is reversible by anyone","May be irreversible","Always insured"], a:1},
+    {q:"Wallet seed phrase:", c:["Backs up access","Decorative phrase","A marketing code"], a:0}
+  ]
+},
+
+/* ---------- Week 2: Risk, Volatility & Scams ---------- */
+{
+  week:2, title:"Risk, Volatility, and Scam Defense",
+  lessons:[
+    {
+      id:"2.1",
+      title:"Market Risks & Volatility",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> Prices can move fast. Leverage, thin liquidity, and protocol bugs increase downside risk.
+        Past returns don’t predict future results. Plan for the possibility of losing most or all funds.</p>
+        <p><strong>Try it:</strong> In notes, write a 2-line “loss plan” (max loss you’d tolerate in a hypothetical simulation).</p>
+      `,
+      resources:[
+        {label:"CFTC — Understand the Risks of Virtual Currency Trading", url:"https://www.cftc.gov/LearnAndProtect/AdvisoriesAndArticles/understand_risks_of_virtual_currency.html"},
+        {label:"CFTC — 14 Digital Asset Risks (PDF)", url:"https://www.cftc.gov/sites/default/files/2022-09/DigitalAssetRisks.pdf"}
+      ],
+      quiz:[
+        {q:"Volatility means:", c:["Stable prices","Large rapid price moves","Guaranteed gains"], a:1},
+        {q:"Leverage can:", c:["Magnify losses","Remove risk","Freeze prices"], a:0},
+        {q:"You should assume:", c:["No chance of loss","You could lose all funds","Guaranteed 10%/mo"], a:1},
+        {q:"Thin liquidity may:", c:["Increase slippage","Reduce risk to zero","Guarantee fills"], a:0},
+        {q:"Protocol bugs are:", c:["Impossible","A real risk","Marketing myths"], a:1}
+      ]
+    },
+    {
+      id:"2.2",
+      title:"Common Scams & How to Report",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> Watch for romance/influencer pump-and-dump, fake “recovery” services, giveaway
+        scams, job/task scams, and impersonations. No government or legit business demands crypto up front. Report to
+        <em>ReportFraud.ftc.gov</em> and relevant agencies.</p>
+        <p><strong>Try it:</strong> Write three red flags that would make you walk away instantly.</p>
+      `,
+      resources:[
+        {label:"FTC — What to Know About Cryptocurrency Scams", url:"https://consumer.ftc.gov/articles/what-know-about-cryptocurrency-scams"},
+        {label:"FTC — Report Fraud", url:"https://reportfraud.ftc.gov/"}
+      ],
+      quiz:[
+        {q:"‘Pay in crypto now or else’ is:", c:["Normal","A scam red flag","Tax advice"], a:1},
+        {q:"Legit giveaways:", c:["Guarantee doubles","Never need your keys","Ask for seed phrase"], a:1},
+        {q:"Impersonators may copy:", c:["Logos & handles","Only colors","Nothing"], a:0},
+        {q:"Where to report scams?", c:["ReportFraud.ftc.gov","Anywhere on X","Group chat only"], a:0},
+        {q:"Recovery service that wants upfront crypto:", c:["Safe","Likely scam","Government-approved"], a:1}
+      ]
+    }
+  ],
+  test:[
+    {q:"A hallmark of scams:", c:["Seed-phrase requests","Two-factor auth","Boring disclosures"], a:0},
+    {q:"Pump-and-dump relies on:", c:["Transparent fees","Artificial hype then dumping","FDIC insurance"], a:1},
+    {q:"Task/job ‘boosting’ schemes often end by:", c:["Paying you fairly","Refunding fees","Stealing deposits"], a:2},
+    {q:"Volatility can cause:", c:["Stable payouts","Large rapid losses","Guaranteed income"], a:1},
+    {q:"Report U.S. consumer scams to:", c:["ReportFraud.ftc.gov","Random forum","Friends"], a:0},
+    {q:"Leverage:", c:["Magnifies losses","Prevents risk","Is insurance"], a:0},
+    {q:"Protocol bugs:", c:["Never happen","May drain funds","Only help prices"], a:1},
+    {q:"Fake ‘recovery’ services:", c:["Common scam vector","Government teams","Bank policy"], a:0},
+    {q:"Hype from influencers is:", c:["Due diligence","A risk to evaluate","Guaranteed alpha"], a:1},
+    {q:"Seed phrase sharing is:", c:["Sometimes OK","Never OK","Required by SEC"], a:1}
+  ]
+},
+
+/* ---------- Week 3: Custody & Security Basics ---------- */
+{
+  week:3, title:"Custody, Wallet Security, and Operation Hygiene",
+  lessons:[
+    {
+      id:"3.1",
+      title:"Custody Models (self, hardware, custodial)",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> Self-custody gives control but shifts security to you; custodial services add
+        counterparty risk; hardware wallets reduce online attack surface. Match custody to skill and risk tolerance.</p>
+        <p><strong>Try it:</strong> List pros/cons of self vs. custodial for a small demo amount (no real keys!).</p>
+      `,
+      resources:[
+        {label:"SEC — Crypto Asset Custody Basics", url:"https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/crypto-asset-custody-basics-retail-investors-investor-bulletin-0"}
+      ],
+      quiz:[
+        {q:"Self-custody requires:", c:["Custodian signature","Your operational discipline","No backups"], a:1},
+        {q:"Custodial risk:", c:["Counterparty failure","None","Guaranteed insurance"], a:0},
+        {q:"Hardware wallets:", c:["Are phish-proof","Reduce online key exposure","Remove need for backups"], a:1},
+        {q:"Match custody to:", c:["Skill & tolerance","Random trend","Logo color"], a:0},
+        {q:"Losing seed phrase:", c:["Fine","Irreversible loss possible","Government restores"], a:1}
+      ]
+    },
+    {
+      id:"3.2",
+      title:"Security Hygiene (phishing, MFA, backups)",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> Use hardware keys or app-based MFA, verify URLs, bookmark official sites,
+        test restores on a spare device, and segment devices/accounts. Never type a seed phrase on a website.</p>
+        <p><strong>Try it:</strong> Write a 5-step “wallet drill” you could follow before any transaction.</p>
+      `,
+      resources:[
+        {label:"SEC — Crypto Asset Securities: Investor Alert", url:"https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-alerts/crypto-asset-securities"}
+      ],
+      quiz:[
+        {q:"MFA helps by:", c:["Adding a 2nd factor","Removing passwords","Printing money"], a:0},
+        {q:"Seed phrase on a website:", c:["OK if HTTPS","Never do this","Only on weekends"], a:1},
+        {q:"URL verification:", c:["Use bookmarks","Trust DMs","Ignore lock icon"], a:0},
+        {q:"Recovery drills:", c:["Optional forever","Build confidence","Ban you"], a:1},
+        {q:"Device segmentation:", c:["Reduces blast radius","Decorative","Illegal"], a:0}
+      ]
+    }
+  ],
+  test:[
+    {q:"Custodial failure risk is:", c:["Counterparty risk","Impossible","Insured like deposits"], a:0},
+    {q:"Self-custody requires:", c:["Security habits","No backups","Support desk"], a:0},
+    {q:"Never type seed phrase:", c:["On any site","Into password manager","On paper offline"], a:0},
+    {q:"MFA stands for:", c:["Multi-Factor Authentication","Many Fast Apps","Major Fund Access"], a:0},
+    {q:"Bookmarking official URLs:", c:["Reduces phishing","Increases risk","Blocks access"], a:0},
+    {q:"Test restores:", c:["Validate backups","Break wallets","Are scams"], a:0},
+    {q:"Segment devices:", c:["Lower cross-risk","Is illegal","Guarantees profits"], a:0},
+    {q:"Hardware wallets:", c:["Remove all risks","Reduce online exposure","Print coins"], a:1},
+    {q:"Phishing often mimics:", c:["Official sites","Random art","Hardware"], a:0},
+    {q:"Seed phrase sharing:", c:["Never","Sometimes","Often"], a:0}
+  ]
+},
+
+/* ---------- Week 4: Policy Landscape & Banking Interfaces ---------- */
+{
+  week:4, title:"Policy, Regulators & Banking Interfaces",
+  lessons:[
+    {
+      id:"4.1",
+      title:"Who regulates what? (high-level U.S. view)",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> U.S. oversight involves multiple agencies. The SEC focuses on investor protection
+        and securities law; the CFTC focuses on derivatives/commodities-related issues; FTC handles consumer scams; IRS
+        taxes digital assets; banking regulators (e.g., FDIC/OCC) supervise banks’ activities related to crypto.</p>
+        <p><strong>Try it:</strong> Map each agency to one responsibility in your notes.</p>
+      `,
+      resources:[
+        {label:"SEC — Crypto Assets Spotlight", url:"https://www.investor.gov/additional-resources/spotlight/crypto-assets"},
+        {label:"CFTC — Understand the Risks", url:"https://www.cftc.gov/LearnAndProtect/AdvisoriesAndArticles/understand_risks_of_virtual_currency.html"},
+        {label:"FTC — Crypto Scams hub", url:"https://www.ftc.gov/media/cryptocurrency-scams"},
+        {label:"FDIC — 2025 guidance update", url:"https://www.fdic.gov/news/press-releases/2025/fdic-clarifies-process-banks-engage-crypto-related-activities"}
+      ],
+      quiz:[
+        {q:"SEC focus includes:", c:["Securities & investors","Agriculture policy","DM emojis"], a:0},
+        {q:"CFTC focus includes:", c:["Derivatives/commodities aspects","Only taxes","Web design"], a:0},
+        {q:"FTC role:", c:["Consumer protection & scams","Tax refunds","Mining"], a:0},
+        {q:"FDIC supervises:", c:["Banks","Exchanges globally","All wallets"], a:0},
+        {q:"Policy can change:", c:["Yes—stay current","Never","Only yearly"], a:0}
+      ]
+    },
+    {
+      id:"4.2",
+      title:"Banks, On-/Off-Ramps, and Insurance Misconceptions",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> Bank accounts may interface with crypto platforms, but <em>crypto tokens aren’t
+        FDIC-insured deposits</em>. Coverage applies to qualifying bank deposits per rules. Understand how your funds flow
+        between platforms and banks and what is (and isn’t) insured.</p>
+        <p><strong>Try it:</strong> Write a one-sentence rule of thumb about “what’s insured when.”</p>
+      `,
+      resources:[
+        {label:"FDIC — Crypto-related activities update", url:"https://www.fdic.gov/news/financial-institution-letters/2025/fdic-clarifies-process-banks-engage-crypto-related"},
+        {label:"FDIC — Press release (context)", url:"https://www.fdic.gov/news/press-releases/2025/fdic-clarifies-process-banks-engage-crypto-related-activities"}
+      ],
+      quiz:[
+        {q:"FDIC insurance covers:", c:["Bank deposits per rules","All tokens everywhere","NFTs"], a:0},
+        {q:"On-/off-ramp risk includes:", c:["Counterparty & transfer risk","Free profit","No KYC ever"], a:0},
+        {q:"Policy updates:", c:["Static","May change","Illegal"], a:1},
+        {q:"Know the flow of funds:", c:["Yes","No"], a:0},
+        {q:"Tokens at exchanges are FDIC deposits.", c:["True","False"], a:1}
+      ]
+    }
+  ],
+  test:[
+    {q:"SEC vs CFTC roles:", c:["Same agency","Distinct mandates","Private firms"], a:1},
+    {q:"FTC handles:", c:["Consumer scams","Mining pools","Interest rates"], a:0},
+    {q:"FDIC insurance:", c:["Covers bank deposits","Automatically covers tokens","Covers NFTs"], a:0},
+    {q:"Rules can:", c:["Change over time","Never change","Only shrink"], a:0},
+    {q:"On-/off-ramp risks:", c:["Counterparty & transfer","Guaranteed arbitrage","None"], a:0},
+    {q:"Staying current:", c:["Important","Optional","Banned"], a:0},
+    {q:"Coverage misconceptions:", c:["Common—verify details","Impossible","Irrelevant"], a:0},
+    {q:"Crypto spotlight:", c:["Investor.gov resources","Only social media","Gaming sites"], a:0},
+    {q:"Agency mapping:", c:["Helps escalation/reporting","Wastes time","Bans wallets"], a:0},
+    {q:"Banks can engage in crypto activities without prior approval (policy as of 2025) if:", c:["Activities are permissible and risks managed","They promise profits","They mint coins"], a:0}
+  ]
+},
+
+/* ---------- Week 5: Taxes & Recordkeeping ---------- */
+{
+  week:5, title:"Taxes & Recordkeeping (U.S. Basics)",
+  lessons:[
+    {
+      id:"5.1",
+      title:"Digital Assets = Property (for tax purposes)",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> The IRS treats digital assets as <em>property</em>. Sales, swaps, and some uses are
+        taxable events with gains/losses. Keep detailed records (dates, amounts, fair market value, fees).</p>
+        <p><strong>Try it:</strong> Make a mock log entry for a hypothetical $50 purchase paid in crypto (no real data).</p>
+      `,
+      resources:[
+        {label:"IRS — Digital Asset FAQs (2025+)", url:"https://www.irs.gov/individuals/international-taxpayers/frequently-asked-questions-on-digital-asset-transactions"},
+        {label:"IRS — Virtual Currency FAQs (general)", url:"https://www.irs.gov/individuals/international-taxpayers/frequently-asked-questions-on-virtual-currency-transactions"}
+      ],
+      quiz:[
+        {q:"IRS treats digital assets as:", c:["Property","Currency with no tax rules","Souvenirs"], a:0},
+        {q:"Good records include:", c:["Dates, FMV, fees","Only emojis","Nothing"], a:0},
+        {q:"Swaps may be:", c:["Non-taxable always","Taxable events","Illegal"], a:1},
+        {q:"Losses:", c:["Never reported","Can be relevant under rules","Always ignored"], a:1},
+        {q:"Receipts & logs help:", c:["Tax reporting","Scam marketing","Mining speed"], a:0}
+      ]
+    },
+    {
+      id:"5.2",
+      title:"Tools & Habits for Accurate Reporting",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> Use export files, tags/labels, and reconcile with bank/fiat records. Consider
+        professional advice for complex activity. Don’t rely on exchange history alone.</p>
+        <p><strong>Try it:</strong> Draft a checklist you would run monthly for clean records.</p>
+      `,
+      resources:[
+        {label:"Investor.gov — Free Financial Planning Tools (calculators hub)", url:"https://www.investor.gov/free-financial-planning-tools"}
+      ],
+      quiz:[
+        {q:"Rely only on one exchange’s export:", c:["Sufficient forever","Can be incomplete","Government required"], a:1},
+        {q:"Monthly reconciliation:", c:["Helps accuracy","Is illegal","Wastes time"], a:0},
+        {q:"Professional advice:", c:["Never needed","Sometimes helpful","Banned"], a:1},
+        {q:"Labeling transfers:", c:["Aids clarity","Red flag","Blocks taxes"], a:0},
+        {q:"Keep fiat links:", c:["To match flows","For decoration","To avoid audits"], a:0}
+      ]
+    }
+  ],
+  test:[
+    {q:"IRS view:", c:["Property treatment","No rules","Always income-tax free"], a:0},
+    {q:"Recordkeeping includes:", c:["Dates, FMV, fees","Only wallet art","Memes"], a:0},
+    {q:"Swaps can be:", c:["Taxable","Free money","Ignored"], a:0},
+    {q:"Reconciliation:", c:["Good habit","Illegal","Optional PR"], a:0},
+    {q:"Exports:", c:["May be incomplete","Perfect always","Not allowed"], a:0},
+    {q:"Professional help:", c:["May be useful","Never","Banned"], a:0},
+    {q:"Fair market value:", c:["Helps compute gains","Marketing term","Prohibited"], a:0},
+    {q:"Document fees:", c:["Yes","No"], a:0},
+    {q:"Only ‘realized’ gains matter under tax rules.", c:["Often true—check specifics","False universally","N/A"], a:0},
+    {q:"Backups of logs:", c:["Wise","Illegal","Red flag"], a:0}
+  ]
+},
+
+/* ---------- Week 6: Putting It Together (DYOR & Safety Plan) ---------- */
+{
+  week:6, title:"Putting It Together — DYOR, Checklists, & Staying Current",
+  lessons:[
+    {
+      id:"6.1",
+      title:"Due Diligence (DYOR) & Verifications",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> Verify people/firms (e.g., FINRA’s BrokerCheck for brokers), read docs, compare
+        claims with independent sources, and beware of guaranteed-return language.</p>
+        <p><strong>Try it:</strong> Write 5 checklist items you would run before engaging any crypto service.</p>
+      `,
+      resources:[
+        {label:"FINRA — BrokerCheck", url:"https://brokercheck.finra.org/"},
+        {label:"Investor.gov — Crypto Assets spotlight", url:"https://www.investor.gov/additional-resources/spotlight/crypto-assets"}
+      ],
+      quiz:[
+        {q:"Guaranteed returns are:", c:["Common & safe","A red flag","Backed by SEC"], a:1},
+        {q:"BrokerCheck helps with:", c:["Verifying professionals","Printing wallets","Taxes"], a:0},
+        {q:"Independent sources:", c:["Reduce bias","Add hype","Ban diligence"], a:0},
+        {q:"Docs & disclosures:", c:["Should be read","Are optional memes","Not real"], a:0},
+        {q:"DYOR means:", c:["Do Your Own Research","Donate Your Own Resources","Delay Your Official Report"], a:0}
+      ]
+    },
+    {
+      id:"6.2",
+      title:"Personal Policy & Exit Plans",
+      contentHtml: `
+        <p><strong>Mini-lesson.</strong> Write a personal policy: position sizing, custody choice, red-flag triggers,
+        tax logging cadence, and exit strategy. Safety > FOMO. Simulate before risking real money.</p>
+        <p><strong>Try it:</strong> Draft a 10-line “Crypto Safety Plan” you could actually follow.</p>
+      `,
+      resources:[
+        {label:"FTC — Crypto Scam hub", url:"https://www.ftc.gov/media/cryptocurrency-scams"},
+        {label:"IRS — Digital Asset FAQs", url:"https://www.irs.gov/individuals/international-taxpayers/frequently-asked-questions-on-digital-asset-transactions"}
+      ],
+      quiz:[
+        {q:"A personal policy:", c:["Reduces impulse","Guarantees profit","Removes taxes"], a:0},
+        {q:"Exit strategy:", c:["Plan before entry","Never needed","Illegal"], a:0},
+        {q:"FOMO:", c:["Sound risk tool","Bias to manage","Tax form"], a:1},
+        {q:"Simulate first:", c:["Prudent","Forbidden","Pointless"], a:0},
+        {q:"Logs & cadence:", c:["Keep you compliant","Create scams","Ban wallets"], a:0}
+      ]
+    }
+  ],
+  test:[
+    {q:"DYOR includes:", c:["Verifications & docs","Copying hype","Ignoring risks"], a:0},
+    {q:"BrokerCheck is for:", c:["Verifying brokers","Creating NFTs","Tax refunds"], a:0},
+    {q:"Personal policy should include:", c:["Sizing, custody, red flags, exits","Logo design","Emoji set"], a:0},
+    {q:"Scam red flags include:", c:["Guaranteed returns","Seed phrase asks","Both"], a:2},
+    {q:"Simulated practice:", c:["Prudent first step","Banned","Tax crime"], a:0},
+    {q:"Logs & taxes:", c:["Keep records early","Do at end only","Never needed"], a:0},
+    {q:"Resources:", c:["Use official pages","Only influencers","DMs"], a:0},
+    {q:"Exit plan:", c:["Prepared in advance","After panic","Never"], a:0},
+    {q:"Policy landscape:", c:["Can change—stay current","Frozen","Irrelevant"], a:0},
+    {q:"Safety > ____:", c:["FOMO","Backups","Bookmarks"], a:0}
+  ]
+}
+];
+
+/* =========================
+   State & localStorage
+   ========================= */
+const STORAGE_KEY = "crypto_workshop_v1";
+const state = {
+  name:"",
+  week:1,
+  lessonIndex:0,
+  quizzesTaken:[],   // {week, lesson, q, correct}
+  tests:{},          // weekN: pct
+  notes:{},          // "w-l" => text
+  completedWeeks:[]
+};
+
+function $(id){return document.getElementById(id);}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) Object.assign(state, JSON.parse(raw));
+  }catch{}
+  const n = $("participantName"); if(n) n.value = state.name || "";
+  updateProgressUI();
+}
+
+function persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function saveState(){
+  const n = $("participantName");
+  state.name = (n && n.value.trim()) || "Participant";
+  try{ persist(); alert("Saved locally."); }catch{ alert("Save failed. Check browser storage settings."); }
+}
+
+function resetState(){
+  if(confirm("Reset all progress for this workshop?")){
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+}
+
+/* =========================
+   UI helpers
+   ========================= */
+function updateProgress(){
+  const completed = state.completedWeeks.length;
+  const total = curriculum.length;
+  const pct = total? Math.round((completed/total)*100):0;
+  const bar = $("progressBar"), label=$("progressPercent");
+  if(bar) bar.style.width = pct + "%";
+  if(label) label.textContent = pct + "%";
+  persist();
+}
+function updateProgressUI(){ updateProgress(); }
+
+function hideAll(){
+  ["quizModal","testArea","finalCertificate"].forEach(id=>{
+    const el=$(id); if(el) el.classList.add("hidden");
+  });
+}
+
+function buildWeeks(){
+  const box = $("weeksList"); box.innerHTML="";
+  curriculum.forEach(week=>{
+    const wrap = document.createElement("div");
+    wrap.style.padding="8px"; wrap.style.borderRadius="10px";
+    wrap.style.background="rgba(255,255,255,.04)";
+    wrap.style.marginBottom="8px";
+
+    const done = state.completedWeeks.includes(week.week);
+    wrap.innerHTML = `
+      <div><strong>Week ${week.week}: ${week.title}</strong>${done?` <span class="badge">✓ Done</span>`:""}</div>
+      <div class="small">${week.lessons.length} lessons • Test included</div>
+    `;
+
+    const lessons = document.createElement("div"); lessons.style.marginTop="6px";
+    week.lessons.forEach((lesson, idx)=>{
+      const b=document.createElement("button");
+      b.style.width="100%"; b.style.marginTop="6px";
+      b.textContent = `W${week.week} • ${lesson.title}`;
+      b.onclick = ()=> startLesson(week.week, idx);
+      lessons.appendChild(b);
+    });
+
+    const testBtn = document.createElement("button");
+    testBtn.className="ghost"; testBtn.style.width="100%"; testBtn.style.marginTop="8px";
+    testBtn.textContent = `Week ${week.week} Test`;
+    testBtn.onclick = ()=> startTest(week.week);
+
+    wrap.appendChild(lessons); wrap.appendChild(testBtn);
+    box.appendChild(wrap);
+  });
+}
+
+/* =========================
+   Lesson view
+   ========================= */
+function startLesson(weekNumber, lessonIndex){
+  state.week = weekNumber; state.lessonIndex = lessonIndex; hideAll();
+
+  const week = curriculum.find(w=>w.week===weekNumber); if(!week) return;
+  const lesson = week.lessons[lessonIndex];
+
+  $("lessonTitle").textContent = `Week ${weekNumber} — ${lesson.title}`;
+  $("lessonBody").innerHTML = `
+    ${lesson.contentHtml}
+    <details class="res" id="resPanel" open>
+      <summary>Resources (toggle)</summary>
+      <ul class="small">
+        ${(lesson.resources||[]).map(r=>`<li><a href="${r.url}" target="_blank" rel="noopener">${r.label}</a></li>`).join("")}
+      </ul>
+    </details>
+
+    <div class="lesson" style="margin-top:10px">
+      <h3>Notes</h3>
+      <textarea id="notesBox" placeholder="Your reflections or study notes…"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button id="saveNotes" class="ghost">Save Notes</button>
+        <button id="toggleQuiz" class="ghost">Pop Quiz (5 Qs)</button>
+        <button id="openTest" class="ghost">Week ${weekNumber} Test</button>
+      </div>
+    </div>
+  `;
+
+  // Load notes for this lesson
+  const k = `w${weekNumber}-l${lessonIndex}`;
+  const nb = $("notesBox"); nb.value = state.notes[k] || "";
+  $("saveNotes").onclick = ()=>{ state.notes[k] = nb.value; persist(); alert("Notes saved locally."); };
+  $("toggleQuiz").onclick = ()=> startQuiz(weekNumber, lessonIndex);
+  $("openTest").onclick = ()=> startTest(weekNumber);
+
+  // Make sure main view visible
+  const mv = $("mainView"); if(mv) mv.classList.remove("hidden");
+
+  // Update start CTA text
+  const startBtn = $("startButton"); if(startBtn) startBtn.textContent = "Resume last lesson";
+
+  updateProgressUI();
+}
+
+/* =========================
+   Quiz logic (5 questions)
+   ========================= */
+function startQuiz(weekNumber, lessonIndex){
+  const week = curriculum.find(w=>w.week===weekNumber); if(!week) return;
+  const lesson = week.lessons[lessonIndex];
+  const qs = (lesson.quiz||[]).slice(0,5);
+
+  const modal = $("quizModal"); modal.classList.remove("hidden");
+  $("quizTitle").textContent = `Pop Quiz — Week ${weekNumber}`;
+  const qEl = $("quizQuestion"), aEl = $("quizAnswers"), fb=$("quizFeedback");
+  let idx=0, score=0;
+
+  function renderQ(){
+    const item = qs[idx];
+    qEl.textContent = `Q${idx+1}. ${item.q}`;
+    aEl.innerHTML="";
+    item.c.forEach((choice,i)=>{
+      const row=document.createElement("div");
+      const label=document.createElement("label");
+      const input=document.createElement("input");
+      input.type="radio"; input.name="qchoice"; input.value=String(i);
+      label.appendChild(input); label.appendChild(document.createTextNode(" "+choice));
+      row.appendChild(label); aEl.appendChild(row);
+    });
+    fb.textContent="";
+  }
+
+  $("submitAnswer").onclick = ()=>{
+    const sel = document.querySelector('input[name="qchoice"]:checked');
+    if(!sel){ alert("Choose an answer."); return; }
+    const chosen = parseInt(sel.value,10);
+    const correct = chosen === qs[idx].a;
+    if(correct) score++;
+    fb.textContent = correct? "Nice! ✅" : `Not quite. Correct: ${qs[idx].c[qs[idx].a]}`;
+    state.quizzesTaken.push({week:weekNumber, lesson:lessonIndex, q:qs[idx].q, correct});
+    persist();
+    setTimeout(()=>{
+      idx++;
+      if(idx>=qs.length){
+        modal.classList.add("hidden");
+      }else{
+        renderQ();
+      }
+    },900);
+  };
+  $("skipQuiz").onclick = ()=> modal.classList.add("hidden");
+  renderQ();
+}
+
+/* =========================
+   Tests
+   ========================= */
+function startTest(weekNumber){
+  hideAll(); state.week = weekNumber;
+  const week = curriculum.find(w=>w.week===weekNumber); if(!week) return;
+
+  $("testTitle").textContent = `Week ${weekNumber} Test`;
+  const body = $("testBody"); body.innerHTML="";
+
+  week.test.forEach((t,i)=>{
+    const block=document.createElement("div"); block.style.marginBottom="8px";
+    const q=document.createElement("div"); q.innerHTML=`<strong>Q${i+1}.</strong> ${t.q}`;
+    block.appendChild(q);
+    t.c.forEach((choice,ci)=>{
+      const row=document.createElement("div");
+      const label=document.createElement("label");
+      const input=document.createElement("input");
+      input.type="radio"; input.name=`t${i}`; input.value=String(ci);
+      label.appendChild(input); label.appendChild(document.createTextNode(" "+choice));
+      row.appendChild(label); block.appendChild(row);
+    });
+    body.appendChild(block);
+  });
+
+  $("testArea").classList.remove("hidden");
+}
+
+function submitTest(){
+  const weekNumber = state.week;
+  const week = curriculum.find(w=>w.week===weekNumber); if(!week) return;
+  let score=0;
+
+  week.test.forEach((t,i)=>{
+    const sel = document.querySelector(`input[name="t${i}"]:checked`);
+    if(sel && parseInt(sel.value,10)===t.a) score++;
+  });
+
+  const pct = week.test.length? Math.round((score/week.test.length)*100):0;
+  $("testResult").textContent = `Score: ${pct}% (${score}/${week.test.length})`;
+
+  state.tests[`week${weekNumber}`] = pct;
+  if(pct>=70 && !state.completedWeeks.includes(weekNumber)){
+    state.completedWeeks.push(weekNumber);
+  }
+  updateProgress();
+  buildWeeks();
+}
+
+/* =========================
+   Certificate
+   ========================= */
+function maybeShowCertificate(){
+  const allDone = state.completedWeeks.length===curriculum.length && curriculum.length>0;
+  if(!allDone){ alert("Pass all week tests (≥70%) to unlock the certificate."); return; }
+  const body = $("certBody");
+  body.innerHTML = `
+    <p><strong>Certificate of Completion</strong></p>
+    <p>This certifies that <strong>${state.name||"Participant"}</strong> completed all ${curriculum.length}
+    weeks of the <em>Crypto Literacy & Safety</em> workshop.</p>
+    <p class="small">Week scores: ${JSON.stringify(state.tests)}</p>
+    <p class="small">Educator/Parent signature: __________________________</p>
+  `;
+  $("finalCertificate").classList.remove("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* =========================
+   Events
+   ========================= */
+window.addEventListener("load", ()=>{
+  loadState();
+  buildWeeks();
+
+  $("saveProgressBtn").onclick = saveState;
+  $("resetBtn").onclick = resetState;
+  $("exportBtn").onclick = ()=>{
+    const data = JSON.stringify(state,null,2);
+    const blob = new Blob([data], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url; a.download=(state.name||"participant")+"_crypto_workshop_report.json";
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  };
+
+  $("startButton").onclick = ()=>{
+    const wk = state.week||1, li=state.lessonIndex||0;
+    startLesson(wk, li);
+  };
+
+  $("submitTest").onclick = submitTest;
+  $("closeTest").onclick = ()=> $("testArea").classList.add("hidden");
+
+  // Footer certificate button
+  const foot = document.querySelector("footer");
+  const certBtn = document.createElement("button");
+  certBtn.className="ghost"; certBtn.textContent="Check Certificate";
+  certBtn.style.marginLeft="6px";
+  certBtn.onclick = maybeShowCertificate;
+  foot.appendChild(certBtn);
+
+  // Print & close cert
+  $("printCert").onclick = ()=> window.print();
+  $("closeCert").onclick = ()=> $("finalCertificate").classList.add("hidden");
+});
+</script>
+</body>
+</html>
