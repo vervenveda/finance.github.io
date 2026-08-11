@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Calculator</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .app-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .input-section {
+            margin-bottom: 12px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+            color: #555;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        #results {
+            margin-top: 20px;
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        p {
+            margin-bottom: 8px;
+        }
+
+        #suggestions {
+            font-weight: bold;
+            color: #f39c12;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>Budget Calculator</h1>
+
+        <!-- Income Input -->
+        <div class="input-section">
+            <label for="income">Total Income:</label>
+            <input type="number" id="income" placeholder="Enter your monthly income">
+        </div>
+
+        <!-- Expenses Input -->
+        <div class="input-section">
+            <label for="housing">Housing (Rent/Mortgage):</label>
+            <input type="number" id="housing" placeholder="Enter housing cost">
+        </div>
+        <div class="input-section">
+            <label for="utilities">Utilities:</label>
+            <input type="number" id="utilities" placeholder="Enter utilities cost">
+        </div>
+        <div class="input-section">
+            <label for="groceries">Groceries:</label>
+            <input type="number" id="groceries" placeholder="Enter groceries cost">
+        </div>
+        <div class="input-section">
+            <label for="transportation">Transportation:</label>
+            <input type="number" id="transportation" placeholder="Enter transportation cost">
+        </div>
+        <div class="input-section">
+            <label for="savings">Savings/Investments:</label>
+            <input type="number" id="savings" placeholder="Enter savings amount">
+        </div>
+        <div class="input-section">
+            <label for="debt">Debt Repayment:</label>
+            <input type="number" id="debt" placeholder="Enter debt repayment amount">
+        </div>
+
+        <!-- Calculate Button -->
+        <button onclick="calculateBudget()">Calculate Budget</button>
+
+        <!-- Results Display -->
+        <div id="results">
+            <h2>Results</h2>
+            <p id="totalExpenses">Total Expenses: $0</p>
+            <p id="remainingBalance">Remaining Balance: $0</p>
+            <p id="suggestions">Suggestions: </p>
+        </div>
+    </div>
+
+    <script>
+        // Function to calculate budget
+        function calculateBudget() {
+            // Get input values
+            let income = parseFloat(document.getElementById("income").value) || 0;
+            let housing = parseFloat(document.getElementById("housing").value) || 0;
+            let utilities = parseFloat(document.getElementById("utilities").value) || 0;
+            let groceries = parseFloat(document.getElementById("groceries").value) || 0;
+            let transportation = parseFloat(document.getElementById("transportation").value) || 0;
+            let savings = parseFloat(document.getElementById("savings").value) || 0;
+            let debt = parseFloat(document.getElementById("debt").value) || 0;
+
+            // Calculate total expenses and remaining balance
+            let totalExpenses = housing + utilities + groceries + transportation + savings + debt;
+            let remainingBalance = income - totalExpenses;
+
+            // Display results
+            document.getElementById("totalExpenses").textContent = `Total Expenses: $${totalExpenses.toFixed(2)}`;
+            document.getElementById("remainingBalance").textContent = `Remaining Balance: $${remainingBalance.toFixed(2)}`;
+
+            // Provide suggestions based on remaining balance
+            let suggestions = "";
+
+            if (remainingBalance < 0) {
+                suggestions = "You are spending more than you earn. Consider reducing non-essential expenses or increasing your income.";
+            } else if (remainingBalance > 0 && remainingBalance <= income * 0.1) {
+                suggestions = "Good job! But consider increasing your savings or investments for better financial security.";
+            } else if (remainingBalance > income * 0.1) {
+                suggestions = "Great job! You're saving well. You might consider increasing your investment contributions.";
+            }
+
+            // Display suggestions
+            document.getElementById("suggestions").textContent = suggestions;
+        }
+    </script>
+</body>
+</html>
