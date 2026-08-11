@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Stock Market Workshop — 6 Weeks (Local-Only)</title>
+<style>
+  :root{
+    --bg:#071229; --card:#0b1220; --ink:#eaf2ff; --muted:#b8c2d9; --accent:#7dd3fc; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+  }
+  html,body{margin:0;background:linear-gradient(180deg,#071229 0%,#0b1220 65%);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial}
+  .app{max-width:1120px;margin:28px auto;padding:16px}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+  h1{margin:0;font-size:28px}
+  .small{color:var(--muted);font-size:13px}
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
+  @media (max-width:880px){.grid{grid-template-columns:1fr}}
+  .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .sidebar .progress{height:10px;background:#09121a;border-radius:8px;overflow:hidden}
+  .sidebar .progress > i{display:block;height:100%;background:linear-gradient(90deg,#7dd3fc,#60a5fa)}
+  button{background:var(--accent);border:none;color:#06202f;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  button.light{background:transparent;color:var(--ink);border:1px solid rgba(255,255,255,.2)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .lesson{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px;margin-bottom:14px}
+  input,select,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(0,0,0,.2);color:#fff}
+  textarea{min-height:90px}
+  a{color:#a5e3ff}
+  .pill{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+  .badge{font-size:11px;padding:3px 8px;border-radius:999px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.4);color:#bff3c8;margin-left:6px}
+  .danger{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.35)}
+  .hint{background:rgba(125,211,252,.08);border:1px solid rgba(125,211,252,.35);border-radius:10px;padding:10px;margin-top:8px}
+  .tabs{display:flex;gap:8px;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.12)}
+  .tab{background:transparent;border:none;color:#cbd5e1;padding:10px 12px;cursor:pointer;border-bottom:2px solid transparent;font-weight:600}
+  .tab.active{color:#fff;border-bottom-color:var(--accent)}
+  .pane{display:none}.pane.show{display:block}
+  .sticky{position:sticky;top:8px}
+  .muted{color:#cbd5e1}
+  .q{margin:8px 0}
+  .warn{color:var(--warn)} .ok{color:var(--ok)} .bad{color:var(--bad)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <svg width="42" height="42" viewBox="0 0 44 44" style="border-radius:10px"><rect rx="10" width="44" height="44" fill="#7dd3fc"/><text x="22" y="27" text-anchor="middle" font-size="20" font-family="Arial" fill="#021b2c">📈</text></svg>
+    <div>
+      <h1>Stock Market Workshop — 6 Weeks</h1>
+      <div class="small">Free, local-only learning. No logins. Save/export your progress privately.</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- Sidebar -->
+    <aside class="card sidebar sticky">
+      <div class="row" style="justify-content:space-between">
+        <div><strong>Progress</strong> <span id="progressPct" class="small">0%</span></div>
+        <button id="saveBtn" class="ghost">Save</button>
+      </div>
+      <div class="progress" style="margin:8px 0 12px"><i id="progressBar" style="width:0%"></i></div>
+      <div class="row">
+        <input id="learnerName" placeholder="Name (optional)"/>
+      </div>
+      <hr style="border-color:rgba(255,255,255,.1)">
+
+      <div><strong>Weeks</strong></div>
+      <div id="weeksList" style="margin-top:6px"></div>
+
+      <hr style="border-color:rgba(255,255,255,.1)">
+      <div><strong>Quick Links</strong></div>
+      <ul class="small" style="margin:6px 0 0 16px">
+        <li><a target="_blank" href="https://www.investor.gov/introduction-investing/investing-basics/how-stock-markets-work/types-orders">SEC: Order Types</a></li>
+        <li><a target="_blank" href="https://www.finra.org/investors/investing/investment-products/stocks/day-trading">FINRA: Day Trading</a></li>
+        <li><a target="_blank" href="https://www.sec.gov/investor/alerts/ib_marginaccounts.pdf">SEC: Margin Risks (PDF)</a></li>
+        <li><a target="_blank" href="https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/RSI">RSI guide</a></li>
+      </ul>
+
+      <hr style="border-color:rgba(255,255,255,.1)">
+      <div class="row">
+        <button id="exportBtn" class="light">Export (.json)</button>
+        <button id="resetBtn" class="light">Reset</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="card">
+      <div class="tabs">
+        <button class="tab active" data-tab="learnTab">Learn</button>
+        <button class="tab" data-tab="toolsTab">Tools Lab</button>
+        <button class="tab" data-tab="testsTab">Tests</button>
+      </div>
+
+      <!-- Learn Pane -->
+      <section id="learnTab" class="pane show">
+        <div class="lesson">
+          <h2 id="lessonTitle">Welcome</h2>
+          <div id="lessonBody" class="small">
+            <p>This 6-week workshop covers markets & instruments, order types, long-term investing vs. trading, day-trading rules & risks, analysis tools (fundamental & technical), and a practical risk plan. Content saves locally to your browser only.</p>
+            <p class="hint"><strong>Safety:</strong> Margin and day trading are risky and can cause losses that exceed your deposit. Review official resources before using advanced tools.</p>
+            <div class="row" style="margin-top:8px">
+              <button id="startBtn">Start Week 1</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz modal -->
+        <div id="quizModal" class="lesson" style="display:none">
+          <h3 id="quizTitle">Pop Quiz</h3>
+          <div id="quizQ"></div>
+          <div id="quizA"></div>
+          <div class="row" style="margin-top:8px">
+            <button id="submitQuiz">Submit</button>
+            <button id="skipQuiz" class="ghost">Skip</button>
+          </div>
+          <div id="quizFeedback" class="small"></div>
+        </div>
+      </section>
+
+      <!-- Tools Pane -->
+      <section id="toolsTab" class="pane">
+        <div class="lesson">
+          <h2>Tools Lab</h2>
+          <p class="small">Local-only helpers for practice. Paste your own prices (no live data).</p>
+
+          <h3>1) Watchlist (manual)</h3>
+          <div class="row">
+            <input id="wlSymbol" placeholder="Ticker (e.g., AAPL)"/>
+            <input id="wlNotes" placeholder="Notes (thesis, level, date)"/>
+            <button id="wlAdd">Add</button>
+          </div>
+          <div id="watchlist"></div>
+
+          <hr style="border-color:rgba(255,255,255,.1);margin:14px 0">
+
+          <h3>2) MA & RSI from pasted closes</h3>
+          <p class="small">Paste daily closing prices (new line or comma separated). Choose windows → compute.</p>
+          <div class="row">
+            <textarea id="taPrices" placeholder="e.g., 187.1, 188.2, 186.4, ... (oldest → newest)"></textarea>
+          </div>
+          <div class="row">
+            <label style="flex:1">SMA short <input id="smaS" value="10" type="number"/></label>
+            <label style="flex:1">SMA long <input id="smaL" value="20" type="number"/></label>
+            <label style="flex:1">RSI period <input id="rsiP" value="14" type="number"/></label>
+            <button id="calcInd">Compute</button>
+          </div>
+          <pre id="indOut" class="small" style="white-space:pre-wrap"></pre>
+
+          <hr style="border-color:rgba(255,255,255,.1);margin:14px 0">
+
+          <h3>3) Position Size / Risk</h3>
+          <div class="row">
+            <label style="flex:1">Account ($)<input id="accBal" type="number" value="10000"></label>
+            <label style="flex:1">Risk % per trade<input id="riskPct" type="number" value="1"></label>
+            <label style="flex:1">Entry ($)<input id="entryPx" type="number" value="50"></label>
+            <label style="flex:1">Stop ($)<input id="stopPx" type="number" value="47.5"></label>
+            <button id="riskCalc">Calculate</button>
+          </div>
+          <div id="riskOut" class="small"></div>
+          <div class="hint small"><strong>Note:</strong> This simple calc ignores slippage, gaps, and fees.</div>
+        </div>
+      </section>
+
+      <!-- Tests Pane -->
+      <section id="testsTab" class="pane">
+        <div class="lesson">
+          <h2 id="testHeader">Weekly Test</h2>
+          <div id="testBody"></div>
+          <div class="row" style="margin-top:8px">
+            <button id="submitTest">Submit Test</button>
+            <button id="backToLearn" class="ghost">Back to Learn</button>
+          </div>
+          <div id="testResult" class="small"></div>
+        </div>
+
+        <div id="certificate" class="lesson" style="display:none">
+          <h3>Completion Certificate</h3>
+          <div id="certBody"></div>
+          <div class="row"><button onclick="window.print()">Print / Save PDF</button></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <p class="small" style="margin-top:10px;text-align:center">
+    Educational content only. Sources: SEC Investor.gov (order types, margin risks), FINRA (pattern day trading), CFTC advisories, ETF primers, RSI intro. 
+  </p>
+</div>
+
+<script>
+/* ================== Data & State ================== */
+const STORAGE_KEY = "stock_workshop_v1";
+
+const curriculum = [
+  {
+    week:1, title:"Markets & Instruments",
+    lessons:[
+      {
+        id:"1.1", title:"What is a Stock? Index? ETF?",
+        contentHtml: `
+          <p>Stocks are ownership shares of a company. Indexes (S&P 500, Nifty 50) are baskets that track parts of the market. 
+          ETFs are funds that trade like stocks and often <em>track</em> an index (e.g., a broad-market ETF for diversification).</p>
+          <p><strong>Mini-activity:</strong> Pick two ETFs and one single stock you know. Write one reason each might behave differently this week (news, earnings, sector move).</p>
+          <div class="small">Refs: ETF overviews, basic definitions.</div>
+        `,
+        resources:[
+          {name:"SEC: Order Types (basics later)", url:"https://www.investor.gov/introduction-investing/investing-basics/how-stock-markets-work/types-orders"},
+          {name:"iShares: What is an ETF?", url:"https://www.ishares.com/us/investor-education/etf-education/what-is-an-etf"},
+          {name:"ETF.com education", url:"https://www.etf.com/sections/news/etf-education-what-etf"}
+        ],
+        quiz:[
+          {q:"An ETF most often:", a:1, choices:["Is a single share of one company","Tracks a basket/index and trades like a stock","Has guaranteed returns"]},
+          {q:"A stock represents:", a:0, choices:["Ownership in a company","A type of loan to a company","A government bond"]},
+          {q:"Indexes like the S&P 500 are:", a:2, choices:["Brokerage accounts","Types of ETFs","Market baskets used to measure performance"]},
+          {q:"One key benefit of broad ETFs is:", a:1, choices:["Guaranteed profits","Diversification","Eliminating all risk"]},
+          {q:"During market hours, ETFs:", a:0, choices:["Trade intraday like stocks","Price once per day","Cannot be bought or sold"]},
+        ]
+      },
+      {
+        id:"1.2", title:"Market Structure, Sessions & Quotes",
+        contentHtml: `
+          <p>U.S. exchanges quote <em>bid</em> (buyers) and <em>ask</em> (sellers). The spread is the gap between them. 
+          Pre-market/after-hours trading has lower liquidity and wider spreads.</p>
+          <p><strong>Mini-activity:</strong> Observe a liquid stock vs. a thinly-traded one. Note the spread and how it changes.</p>
+        `,
+        resources:[
+          {name:"Exchange basics (SEC)", url:"https://www.investor.gov/introduction-investing/investing-basics/how-stock-markets-work/types-orders"}
+        ],
+        quiz:[
+          {q:"The bid is:", a:2, choices:["The price you must pay","Always higher than ask","What buyers are willing to pay"]},
+          {q:"Spreads often widen:", a:1, choices:["At mid-day","In pre/after-hours","When volatility is low"]},
+          {q:"Lower liquidity tends to mean:", a:0, choices:["Bigger spreads","Smaller spreads","No spreads"]},
+          {q:"Quotes show:", a:2, choices:["Only last trade","Only 52-week range","Bid/ask and last trade nearby"]},
+          {q:"After-hours fills can:", a:1, choices:["Be guaranteed","Have more slippage","Always be cheaper"]},
+        ]
+      }
+    ],
+    test:[
+      {q:"An ETF commonly:", a:0, choices:["Tracks an index and trades intraday","Is a loan to a company","Is guaranteed by the SEC"]},
+      {q:"A stock share is:", a:1, choices:["A fund share","Ownership in a company","A bond"]},
+      {q:"The bid-ask spread is:", a:2, choices:["Broker commission","Difference between today and yesterday","Gap between buyers and sellers"]},
+      {q:"Pre/after-hours often mean:", a:0, choices:["Lower liquidity & wider spreads","No trading at all","Same liquidity as regular hours"]},
+      {q:"Indexes are used to:", a:2, choices:["Eliminate risk","Create margin","Measure market performance"]},
+      {q:"ETFs vs. mutual funds:", a:0, choices:["ETFs trade all day; many mutual funds price once/day","Both price once/day","ETFs never track indexes"]},
+      {q:"A thinly-traded stock usually has:", a:1, choices:["Tight spreads","Wider spreads","No spreads"]},
+      {q:"A reason ETFs can diversify is:", a:0, choices:["They hold baskets of securities","They are guaranteed","They are bonds"]},
+      {q:"The ask is:", a:1, choices:["What buyers pay","What sellers are asking","Yesterday’s close"]},
+      {q:"Quotes display:", a:2, choices:["Only last price","Only open price","Bid, ask, last, and more"]},
+    ]
+  },
+  {
+    week:2, title:"Accounts, Orders & Costs",
+    lessons:[
+      {
+        id:"2.1", title:"Order Types (Market, Limit, Stop/Stop-Limit)",
+        contentHtml: `
+          <p>Market orders aim for immediate execution at available prices; limits set a maximum buy/minimum sell price; stop orders trigger into market or limit orders once the stop price hits.</p>
+          <p><strong>Mini-activity:</strong> Write when you'd prefer a limit vs. a market order. What trade-offs matter?</p>
+          <div class="small">Ref: SEC Investor.gov order types.</div>
+        `,
+        resources:[
+          {name:"SEC: Types of Orders", url:"https://www.investor.gov/introduction-investing/investing-basics/how-stock-markets-work/types-orders"},
+          {name:"SEC: Stop / Stop-Limit / Trailing Stops", url:"https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-15"}
+        ],
+        quiz:[
+          {q:"A market order:", a:0, choices:["Executes quickly at available prices","Guarantees a price","Is only for ETFs"]},
+          {q:"A buy limit:", a:1, choices:["Executes above the limit","Executes at/below the limit","Becomes a market order immediately"]},
+          {q:"A stop order:", a:2, choices:["Always improves your fill","Never triggers","Becomes active when the stop price hits"]},
+          {q:"Stop-limit risk:", a:1, choices:["No risk","May not fill in fast drops","Always fills better than market"]},
+          {q:"Limit orders help you:", a:0, choices:["Control price","Avoid partial fills","Eliminate slippage always"]},
+        ]
+      },
+      {
+        id:"2.2", title:"Fees, Taxes, and Slippage",
+        contentHtml: `
+          <p>Even with zero commissions, spreads and slippage are costs. Short-term trading can have higher tax rates. Track total trade cost in your journal.</p>
+          <p><strong>Mini-activity:</strong> Estimate 'all-in' cost for a mock trade using spread + expected slippage.</p>
+        `,
+        resources:[],
+        quiz:[
+          {q:"One hidden cost is:", a:2, choices:["Color theme","Ticker length","Bid-ask spread"]},
+          {q:"Slippage means:", a:0, choices:["Fill worse than expected","Guaranteed better fills","No impact on cost"]},
+          {q:"Zero commissions mean:", a:1, choices:["No costs at all","Spreads/slippage can still matter","Taxes disappear"]},
+          {q:"Tracking costs helps you:", a:0, choices:["Evaluate strategy edge","Guarantee profits","Avoid stop losses"]},
+          {q:"Short-term taxable rates may be:", a:2, choices:["Always lower","Zero","Higher than long-term"]},
+        ]
+      }
+    ],
+    test:[
+      {q:"Market vs. Limit:", a:1, choices:["Both guarantee price","Market prioritizes speed; limit sets price","Limit guarantees execution immediately"]},
+      {q:"Stops:", a:0, choices:["Trigger orders after a price level","Eliminate risk","Always fill at stop price"]},
+      {q:"A common cost besides commissions:", a:2, choices:["Realtime quotes","Ticker symbol","Spread/slippage"]},
+      {q:"Zero-commission trading:", a:1, choices:["Means trading is free","Still has spread/slippage costs","Removes taxes"]},
+      {q:"Stop-limit may fail to fill in:", a:0, choices:["Fast moves/gaps","Calm markets","Never"]},
+      {q:"Taxes:", a:2, choices:["Are identical always","Don’t apply to stocks","Can differ by holding period/region"]},
+      {q:"Trade journal purpose:", a:1, choices:["Marketing","Measure edge and costs","Replace a plan"]},
+      {q:"A limit buy executes:", a:2, choices:["At any price","Above the limit only","At/below limit"]},
+      {q:"Slippage is often worse in:", a:0, choices:["Thin markets/after-hours","Liquid markets","Lunch time always"]},
+      {q:"Spreads are:", a:1, choices:["Guaranteed to be 1 cent","Difference between bid/ask","Tax rebate"]},
+    ]
+  },
+  {
+    week:3, title:"Investing vs. Trading",
+    lessons:[
+      {
+        id:"3.1", title:"Buy-and-Hold, Indexing, and Compounding",
+        contentHtml: `
+          <p>Long-term investors often use broad index funds/ETFs and benefit from compounding over time. Costs and behavior (sticking to a plan) matter.</p>
+          <p><strong>Mini-activity:</strong> Sketch a 'set-and-review' plan—how often would you rebalance?</p>
+        `,
+        resources:[
+          {name:"ETF primer", url:"https://www.ishares.com/us/investor-education/etf-education/what-is-an-etf"}
+        ],
+        quiz:[
+          {q:"Indexing seeks to:", a:1, choices:["Beat the market each week","Match a market basket","Time every swing"]},
+          {q:"Compounding is helped by:", a:0, choices:["Time in the market","Constant switching","Ignoring costs"]},
+          {q:"Rebalancing is:", a:2, choices:["Buying more winners only","Never selling","Periodically resetting target weights"]},
+          {q:"Behavior matters because:", a:0, choices:["Panic can derail plans","It eliminates risk","It guarantees returns"]},
+          {q:"Broad ETFs can:", a:2, choices:["Guarantee profits","Eliminate drawdowns","Provide diversification"]},
+        ]
+      },
+      {
+        id:"3.2", title:"Active Approaches (Swing/Position) — Risks",
+        contentHtml: `
+          <p>Trading styles like swing (days-weeks) and position (weeks-months) use rules for entries/exits and risk. Journaling and position sizing are essential.</p>
+          <p><strong>Mini-activity:</strong> Define a 3-line plan: setup, invalidation (stop), and size rule.</p>
+        `,
+        resources:[],
+        quiz:[
+          {q:"Swing trading usually holds:", a:1, choices:["Minutes","Days-weeks","Years"]},
+          {q:"A plan should include:", a:2, choices:["Color scheme","Broker logo","Entry, stop, size"]},
+          {q:"Position size depends on:", a:0, choices:["Risk per trade & stop distance","Ticker popularity","News feed brand"]},
+          {q:"Journaling helps:", a:1, choices:["With taxes only","Find repeatable edges","Draw better logos"]},
+          {q:"A stop defines:", a:0, choices:["Invalidation/risk","Profit target","Commission"]},
+        ]
+      }
+    ],
+    test:[
+      {q:"Indexing goal:", a:0, choices:["Match an index","Beat daily","Time all swings"]},
+      {q:"Compounding benefits from:", a:1, choices:["Frequent switching","Time and discipline","Only leverage"]},
+      {q:"Diversification reduces:", a:2, choices:["Taxes","All risk","Single-name risk"]},
+      {q:"Swing trading timeframe:", a:0, choices:["Days-weeks","Years","Seconds"]},
+      {q:"A plan’s stop is:", a:1, choices:["Entry price","Where you exit if wrong","Your target"]},
+      {q:"Sizing considers:", a:2, choices:["Ticker letters","Lunch time","Account risk % and stop distance"]},
+      {q:"Journals track:", a:0, choices:["Setups, costs, results","Only watchlist","Only profits"]},
+      {q:"Behavioral mistakes can:", a:1, choices:["Guarantee better fills","Hurt returns","Eliminate spreads"]},
+      {q:"Index funds are bought often via:", a:0, choices:["ETFs","Crypto wallets","401(k) only"]},
+      {q:"Long-term investors focus on:", a:2, choices:["Scalping","Leverage only","Costs, time, discipline"]},
+    ]
+  },
+  {
+    week:4, title:"Day Trading & Regulations",
+    lessons:[
+      {
+        id:"4.1", title:"PDT Rule & Margin Basics",
+        contentHtml: `
+          <p class="danger"><strong>Risk:</strong> Day trading and margin can cause rapid losses. In the U.S., FINRA's Pattern Day Trader (PDT) designation applies if you place 4+ day trades in 5 business days in a <em>margin</em> account; brokers require at least $25,000 equity to continue day trading.</p>
+          <p><strong>Mini-activity:</strong> Write a one-paragraph 'If-Then' risk plan if you get flagged for PDT or face a margin call.</p>
+          <div class="small">Refs: FINRA PDT & SEC margin risks.</div>
+        `,
+        resources:[
+          {name:"FINRA: Day Trading", url:"https://www.finra.org/investors/investing/investment-products/stocks/day-trading"},
+          {name:"FINRA Rule 4210 (margin)", url:"https://www.finra.org/rules-guidance/rulebooks/finra-rules/4210"},
+          {name:"SEC: Margin Risks (PDF)", url:"https://www.sec.gov/investor/alerts/ib_marginaccounts.pdf"}
+        ],
+        quiz:[
+          {q:"PDT can apply after:", a:2, choices:["1 day trade total","2 day trades in 2 days","4+ day trades in 5 business days (margin)"]},
+          {q:"To day trade after PDT flag you generally need:", a:1, choices:["$2,000","$25,000 equity","No minimum"]},
+          {q:"Margin means:", a:0, choices:["Borrowing from broker, amplifying gains/losses","Free leverage","Guaranteed fills"]},
+          {q:"A margin call:", a:1, choices:["Is good news","Requires you to add equity or reduce positions","Is a tax refund"]},
+          {q:"Main risk of margin:", a:0, choices:["Losses can exceed cash deposit","Spreads vanish","Taxes disappear"]},
+        ]
+      },
+      {
+        id:"4.2", title:"Short Selling, Leverage & Fees",
+        contentHtml: `
+          <p>Shorting borrows shares to sell first, aiming to buy back lower. Leverage multiplies exposure and risk. Costs include borrow fees and interest.</p>
+          <p><strong>Mini-activity:</strong> Describe a scenario where shorting might be risky even if you're 'right' (squeeze, borrow recall, gap).</p>
+        `,
+        resources:[
+          {name:"CFTC Advisory (be skeptical of systems)", url:"https://www.cftc.gov/LearnAndProtect/FraudAwarenessPrevention/CFTCFraudAdvisories/fraudadv_phonywebsites"}
+        ],
+        quiz:[
+          {q:"Shorting sells:", a:1, choices:["Your own shares","Borrowed shares","ETFs only"]},
+          {q:"Leverage:", a:0, choices:["Amplifies gains/losses","Cuts risk in half","Eliminates spreads"]},
+          {q:"A short squeeze is:", a:2, choices:["A stop order","A catalyst for dividends","Rapid price rise forcing covers"]},
+          {q:"Borrow fees:", a:1, choices:["Don’t exist","Can be substantial","Are paid by the exchange"]},
+          {q:"Leverage + volatility:", a:0, choices:["Increases risk of big drawdowns","Guarantees profit","Removes tax"]},
+        ]
+      }
+    ],
+    test:[
+      {q:"PDT threshold:", a:1, choices:["2 day trades/5 days","4+ day trades/5 days (margin)","10 day trades/10 days"]},
+      {q:"Typical equity to keep day trading:", a:1, choices:["$2,000","$25,000","$250,000"]},
+      {q:"Margin risk:", a:2, choices:["Lower losses","Guaranteed returns","Losses can exceed deposit"]},
+      {q:"Short selling sells:", a:0, choices:["Borrowed shares","Only options","Only ETFs"]},
+      {q:"Leverage effect:", a:2, choices:["Reduces volatility","Lowers spreads","Magnifies P/L swings"]},
+      {q:"CFTC warns:", a:1, choices:["Systems can guarantee profits","Be skeptical of ‘guaranteed’ trading systems","Spreads are illegal"]},
+      {q:"A margin call:", a:0, choices:["Requires action to restore equity","Is optional paperwork","Is tax relief"]},
+      {q:"Fees specific to shorting:", a:2, choices:["None","Maker/taker only","Borrow/interest costs"]},
+      {q:"After PDT flag without equity:", a:0, choices:["Restrictions on day trades","Free leverage","Nothing changes"]},
+      {q:"Stops in fast markets:", a:1, choices:["Always exact price","Can slip or not fill (stop-limit)","Don’t trigger"]},
+    ]
+  },
+  {
+    week:5, title:"Tools & Analysis",
+    lessons:[
+      {
+        id:"5.1", title:"Fundamentals: Revenue, EPS, P/E, Catalysts",
+        contentHtml: `
+          <p>Fundamental analysis reviews business health: growth, profitability, balance sheet, and catalysts (earnings, guidance, macro). Ratios (e.g., P/E) compare price to earnings.</p>
+          <p><strong>Mini-activity:</strong> Pick one company; write 2 metrics you'd track each quarter and why.</p>
+        `,
+        resources:[],
+        quiz:[
+          {q:"EPS stands for:", a:0, choices:["Earnings Per Share","Equity Price Spread","Enterprise Share"]},
+          {q:"A catalyst example:", a:1, choices:["Ticker change","Earnings/guidance","Chart color"]},
+          {q:"High P/E can mean:", a:2, choices:["Cheap stock","Guaranteed growth","High expectations (context matters)"]},
+          {q:"Profitability ratio example:", a:0, choices:["Net margin","Ticker length","Spread"]},
+          {q:"Balance sheet item:", a:2, choices:["PE ratio","Moving average","Debt"]},
+        ]
+      },
+      {
+        id:"5.2", title:"Technicals: Trends, MAs, RSI (Basics)",
+        contentHtml: `
+          <p>MAs smooth price; crossovers can signal trend shifts. RSI (0–100) gauges momentum; traditionally, above ~70 = overbought, below ~30 = oversold, but context matters.</p>
+          <p><strong>Mini-activity:</strong> Paste closes into the tool and compute SMA(10/20) and RSI(14). What do you see?</p>
+          <div class="small">Ref: RSI primer.</div>
+        `,
+        resources:[
+          {name:"RSI overview (Fidelity)", url:"https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/RSI"}
+        ],
+        quiz:[
+          {q:"SMA stands for:", a:2, choices:["Strong Market Advance","Short Momentum Average","Simple Moving Average"]},
+          {q:"RSI values range:", a:1, choices:["10-90","0-100","-1 to +1"]},
+          {q:"Overbought/oversold levels are:", a:0, choices:["Context-dependent","Guaranteed signals","Illegal to use"]},
+          {q:"MAs are used to:", a:2, choices:["Change taxes","Eliminate risk","Smooth price/trend"]},
+          {q:"RSI 50+ often implies:", a:1, choices:["Bearish momentum","Bullish tilt (context)","No info"]},
+        ]
+      }
+    ],
+    test:[
+      {q:"P/E compares:", a:0, choices:["Price to earnings","Price to entries","Price to expenses"]},
+      {q:"Catalyst example:", a:2, choices:["Spread change","Ticker font","Earnings report"]},
+      {q:"RSI scale:", a:0, choices:["0–100","0–10","0–1000"]},
+      {q:"MA purpose:", a:1, choices:["Guarantee profits","Smooths data/trend insight","Tax planning"]},
+      {q:"High P/E:", a:2, choices:["Means cheap","Means fraud","May mean high expectations"]},
+      {q:"Fundamental metric:", a:1, choices:["RSI","Revenue growth","SMA crossover"]},
+      {q:"Momentum tool:", a:0, choices:["RSI","P/E","Debt ratio"]},
+      {q:"Crossovers sometimes used as:", a:0, choices:["Trend change hints","Tax events","Order types"]},
+      {q:"A balance sheet risk:", a:1, choices:["SMA lag","High leverage/debt","Ticker vowels"]},
+      {q:"Catalysts belong in:", a:2, choices:["Color theme","Spread calc","Journal/plan"]},
+    ]
+  },
+  {
+    week:6, title:"Practice & Risk Plan",
+    lessons:[
+      {
+        id:"6.1", title:"Paper Trading, Journaling, Psychology",
+        contentHtml: `
+          <p>Practice first. Journal your setup, risk, reasoning, and result. Common pitfalls: FOMO, revenge trading, and moving stops.</p>
+          <p><strong>Mini-activity:</strong> Create a one-page trading plan with max daily loss, risk per trade, and 'no-trade' times.</p>
+        `,
+        resources:[
+          {name:"CFTC: Be skeptical of 'guaranteed' systems", url:"https://www.cftc.gov/LearnAndProtect/FraudAwarenessPrevention/CFTCFraudAdvisories/fraudadv_phonywebsites"}
+        ],
+        quiz:[
+          {q:"Paper trading is:", a:0, choices:["Practice with no real money","Illegal","High leverage"]},
+          {q:"A journal should include:", a:1, choices:["Ticker logo","Setup, risk, notes","Only P/L"]},
+          {q:"A daily loss limit helps:", a:2, choices:["Increase risk","Ignore stops","Prevent spiral mistakes"]},
+          {q:"Moving stops away usually:", a:0, choices:["Increases risk beyond plan","Improves edge","Is disciplined"]},
+          {q:"FOMO stands for:", a:1, choices:["Funds on margin only","Fear of missing out","Fast order market only"]},
+        ]
+      },
+      {
+        id:"6.2", title:"Putting It Together",
+        contentHtml: `
+          <p>Combine a diversified core (if investing) with clear trading rules (if active). You don’t need complexity—just consistency and risk control.</p>
+          <p><strong>Mini-activity:</strong> Write a 5-line checklist you'll read before every trade.</p>
+        `,
+        resources:[],
+        quiz:[
+          {q:"Consistency often beats:", a:0, choices:["Complexity","Journaling","Stops"]},
+          {q:"A core-satellite idea is:", a:2, choices:["All shorting","All cash","Core long-term + small active sleeve"]},
+          {q:"Reading a checklist:", a:1, choices:["Wastes time","Improves discipline","Guarantees profits"]},
+          {q:"Risk control includes:", a:0, choices:["Sizing, stops, limits","Ignoring spreads","Only adding on losers"]},
+          {q:"Paper trade first:", a:2, choices:["Never","Only with leverage","To test process before risking real money"]},
+        ]
+      }
+    ],
+    test:[
+      {q:"Paper accounts:", a:0, choices:["Help practice process","Change taxes","Guarantee fills"]},
+      {q:"Psychology issues include:", a:1, choices:["ETF fees","FOMO/revenge trading","Ticker fonts"]},
+      {q:"Risk plan includes:", a:2, choices:["Color theme","Lunch time","Max loss & risk per trade"]},
+      {q:"Core-satellite means:", a:1, choices:["Only day trade","Core long-term + small active trades","Only options"]},
+      {q:"Journaling tracks:", a:0, choices:["Setups/risk/results","Only wins","Only fees"]},
+      {q:"Before real money:", a:1, choices:["Skip practice","Try paper trading","Ignore stops"]},
+      {q:"Consistency is usually better than:", a:2, choices:["Discipline","Sizing","Constant strategy hopping"]},
+      {q:"Stops are placed at:", a:1, choices:["Random levels","Invalidation points","Target price"]},
+      {q:"Leverage should be:", a:0, choices:["Used with caution","Always maxed","Ignored in plans"]},
+      {q:"A pre-trade checklist aims to:", a:2, choices:["Guarantee profit","Lower taxes","Prevent avoidable errors"]},
+    ]
+  }
+];
+
+/* ================== App State ================== */
+const state = {
+  name:"", week:1, lessonIndex:0,
+  quizzes:[], tests:{}, completedWeeks:[],
+  watchlist:[], prices:[], tools:{}
+};
+
+/* ================== Helpers ================== */
+const $ = (id)=>document.getElementById(id);
+const saveState = ()=> localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}");
+    Object.assign(state, s);
+  }catch{}
+  $("learnerName").value = state.name||"";
+  buildWeeks();
+  updateProgress();
+}
+function fmtPct(n){return (Math.round(n*100))+"%";}
+
+/* ================== UI Builders ================== */
+function buildWeeks(){
+  const container = $("weeksList"); container.innerHTML = "";
+  curriculum.forEach(w=>{
+    const box = document.createElement("div");
+    box.className="lesson";
+    const done = state.completedWeeks.includes(w.week);
+    box.innerHTML = `<div><strong>Week ${w.week}: ${w.title}</strong>${done?` <span class="badge">Done</span>`:""}</div>
+      <div class="small">${w.lessons.length} lessons • Test included</div>`;
+    w.lessons.forEach((ls,i)=>{
+      const b = document.createElement("button");
+      b.style.marginTop="6px"; b.textContent = `W${w.week} • ${ls.title}`;
+      b.onclick = ()=> startLesson(w.week,i);
+      box.appendChild(b);
+    });
+    const t = document.createElement("button");
+    t.className="ghost"; t.style.marginTop="8px"; t.textContent=`Week ${w.week} Test`;
+    t.onclick = ()=> startTest(w.week);
+    box.appendChild(t);
+
+    container.appendChild(box);
+  });
+}
+
+function startLesson(week, idx){
+  state.week = week; state.lessonIndex = idx; saveState();
+  setTab("learnTab");
+  const w = curriculum.find(x=>x.week===week), ls = w.lessons[idx];
+  $("lessonTitle").textContent = `Week ${week} — ${ls.title}`;
+  $("lessonBody").innerHTML = `
+    ${ls.contentHtml}
+    <div class="row" style="margin-top:10px">
+      <button id="openRes" class="light">Open Resources</button>
+      <button id="takeQuiz">Pop Quiz (5 Qs)</button>
+      <button id="weekTestBtn">Go to Week ${week} Test</button>
+    </div>
+    <div id="resourcesArea" style="margin-top:8px;display:none"></div>
+  `;
+  $("openRes").onclick = ()=>{
+    const r = $("resourcesArea");
+    if(r.style.display==="none"){ // open
+      r.style.display="block";
+      r.innerHTML = (ls.resources||[]).length
+        ? `<ul class="small">` + ls.resources.map(o=>`<li><a target="_blank" href="${o.url}">${o.name}</a></li>`).join("") + `</ul>`
+        : `<div class="small">No external links for this lesson.</div>`;
+    }else{ // collapse
+      r.style.display="none";
+      r.innerHTML="";
+    }
+  };
+  $("takeQuiz").onclick = ()=> openQuiz(ls.quiz, week, idx);
+  $("weekTestBtn").onclick = ()=> startTest(week);
+  updateProgress();
+}
+
+function setTab(id){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("show"));
+  document.querySelector(`.tab[data-tab='${id}']`).classList.add("active");
+  $(id).classList.add("show");
+}
+
+/* ================== Quizzes ================== */
+function openQuiz(questions, week, idx){
+  const modal = $("quizModal");
+  modal.style.display="block";
+  $("quizTitle").textContent = `Pop Quiz — Week ${week}`;
+  $("quizQ").innerHTML = "";
+  $("quizA").innerHTML = "";
+  $("quizFeedback").textContent = "";
+
+  // Build 5 questions (or all if <=5)
+  const qs = (questions||[]).slice(0,5);
+  qs.forEach((qq,qi)=>{
+    const div = document.createElement("div"); div.className="q";
+    div.innerHTML = `<div><strong>Q${qi+1}.</strong> ${qq.q}</div>` +
+      qq.choices.map((c,i)=> `<label class="small"><input type="radio" name="q${qi}" value="${i}"> ${c}</label>`).join("<br>");
+    $("quizQ").appendChild(div);
+  });
+
+  $("submitQuiz").onclick = ()=>{
+    let correct = 0;
+    qs.forEach((qq,qi)=>{
+      const sel = document.querySelector(`input[name="q${qi}"]:checked`);
+      if(sel && +sel.value === qq.a) correct++;
+    });
+    const pct = Math.round((correct/qs.length)*100);
+    $("quizFeedback").textContent = `Score: ${pct}% (${correct}/${qs.length})`;
+    state.quizzes.push({week, lesson:idx, score:pct}); saveState();
+    setTimeout(()=>{ modal.style.display="none"; $("quizFeedback").textContent=""; }, 1200);
+    updateProgress();
+  };
+  $("skipQuiz").onclick = ()=> { modal.style.display="none"; };
+}
+
+/* ================== Tests ================== */
+function startTest(week){
+  setTab("testsTab");
+  const w = curriculum.find(x=>x.week===week);
+  $("testHeader").textContent = `Week ${week} Test`;
+  const body = $("testBody"); body.innerHTML = "";
+  w.test.forEach((t,i)=>{
+    const block = document.createElement("div"); block.className="q";
+    block.innerHTML = `<div><strong>Q${i+1}.</strong> ${t.q}</div>` +
+      t.choices.map((c,ci)=> `<label class="small"><input type="radio" name="t${i}" value="${ci}"> ${c}</label>`).join("<br>");
+    body.appendChild(block);
+  });
+  $("submitTest").onclick = ()=>{
+    let score=0;
+    w.test.forEach((t,i)=>{
+      const sel = document.querySelector(`input[name="t${i}"]:checked`);
+      if(sel && +sel.value===t.a) score++;
+    });
+    const pct = Math.round((score/w.test.length)*100);
+    $("testResult").textContent = `Score: ${pct}% (${score}/${w.test.length})`;
+    state.tests["week"+week]=pct;
+    if(pct>=70 && !state.completedWeeks.includes(week)) state.completedWeeks.push(week);
+    saveState(); buildWeeks(); updateProgress(); maybeCertificate();
+  };
+  $("backToLearn").onclick = ()=> setTab("learnTab");
+}
+
+function maybeCertificate(){
+  if(state.completedWeeks.length === curriculum.length){
+    const cert = $("certificate"); cert.style.display="block";
+    $("certBody").innerHTML = `
+      <p><strong>Certificate of Completion</strong></p>
+      <p>This certifies that <strong>${state.name||"Participant"}</strong> completed the Stock Market Workshop (6 weeks).</p>
+      <p class="small">Week scores: ${JSON.stringify(state.tests)}</p>
+      <p class="small">Signed: _______________________ &nbsp;&nbsp; Date: ___________</p>
+    `;
+  }
+}
+
+/* ================== Tools Lab ================== */
+function renderWatchlist(){
+  const box = $("watchlist"); box.innerHTML="";
+  if(!(state.watchlist||[]).length){ box.innerHTML = `<div class="small muted">No items yet.</div>`; return; }
+  state.watchlist.forEach((it,idx)=>{
+    const row = document.createElement("div"); row.className="row"; row.style.margin="6px 0";
+    row.innerHTML = `<span class="pill">${it.symbol}</span> <span class="small">${it.notes||""}</span>`;
+    const del = document.createElement("button"); del.className="ghost"; del.textContent="Remove";
+    del.onclick = ()=>{ state.watchlist.splice(idx,1); saveState(); renderWatchlist(); };
+    row.appendChild(del);
+    box.appendChild(row);
+  });
+}
+function parsePrices(txt){
+  return (txt||"").split(/[\s,]+/).map(x=>parseFloat(x)).filter(x=>isFinite(x));
+}
+function sma(arr, n){
+  const out=[]; for(let i=0;i<arr.length;i++){
+    if(i<n-1){ out.push(null); continue; }
+    let s=0; for(let k=i-n+1;k<=i;k++) s+=arr[k]; out.push(s/n);
+  } return out;
+}
+function rsi(values, period=14){
+  if(values.length<period+1) return [];
+  let gains=0, losses=0;
+  for(let i=1;i<=period;i++){
+    const diff = values[i]-values[i-1];
+    if(diff>=0) gains+=diff; else losses-=diff;
+  }
+  let avgGain=gains/period, avgLoss=losses/period;
+  const out=[...Array(period).fill(null)];
+  for(let i=period+1;i<values.length;i++){
+    const diff = values[i]-values[i-1];
+    const gain = Math.max(0,diff), loss = Math.max(0,-diff);
+    avgGain = (avgGain*(period-1)+gain)/period;
+    avgLoss = (avgLoss*(period-1)+loss)/period;
+    const rs = avgLoss===0 ? 100 : avgGain/avgLoss;
+    const r = 100 - (100/(1+rs));
+    out.push(r);
+  }
+  return out;
+}
+function computeIndicators(){
+  const closes = parsePrices($("taPrices").value);
+  const short = Math.max(2, +$("smaS").value||10);
+  const long = Math.max(short+1, +$("smaL").value||20);
+  const rp = Math.max(2, +$("rsiP").value||14);
+  if(closes.length < Math.max(long, rp)+1){
+    $("indOut").textContent = "Need more data points.";
+    return;
+  }
+  const s1 = sma(closes, short), s2 = sma(closes, long), r = rsi(closes, rp);
+  const last = closes.length-1;
+  const info = [
+    `Closes: ${closes.length} points`,
+    `SMA(${short}) last: ${s1[last]?.toFixed(2)}`,
+    `SMA(${long}) last: ${s2[last]?.toFixed(2)}`,
+    `RSI(${rp}) last: ${r[last]?.toFixed(1)}`,
+    `Trend hint: ${s1[last]>s2[last] ? "short>long (bullish tilt)": "short<=long (neutral/bearish tilt)"}`
+  ].join("\n");
+  $("indOut").textContent = info + "\n\nTip: combine with support/resistance and risk plan.";
+  state.tools.ind = {short,long,rp}; saveState();
+}
+function calcRisk(){
+  const bal = +$("accBal").value||0, rp = (+$("riskPct").value||0)/100, entry = +$("entryPx").value||0, stop = +$("stopPx").value||0;
+  if(bal<=0||rp<=0||entry<=0||stop<=0||stop>=entry){ $("riskOut").innerHTML = `<span class="bad">Check inputs. Stop must be below entry for longs.</span>`; return; }
+  const risk$ = bal*rp, perShare = (entry - stop);
+  const shares = Math.floor(risk$/perShare);
+  $("riskOut").innerHTML = `Risk $: <strong>$${risk$.toFixed(2)}</strong> • Max shares: <strong>${shares}</strong> • Approx position: $${(shares*entry).toFixed(2)}.`;
+}
+
+/* ================== Progress & Export ================== */
+function updateProgress(){
+  const pct = curriculum.length ? Math.round((state.completedWeeks.length/curriculum.length)*100) : 0;
+  $("progressBar").style.width = pct+"%";
+  $("progressPct").textContent = pct+"%";
+}
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob); const a = document.createElement("a");
+  a.href=url; a.download = (state.name||"participant")+"_stock_workshop.json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+/* ================== Events ================== */
+window.addEventListener("load", ()=>{
+  loadState();
+
+  $("startBtn").onclick = ()=> startLesson(state.week||1, state.lessonIndex||0);
+  $("learnerName").addEventListener("input", e=>{ state.name = e.target.value.trim(); saveState(); });
+  $("saveBtn").onclick = saveState;
+  $("exportBtn").onclick = exportJSON;
+  $("resetBtn").onclick = ()=> { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+
+  // Tools
+  $("wlAdd").onclick = ()=>{
+    const s = $("wlSymbol").value.trim().toUpperCase();
+    if(!s) return;
+    state.watchlist.push({symbol:s, notes:$("wlNotes").value.trim()});
+    $("wlSymbol").value=""; $("wlNotes").value=""; saveState(); renderWatchlist();
+  };
+  renderWatchlist();
+  $("calcInd").onclick = computeIndicators;
+  $("riskCalc").onclick = calcRisk;
+
+  // Tabs
+  document.querySelectorAll(".tab").forEach(b=> b.addEventListener("click", ()=> setTab(b.getAttribute("data-tab"))));
+});
+</script>
+</body>
+</html>
