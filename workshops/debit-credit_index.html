@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+<title>Khaemaegis Financial Academy — Credit & Debt Workshop</title>
+
+<style>
+/* same styles as above */
+:root{
+  --bg:#0b0c10;
+  --panel:#141622;
+  --card:#1b1e2e;
+  --gold:#d9a441;
+  --gold-soft:#f2d48a;
+  --ink:#f5f3ec;
+  --muted:#b9b5aa;
+  --accent:#ff9f1c;
+  --accent-soft:rgba(255,159,28,0.18);
+  --radius:16px;
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif;
+  background:linear-gradient(180deg,#0b0c10,#10132a);
+  color:var(--ink);
+}
+
+header{
+  padding:24px 18px 12px;
+  text-align:center;
+}
+
+header h1{
+  margin:0;
+  font-size:1.9rem;
+  color:var(--gold);
+  letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+
+header p{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:0.95rem;
+}
+
+.hero{
+  max-width:820px;
+  margin:0 auto;
+  padding:0 18px 6px;
+  font-size:0.9rem;
+  color:var(--muted);
+}
+
+.hero strong{
+  color:var(--gold-soft);
+}
+
+.app{
+  max-width:820px;
+  margin:0 auto 24px;
+  padding:12px 12px 24px;
+}
+
+.progress-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin:4px 2px 14px;
+  font-size:0.85rem;
+  color:var(--muted);
+}
+
+.progress-label{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.progress-label span strong{
+  color:var(--gold-soft);
+}
+
+.progress-bar{
+  height:12px;
+  background:#2a2d42;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:4px;
+  min-width:180px;
+}
+
+.progress-bar span{
+  display:block;
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--gold));
+  width:0%;
+  transition:width .25s ease-out;
+}
+
+.progress-controls{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.small-btn{
+  border:none;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:0.75rem;
+  cursor:pointer;
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+}
+.small-btn:hover{
+  background:rgba(255,255,255,0.12);
+}
+
+.week{
+  margin-bottom:18px;
+}
+
+.week h2{
+  font-size:1.05rem;
+  color:var(--gold-soft);
+  margin:12px 6px 4px;
+}
+
+.week-sub{
+  margin:0 6px 8px;
+  font-size:0.8rem;
+  color:var(--muted);
+}
+
+.week-empty{
+  margin:4px 6px 10px;
+  font-size:0.85rem;
+  color:var(--muted);
+  font-style:italic;
+}
+
+.lesson{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:14px;
+  margin:0 2px 10px;
+  border:1px solid rgba(255,255,255,0.08);
+  position:relative;
+}
+
+.lesson h3{
+  margin:0;
+  font-size:1rem;
+}
+
+.lesson p{
+  margin:6px 0;
+  font-size:0.9rem;
+  color:var(--muted);
+}
+
+.lesson button{
+  margin-top:8px;
+  padding:10px 14px;
+  font-size:0.85rem;
+  border-radius:10px;
+  border:none;
+  background:var(--accent);
+  color:#000;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.lesson button:hover{
+  filter:brightness(1.05);
+}
+
+.lesson.completed{
+  outline:2px solid var(--gold);
+  box-shadow:0 0 0 1px rgba(217,164,65,0.2);
+}
+
+.lesson.completed::after{
+  content:"Completed";
+  position:absolute;
+  top:10px;
+  right:12px;
+  font-size:0.7rem;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  padding:3px 7px;
+  border-radius:999px;
+  background:var(--accent-soft);
+  color:var(--gold-soft);
+}
+
+.player{
+  margin-top:12px;
+  position:relative;
+  padding-top:56.25%;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 14px 30px rgba(0,0,0,0.45);
+}
+
+.player iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:none;
+}
+
+.notes-area{
+  width:100%;
+  min-height:70px;
+  padding:8px 10px;
+  border-radius:10px;
+  border:none;
+  background:#0e1020;
+  color:var(--ink);
+  font-family:inherit;
+  font-size:0.85rem;
+  resize:vertical;
+  margin-top:6px;
+}
+.notes-area::placeholder{
+  color:rgba(185,181,170,0.7);
+}
+
+.footer{
+  margin-top:10px;
+  padding:8px 2px 0;
+  font-size:0.8rem;
+  color:var(--muted);
+  text-align:right;
+}
+
+#adminModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:50;
+}
+
+.admin-card{
+  background:var(--panel);
+  padding:20px;
+  width:92%;
+  max-width:420px;
+  border-radius:18px;
+  box-shadow:0 26px 55px rgba(0,0,0,0.6);
+}
+
+.admin-card h3{
+  margin-top:0;
+  color:var(--gold);
+  font-size:1.1rem;
+}
+
+.admin-card p{
+  margin:4px 0 10px;
+  font-size:0.8rem;
+  color:var(--muted);
+}
+
+.admin-card label{
+  display:block;
+  margin:8px 0 4px;
+  font-size:0.8rem;
+  color:var(--muted);
+}
+
+.admin-card input,
+.admin-card textarea{
+  width:100%;
+  margin:0 0 6px;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  background:#0e1020;
+  color:var(--ink);
+  font-size:0.85rem;
+}
+
+.admin-card textarea{
+  min-height:80px;
+  resize:vertical;
+}
+
+.admin-card .btn-row{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.admin-card button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  font-size:0.85rem;
+  cursor:pointer;
+}
+
+.admin-card button.primary{
+  background:var(--accent);
+  color:#000;
+}
+
+.admin-card button.secondary{
+  background:rgba(255,255,255,0.06);
+  color:var(--muted);
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:16px;
+  transform:translateX(-50%);
+  background:rgba(0,0,0,0.78);
+  color:var(--ink);
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:0.8rem;
+  border:1px solid rgba(255,255,255,0.16);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.2s ease-out, transform 0.2s ease-out;
+  z-index:60;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(-3px);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Khaemaegis Financial Academy</h1>
+  <p>Free 6-Week Credit & Debt Workshop</p>
+</header>
+
+<div class="hero">
+  <p>
+    <strong>Educational only.</strong> This workshop is for general financial education and does
+    <em>not</em> provide personalized credit or debt advice. Always consider your own situation and, when needed,
+    consult a licensed financial professional before making major decisions.
+  </p>
+</div>
+
+<div class="app">
+  <div class="progress-row">
+    <div class="progress-label">
+      <span><strong id="progressText">0% complete</strong></span>
+      <small>Lessons and notes save on this device only (localStorage). No account. No uploads.</small>
+      <div class="progress-bar">
+        <span id="progressFill"></span>
+      </div>
+    </div>
+    <div class="progress-controls">
+      <button type="button" class="small-btn" id="exportBtn">Export Notes</button>
+      <button type="button" class="small-btn" id="resetBtn">Reset Progress & Notes</button>
+    </div>
+  </div>
+
+  <div id="weeks"></div>
+
+  <div class="footer">
+    Khaemaegis Financial Academy™ · All local · Educational only
+  </div>
+</div>
+
+<div id="adminModal">
+  <div class="admin-card">
+    <h3>Add or Edit Lesson</h3>
+    <p>For Founder/Admin use only. Changes are stored locally in this browser.</p>
+    <label for="aWeek">Week (1–6)</label>
+    <input id="aWeek" type="number" min="1" max="6" placeholder="e.g., 1">
+
+    <label for="aTitle">Lesson title</label>
+    <input id="aTitle" placeholder="e.g., Credit Scores 101">
+
+    <label for="aDesc">Lesson description</label>
+    <textarea id="aDesc" placeholder="Short description shown on the card"></textarea>
+
+    <label for="aVideo">Video URL (YouTube or Vimeo)</label>
+    <input id="aVideo" placeholder="Paste watch link or embed link">
+
+    <div class="btn-row">
+      <button type="button" class="secondary" onclick="closeAdmin()">Close</button>
+      <button type="button" class="primary" onclick="addLesson()">Save Lesson</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const WORKSHOP_NAME = "Credit & Debt";
+const WORKSHOP_SLUG = "credit_debt";
+const LS_PREFIX     = "kha_fin_ws3_";
+
+const LS_LESSONS_KEY   = LS_PREFIX + "lessons_v1";
+const LS_COMPLETED_KEY = LS_PREFIX + "completed_v1";
+const LS_NOTES_KEY     = LS_PREFIX + "notes_v1";
+
+// Default Credit & Debt track
+const DEFAULT_LESSONS = [
+  {week:1,title:"Credit Scores & Reports",    desc:"Understand what a credit score is, what goes into it, and how reports are used.",     video:""},
+  {week:2,title:"Types of Debt",              desc:"Credit cards, student loans, auto loans, mortgages, and how each behaves.",          video:""},
+  {week:3,title:"Interest, APR & Minimums",   desc:"How interest is calculated and why minimum payments can keep you in debt longer.",   video:""},
+  {week:4,title:"Payoff Strategies",          desc:"Compare snowball vs avalanche and how to build a realistic payoff plan.",           video:""},
+  {week:5,title:"Protecting Your Credit",     desc:"Avoiding common traps, late payments, and identity fraud basics.",                  video:""},
+  {week:6,title:"Staying Out of the Debt Trap",desc:"Building habits, buffers, and plans so you can use credit wisely or not at all.",  video:""}
+];
+
+const WEEK_BLURBS = {
+  1:"Learn what your credit score measures and why it matters.",
+  2:"See how different types of debt work and where they show up.",
+  3:"Decode interest, APR, and the true cost of carrying balances.",
+  4:"Explore practical payoff strategies you can actually apply.",
+  5:"Protect your credit life from avoidable damage and scams.",
+  6:"Create systems that keep you out of the debt spiral long-term."
+};
+
+const weeksEl       = document.getElementById("weeks");
+const progressFill  = document.getElementById("progressFill");
+const progressText  = document.getElementById("progressText");
+const resetBtn      = document.getElementById("resetBtn");
+const exportBtn     = document.getElementById("exportBtn");
+const adminModal    = document.getElementById("adminModal");
+const toastEl       = document.getElementById("toast");
+
+const aWeekEl  = document.getElementById("aWeek");
+const aTitleEl = document.getElementById("aTitle");
+const aDescEl  = document.getElementById("aDesc");
+const aVideoEl = document.getElementById("aVideo");
+
+let lessons   = loadJSON(LS_LESSONS_KEY, DEFAULT_LESSONS);
+let completed = loadJSON(LS_COMPLETED_KEY, []);
+let notes     = loadJSON(LS_NOTES_KEY, {});
+
+function loadJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed ?? fallback;
+  }catch(e){
+    return fallback;
+  }
+}
+
+function saveLessons(){
+  localStorage.setItem(LS_LESSONS_KEY, JSON.stringify(lessons));
+}
+
+function saveCompleted(){
+  localStorage.setItem(LS_COMPLETED_KEY, JSON.stringify(completed));
+}
+
+function saveNotes(){
+  localStorage.setItem(LS_NOTES_KEY, JSON.stringify(notes));
+}
+
+function getWeekNote(w){
+  return notes[w] || "";
+}
+
+function setWeekNote(w, text){
+  notes[w] = text;
+  saveNotes();
+}
+
+function escapeHTML(str){
+  return String(str || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function toEmbedURL(url){
+  if(!url) return "";
+  let u = url.trim();
+  if(u.includes("youtube.com/embed") || u.includes("player.vimeo.com")){
+    return u;
+  }
+  if(u.includes("youtu.be/")){
+    const id = u.split("youtu.be/")[1].split(/[?&]/)[0];
+    return "https://www.youtube.com/embed/" + id;
+  }
+  if(u.includes("youtube.com/watch")){
+    const m = u.match(/[?&]v=([^&]+)/);
+    if(m && m[1]) return "https://www.youtube.com/embed/" + m[1];
+  }
+  if(u.includes("vimeo.com/") && !u.includes("player.vimeo.com")){
+    const parts = u.split("vimeo.com/");
+    const id = parts[1] ? parts[1].split(/[?&]/)[0] : "";
+    if(id) return "https://player.vimeo.com/video/" + id;
+  }
+  return u;
+}
+
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  setTimeout(()=>toastEl.classList.remove("show"), 1900);
+}
+
+function updateProgress(){
+  const total = lessons.length || 1;
+  const uniqueCompleted = [...new Set(completed)];
+  const pct = Math.min(100, Math.round((uniqueCompleted.length / total) * 100));
+  progressFill.style.width = pct + "%";
+  progressText.textContent = pct + "% complete";
+}
+
+function render(){
+  weeksEl.innerHTML = "";
+  for(let w=1; w<=6; w++){
+    const weekSection = document.createElement("section");
+    weekSection.className = "week";
+
+    const h2 = document.createElement("h2");
+    h2.textContent = "Week " + w;
+    weekSection.appendChild(h2);
+
+    if(WEEK_BLURBS[w]){
+      const sub = document.createElement("p");
+      sub.className = "week-sub";
+      sub.textContent = WEEK_BLURBS[w];
+      weekSection.appendChild(sub);
+    }
+
+    const weekLessons = lessons.filter(l => Number(l.week) === w);
+
+    if(weekLessons.length === 0){
+      const empty = document.createElement("p");
+      empty.className = "week-empty";
+      empty.textContent = "No lessons added yet for this week.";
+      weekSection.appendChild(empty);
+    }else{
+      weekLessons.forEach(lesson => {
+        const done = completed.includes(lesson.title);
+        const card = document.createElement("article");
+        card.className = "lesson";
+        if(done) card.classList.add("completed");
+
+        card.innerHTML =
+          "<h3>" + escapeHTML(lesson.title) + "</h3>" +
+          "<p>" + escapeHTML(lesson.desc) + "</p>" +
+          "<button type='button'>Open Lesson</button>";
+
+        const btn = card.querySelector("button");
+        btn.addEventListener("click", function(){
+          openLesson(card, lesson);
+        });
+
+        weekSection.appendChild(card);
+      });
+    }
+
+    const notesCard = document.createElement("article");
+    notesCard.className = "lesson";
+    notesCard.innerHTML =
+      "<h3>Week " + w + " Notes & Reflections</h3>" +
+      "<p style='font-size:0.8rem;color:var(--muted);margin-top:4px;'>Note what you learned and any decisions or questions about credit and debt.</p>";
+
+    const ta = document.createElement("textarea");
+    ta.className = "notes-area";
+    ta.placeholder = "Key takeaways, actions, questions for a professional…";
+    ta.value = getWeekNote(w);
+    ta.addEventListener("input", function(){
+      setWeekNote(w, ta.value);
+    });
+
+    notesCard.appendChild(ta);
+    weekSection.appendChild(notesCard);
+
+    weeksEl.appendChild(weekSection);
+  }
+  updateProgress();
+}
+
+function openLesson(card, lesson){
+  if(card.querySelector(".player")) return;
+  const embed = toEmbedURL(lesson.video);
+  if(!embed){
+    showToast("No video URL set for this lesson yet.");
+    return;
+  }
+  const player = document.createElement("div");
+  player.className = "player";
+  player.innerHTML =
+    "<iframe src=\"" + escapeHTML(embed) +
+    "\" allowfullscreen allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture\"></iframe>";
+  card.appendChild(player);
+
+  if(!completed.includes(lesson.title)){
+    completed.push(lesson.title);
+    saveCompleted();
+    card.classList.add("completed");
+    updateProgress();
+    showToast("Lesson marked complete ✅");
+  }
+}
+
+resetBtn.addEventListener("click", function(){
+  if(!confirm("Reset your lesson completion progress and notes on this device?")) return;
+  completed = [];
+  notes = {};
+  saveCompleted();
+  saveNotes();
+  render();
+  showToast("Progress and notes reset.");
+});
+
+exportBtn.addEventListener("click", function(){
+  const lines = [];
+  lines.push("Khaemaegis Financial Academy — " + WORKSHOP_NAME + " — Notes Export");
+  lines.push("Exported: " + new Date().toLocaleString());
+  lines.push("");
+  for(let w=1; w<=6; w++){
+    let header = "Week " + w;
+    if(WEEK_BLURBS[w]) header += " — " + WEEK_BLURBS[w];
+    lines.push(header);
+    const txt = (notes[w] || "").trim();
+    lines.push(txt || "(no notes)");
+    lines.push("");
+  }
+  const blob = new Blob([lines.join("\n")], {type:"text/plain;charset=utf-8"});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url;
+  a.download = "khaemaegis_" + WORKSHOP_SLUG + "_notes.txt";
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(()=>{
+    URL.revokeObjectURL(url);
+    a.remove();
+  },300);
+});
+
+function openAdmin(){
+  adminModal.style.display = "flex";
+}
+function clearAdminForm(){
+  aWeekEl.value = "";
+  aTitleEl.value = "";
+  aDescEl.value = "";
+  aVideoEl.value = "";
+}
+function closeAdmin(){
+  adminModal.style.display = "none";
+}
+window.closeAdmin = closeAdmin;
+
+function addLesson(){
+  const weekNum = parseInt(aWeekEl.value, 10);
+  const title   = (aTitleEl.value || "").trim();
+  const desc    = (aDescEl.value || "").trim();
+  const video   = (aVideoEl.value || "").trim();
+
+  if(!weekNum || weekNum < 1 || weekNum > 6){
+    showToast("Week must be between 1 and 6.");
+    return;
+  }
+  if(!title){
+    showToast("Add a lesson title.");
+    return;
+  }
+  if(!video){
+    showToast("Add a video URL.");
+    return;
+  }
+
+  lessons.push({
+    week: weekNum,
+    title: title,
+    desc: desc || "Lesson added by admin.",
+    video: video
+  });
+
+  saveLessons();
+  clearAdminForm();
+  closeAdmin();
+  render();
+  showToast("Lesson saved locally ✅");
+}
+window.addLesson = addLesson;
+
+document.addEventListener("keydown", function(e){
+  if(e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")){
+    e.preventDefault();
+    openAdmin();
+  }
+  if(e.key === "Escape" && adminModal.style.display === "flex"){
+    closeAdmin();
+  }
+});
+
+render();
+</script>
+
+</body>
+</html>
