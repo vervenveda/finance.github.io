@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>American Business Sovereign Sandbox</title>
+<style>
+:root {
+  --bg: #07111f;
+  --panel: #0f172a;
+  --card: #172033;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --accent: #2563eb;
+  --accent2: #14b8a6;
+  --border: rgba(255,255,255,0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: linear-gradient(180deg, #07111f, #0f172a);
+  color: #ffffff;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.container {
+  max-width: 1111px;
+  margin: 0 auto;
+}
+
+.hero {
+  background: linear-gradient(135deg, rgba(37,99,235,0.25), rgba(20,184,166,0.18));
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 40px;
+  margin-bottom: 24px;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 18px;
+}
+
+.hero p {
+  max-width: 900px;
+  color: #ffffff;
+  line-height: 1.8;
+  font-size: 1.05rem;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+
+input, select {
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: #ffffff;
+}
+
+input {
+  flex: 1;
+  min-width: 240px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: rgba(23,32,51,0.9);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 24px;
+  transition: 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(37,99,235,0.45);
+}
+
+.tag {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(37,99,235,0.16);
+  color: #bfdbfe;
+  margin-bottom: 14px;
+  font-size: 0.8rem;
+}
+
+.card h3 {
+  margin-bottom: 12px;
+}
+
+.card p {
+  color: #ffffff;
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 11px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  margin: 32px 0 20px;
+}
+
+.resource-panel {
+  margin-top: 36px;
+  background: rgba(15,23,42,0.95);
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  padding: 28px;
+}
+
+.resource-panel h2 {
+  margin-bottom: 18px;
+}
+
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.state-btn {
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  color: white;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.state-btn:hover {
+  background: rgba(37,99,235,0.18);
+}
+
+.notes {
+  margin-top: 32px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: #ffffff;
+  resize: vertical;
+}
+
+.footer {
+  text-align: center;
+  color: #ffffff;
+  margin-top: 42px;
+  line-height: 1.7;
+}
+
+@media (max-width: 700px) {
+  .hero h1 {
+    font-size: 2.1rem;
+  }
+
+  .toolbar {
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<section class="hero">
+  <h1>🇺🇸 American Business Hub</h1>
+  <p>
+    A private, browser-based national business development hub designed to help entrepreneurs, freelancers, creators, nonprofits, startups, tradespeople, and small business owners launch, manage, grow, and sustain independent businesses across the United States. This sovereign sandbox provides educational tools, state-by-state business resources, operational guidance, startup planning tools, grant information, compliance education, and business wellness support.  All without accounts, tracking, or invasive data collection.
+  </p>
+</section>
+
+<div class="toolbar">
+  <input type="text" id="searchInput" placeholder="Search business resources..." />
+
+  <select id="categoryFilter">
+    <option value="all">All Categories</option>
+    <option value="startup">Startup</option>
+    <option value="funding">Funding</option>
+    <option value="marketing">Marketing</option>
+    <option value="legal">Legal</option>
+    <option value="operations">Operations</option>
+    <option value="education">Education</option>
+  </select>
+</div>
+
+<h2 class="section-title">📊 Business Development Resources</h2>
+
+<div class="grid" id="resourceGrid"></div>
+
+<section class="resource-panel">
+  <h2>🗺️ State Business Resource Hub</h2>
+  <p style="color: #ffffff; line-height: 1.7;">
+    Explore state-by-state entrepreneurial resources, business registration guidance, grant opportunities, tax portals, licensing information, workforce programs, and economic development support.
+  </p>
+
+  <div class="state-grid" id="stateGrid"></div>
+</section>
+
+<section class="resource-panel">
+  <h2>📝 Business Planning Journal</h2>
+  <p style="color: #ffffff; margin-bottom: 16px;">
+    Save business ideas, planning notes, marketing strategies, financial goals, and operational tasks locally to your browser.
+  </p>
+
+  <textarea id="journalBox" placeholder="Write your business plans, ideas, or notes here..."></textarea>
+
+  <div style="margin-top: 16px; display:flex; gap:12px; flex-wrap:wrap;">
+    <button class="btn" id="saveJournal">Save Notes</button>
+    <button class="btn" id="clearJournal">Clear Notes</button>
+  </div>
+</section>
+
+<section class="resource-panel">
+  <h2>🚀 Daily Entrepreneur Motivation</h2>
+  <div id="motivationText" style="margin-top:18px; font-size:1.15rem; line-height:1.8; color:#ffffff;">
+    Small businesses build strong communities.
+  </div>
+
+  <div style="margin-top:16px;">
+    <button class="btn" id="newMotivation">New Motivation</button>
+  </div>
+</section>
+
+<div class="footer">
+  <p>
+    Sovereign Business Hub • Privacy First • Built for American Entrepreneurs
+  </p>
+</div>
+
+</div>
+
+<script>
+const resources = [
+  {
+    title: 'Business Startup Roadmap',
+    category: 'startup',
+    description: 'Learn the essential steps to legally form, structure, and launch a business in the United States.'
+  },
+  {
+    title: 'Small Business Funding Guide',
+    category: 'funding',
+    description: 'Educational resources covering grants, microloans, crowdfunding, and responsible capital planning.'
+  },
+  {
+    title: 'Branding & Marketing Hub',
+    category: 'marketing',
+    description: 'Build a strong brand identity, digital presence, social media strategy, and customer engagement plan.'
+  },
+  {
+    title: 'Legal & Compliance Education',
+    category: 'legal',
+    description: 'Understand licensing, tax obligations, contracts, intellectual property basics, and business regulations.'
+  },
+  {
+    title: 'Operations & Productivity',
+    category: 'operations',
+    description: 'Systems for scheduling, invoicing, inventory, project management, and sustainable operations.'
+  },
+  {
+    title: 'Entrepreneurship Learning Center',
+    category: 'education',
+    description: 'Educational content focused on leadership, negotiation, communication, planning, and growth.'
+  },
+  {
+    title: 'Freelancer & Creator Toolkit',
+    category: 'startup',
+    description: 'Resources for artists, writers, designers, developers, creators, and independent contractors.'
+  },
+  {
+    title: 'Business Financial Wellness',
+    category: 'funding',
+    description: 'Learn budgeting, pricing strategies, savings planning, and responsible financial management.'
+  }
+];
+
+const states = [
+'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Delaware','Florida','Georgia',
+'Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky','Louisiana','Maine','Maryland',
+'Massachusetts','Michigan','Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire','New Jersey',
+'New Mexico','New York','North Carolina','North Dakota','Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina',
+'South Dakota','Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia','Wisconsin','Wyoming'
+];
+
+const motivations = [
+  'Small businesses build strong communities.',
+  'Every successful business begins with one courageous idea.',
+  'Consistency creates momentum.',
+  'Your creativity can become your livelihood.',
+  'Build systems that support freedom and sustainability.',
+  'Independent businesses strengthen local economies.',
+  'Leadership begins with service and integrity.',
+  'A clear vision creates stronger decisions.',
+  'Progress matters more than perfection.',
+  'The strongest brands are built on trust.'
+];
+
+const grid = document.getElementById('resourceGrid');
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+
+function renderResources() {
+  const search = searchInput.value.toLowerCase();
+  const category = categoryFilter.value;
+
+  grid.innerHTML = '';
+
+  const filtered = resources.filter(resource => {
+    const matchesSearch = resource.title.toLowerCase().includes(search) ||
+      resource.description.toLowerCase().includes(search);
+
+    const matchesCategory = category === 'all' || resource.category === category;
+
+    return matchesSearch && matchesCategory;
+  });
+
+  filtered.forEach(resource => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    card.innerHTML = `
+      <div class="tag">${resource.category}</div>
+      <h3>${resource.title}</h3>
+      <p>${resource.description}</p>
+      <a href="#" class="btn">Explore</a>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+renderResources();
+searchInput.addEventListener('input', renderResources);
+categoryFilter.addEventListener('change', renderResources);
+
+const stateGrid = document.getElementById('stateGrid');
+
+states.forEach(state => {
+  const btn = document.createElement('button');
+  btn.className = 'state-btn';
+  btn.textContent = state;
+
+  btn.addEventListener('click', () => {
+    alert(`${state} Business Resource Portal Coming Soon.\n\nSuggested integrations:\n• Secretary of State\n• Licensing Resources\n• State Grants\n• Tax Registration\n• Workforce Programs\n• Economic Development Resources`);
+  });
+
+  stateGrid.appendChild(btn);
+});
+
+const journalBox = document.getElementById('journalBox');
+journalBox.value = localStorage.getItem('businessSandboxJournal') || '';
+
+document.getElementById('saveJournal').addEventListener('click', () => {
+  localStorage.setItem('businessSandboxJournal', journalBox.value);
+  alert('Business notes saved locally.');
+});
+
+document.getElementById('clearJournal').addEventListener('click', () => {
+  journalBox.value = '';
+  localStorage.removeItem('businessSandboxJournal');
+});
+
+const motivationText = document.getElementById('motivationText');
+
+document.getElementById('newMotivation').addEventListener('click', () => {
+  const random = motivations[Math.floor(Math.random() * motivations.length)];
+  motivationText.textContent = random;
+});
+</script>
+</body>
+</html>
