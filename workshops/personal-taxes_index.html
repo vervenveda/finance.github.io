@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>2-Week Personal Tax Workshop (U.S.) — Local Only</title>
+<style>
+  :root{
+    --bg:#071229; --panel:#0b1220; --ink:#ecf2ff; --muted:#b8c2d9; --accent:#7dd3fc;
+    --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --outline:rgba(255,255,255,.12);
+  }
+  html,body{margin:0;background:linear-gradient(180deg,#071229 0%,#0b1220 65%);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial}
+  .app{max-width:1120px;margin:28px auto;padding:16px}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+  h1{margin:0;font-size:26px}
+  .small{color:var(--muted);font-size:13px}
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
+  @media (max-width:880px){.grid{grid-template-columns:1fr}}
+  .card{background:rgba(255,255,255,.04);border:1px solid var(--outline);border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .sidebar .progress{height:10px;background:#09121a;border-radius:8px;overflow:hidden}
+  .sidebar .progress > i{display:block;height:100%;background:linear-gradient(90deg,#7dd3fc,#60a5fa)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  button{background:var(--accent);border:none;color:#06202f;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  button.light{background:transparent;color:var(--ink);border:1px solid var(--outline)}
+  input,textarea{width:100%;padding:10px;border-radius:10px;border:1px solid var(--outline);background:rgba(0,0,0,.25);color:#fff}
+  textarea{min-height:90px}
+  a{color:#a5e3ff}
+  .lesson{background:rgba(255,255,255,.03);border:1px solid var(--outline);border-radius:12px;padding:14px;margin-bottom:14px}
+  .pill{font-size:12px;padding:4px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--outline)}
+  .badge{font-size:11px;padding:3px 8px;border-radius:999px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.4);color:#bff3c8;margin-left:6px}
+  .hint{background:rgba(125,211,252,.08);border:1px solid rgba(125,211,252,.35);border-radius:10px;padding:10px;margin-top:8px}
+  .toggle{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.05);border:1px solid var(--outline);border-radius:10px;padding:10px;cursor:pointer}
+  .section{display:none;margin-top:8px}
+  .section.show{display:block}
+  .q{margin:8px 0}
+  .sticky{position:sticky;top:8px}
+  .muted{color:#cbd5e1}
+  .check{display:flex;gap:10px;align-items:flex-start;margin:6px 0}
+  .check input{width:auto}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <svg width="42" height="42" viewBox="0 0 44 44" style="border-radius:10px">
+      <rect rx="10" width="44" height="44" fill="#7dd3fc"/>
+      <text x="22" y="27" text-anchor="middle" font-size="20" font-family="Arial" fill="#021b2c">🧾</text>
+    </svg>
+    <div>
+      <h1>File Your Taxes with Confidence<br>
+        2-Week Workshop</h1>
+      <div class="small">
+  This is a learning tool, not professional advice. For specific questions, consult a qualified tax professional or the IRS directly.
+</div>
+
+      
+      <div class="small">Free, local-only learning. Save/export your progress privately. (Education only, not tax advice.)</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- Sidebar -->
+    <aside class="card sidebar sticky">
+      <div class="row" style="justify-content:space-between">
+        <div><strong>Progress</strong> <span id="progressPct" class="small">0%</span></div>
+        <button id="saveBtn" class="ghost">Save</button>
+      </div>
+      <div class="progress" style="margin:8px 0 12px"><i id="progressBar" style="width:0%"></i></div>
+      <div class="row">
+        <input id="learnerName" placeholder="Name (optional)"/>
+      </div>
+
+      <hr style="border-color:var(--outline)">
+      <div><strong>Quick Launch</strong></div>
+      <ul class="small" style="margin:6px 0 0 16px">
+        <li><a target="_blank" href="https://www.irs.gov/filing/free-file-do-your-federal-taxes-for-free">IRS Free File</a></li>
+        <li><a target="_blank" href="https://irs.treasury.gov/freetaxprep">VITA/TCE Site Finder</a></li>
+        <li><a target="_blank" href="https://www.aarp.org/money/taxes/aarp_taxaide/">AARP Tax-Aide</a></li>
+        <li><a target="_blank" href="https://www.myfreetaxes.com/">MyFreeTaxes (United Way)</a></li>
+        <li><a target="_blank" href="https://www.taxact.com/">TaxAct</a></li>
+        <li><a target="_blank" href="https://www.freetaxusa.com/">FreeTaxUSA</a></li>
+        <li><a target="_blank" href="https://cash.app/taxes">Cash App Taxes</a></li>
+        <li><a target="_blank" href="https://www.irs.gov/payments/your-online-account">IRS Online Account</a></li>
+        <li><a target="_blank" href="https://www.irs.gov/individuals/get-transcript">Get Transcript</a></li>
+        <li><a target="_blank" href="https://www.irs.gov/identity-theft-fraud-scams/get-an-identity-protection-pin">Get an IP PIN</a></li>
+        <li><a target="_blank" href="https://www.irs.gov/refunds/where-is-my-refund">Where’s My Refund?</a></li>
+        <li><a target="_blank" href="https://www.irs.gov/forms-pubs/about-form-4868">Form 4868 (Extension)</a></li>
+      </ul>
+
+      <hr style="border-color:var(--outline)">
+      <div><strong>Days</strong></div>
+      <div id="daysList" class="small" style="margin-top:6px"></div>
+
+      <hr style="border-color:var(--outline)">
+      <div class="row">
+        <button id="exportBtn" class="light">Export (.json)</button>
+        <button id="resetBtn" class="light">Reset</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="card">
+      <div class="lesson">
+        <h2 id="dayTitle">Welcome</h2>
+        <div id="dayBody" class="small">
+          <p>Ten short lessons (Mon–Fri × 2 weeks) with collapsible <em>Resources</em>, a task <em>Checklist</em>, and a quick <em>Quiz</em>. Use the sidebar to jump to any day. Everything saves locally in your browser.</p>
+          <div class="hint"><strong>Safety:</strong> Avoid “guaranteed refund” promises; never pay up-front fees for grants or surprise “tax debt relief.” Verify .gov domains and use the official IRS links above.</div>
+          <div class="row" style="margin-top:8px">
+            <button id="startBtn">Start Day 1</button>
+          </div>
+        </div>
+      </div>
+      
+            <div class="lesson">
+        <h3>Day Notes</h3>
+        <p class="small muted">Use this space to write questions, reminders, or anything you want to remember about today’s tax prep. Saved only in your browser.</p>
+        <textarea id="dayNotes" placeholder="Your notes for this day…"></textarea>
+      </div>
+
+
+      <!-- Collapsible sections -->
+      <div class="lesson">
+        <div class="toggle" id="resToggle"><strong>Resources</strong><span class="small" id="resCaret">Show ▸</span></div>
+        <div id="resources" class="section"></div>
+      </div>
+
+      <div class="lesson">
+        <div class="toggle" id="chkToggle"><strong>Checklist</strong><span class="small" id="chkCaret">Show ▸</span></div>
+        <div id="checklist" class="section"></div>
+      </div>
+
+      <div class="lesson">
+        <div class="toggle" id="quizToggle"><strong>Quiz (3 Qs)</strong><span class="small" id="quizCaret">Show ▸</span></div>
+        <div id="quizBox" class="section">
+          <div id="quizQ"></div>
+          <div class="row" style="margin-top:8px">
+            <button id="submitQuiz">Submit Quiz</button>
+            <button id="closeQuiz" class="ghost">Close</button>
+          </div>
+          <div id="quizFeedback" class="small" style="margin-top:6px"></div>
+        </div>
+      </div>
+
+      <div class="lesson">
+        <div class="row" style="justify-content:space-between">
+          <button id="markComplete" class="light">Mark Day Complete</button>
+          <div class="small muted">Completion requires either a quiz submission or manual mark.</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <p class="small" style="margin-top:10px;text-align:center">
+    Educational content only. Always check current rules on official .gov sites.
+  </p>
+</div>
+
+<script>
+/* =============== Data =============== */
+const STORAGE_KEY = "tax_workshop_2wk_v1";
+
+const course = [
+  { // Day 1
+    day:1, week:1, title:"Set up IRS Tools",
+    contentHtml: `
+      <p>Create or sign into your <em>IRS Online Account</em> to view balances, notices, and payments. If you want extra identity protection, request an <strong>IP PIN</strong> (this helps prevent someone else from e-filing with your SSN).</p>
+      <p><strong>Mini-lab:</strong> Open <em>Get Transcript</em> and find last year’s AGI so your e-file will validate smoothly.</p>
+    `,
+    resources:[
+      {name:"IRS Online Account", url:"https://www.irs.gov/payments/your-online-account"},
+      {name:"Get Transcript", url:"https://www.irs.gov/individuals/get-transcript"},
+      {name:"Get an IP PIN", url:"https://www.irs.gov/identity-theft-fraud-scams/get-an-identity-protection-pin"}
+    ],
+    checklist:[
+      "Create/verify IRS Online Account login",
+      "Locate last year’s AGI via Get Transcript",
+      "Record your IP PIN (if issued) in a safe place"
+    ],
+    quiz:[
+      {q:"Your AGI from last year helps with:", a:1, choices:["Getting a refund faster","Validating this year’s e-file","Itemizing deductions"]},
+      {q:"An IP PIN is used to:", a:2, choices:["Speed refunds","Skip state taxes","Prevent someone else e-filing as you"]},
+      {q:"Your IRS account lets you:", a:0, choices:["See balances/notices","Choose any refund amount","File for free for all states"]},
+    ]
+  },
+  { // Day 2
+    day:2, week:1, title:"Income & Dependents",
+    contentHtml: `
+      <p>Collect all income forms: W-2, 1099-NEC/MISC/INT/DIV, 1099-K, SSA-1099, 1099-G, 1099-R. Review who qualifies as your dependent (children, students, certain relatives) to avoid duplicate claims.</p>
+      <p><strong>Mini-lab:</strong> Create a “Documents Inbox” list and check off each form as it arrives.</p>
+    `,
+    resources:[
+      {name:"IRS: Dependents (Pub 501)", url:"https://www.irs.gov/publications/p501"},
+      {name:"1099-K FAQs", url:"https://www.irs.gov/businesses/understanding-your-form-1099-k"}
+    ],
+    checklist:[
+      "List all expected income forms",
+      "Confirm dependents and gather documents (SSNs, school status, etc.)"
+    ],
+    quiz:[
+      {q:"A 1099-NEC usually reports:", a:1, choices:["Wages","Self-employment/non-employee pay","State refund"]},
+      {q:"Claiming the same dependent on two returns:", a:0, choices:["Causes filing issues","Is fine if both agree","Increases refund automatically"]},
+      {q:"A W-2 reports:", a:2, choices:["Dividends","1099-K income","Wage/salary from an employer"]},
+    ]
+  },
+  { // Day 3
+    day:3, week:1, title:"Deductions vs. Credits",
+    contentHtml: `
+      <p>Most filers take the <em>standard deduction</em>; itemizing may help if deductible expenses exceed that. Credits like the EITC, Child Tax Credit, education credits, Saver’s Credit, and Premium Tax Credit can significantly reduce tax owed.</p>
+      <p><strong>Mini-lab:</strong> List 2–3 credits you might qualify for and what proof (1098-T, childcare statements, 1095-A) you’ll need.</p>
+    `,
+    resources:[
+      {name:"IRS: Credits & Deductions", url:"https://www.irs.gov/credits-deductions-for-individuals"}
+    ],
+    checklist:[
+      "Decide likely standard vs. itemize",
+      "Identify credits to explore and collect proof"
+    ],
+    quiz:[
+      {q:"A tax credit:", a:0, choices:["Reduces tax dollar-for-dollar","Reduces taxable income only","Rarely applies to families"]},
+      {q:"Standard vs. itemize depends on:", a:1, choices:["Your state only","Your deductible expenses vs. standard amount","Your credit score"]},
+      {q:"Education credit documents often include:", a:2, choices:["1098-E","W-3","1098-T"]},
+    ]
+  },
+  { // Day 4
+    day:4, week:1, title:"Pick Your Filing Path",
+    contentHtml: `
+      <p>Choose free or low-cost routes: IRS Free File (income-based), VITA/TCE (free in-person help), AARP Tax-Aide, or reputable software (TaxAct, FreeTaxUSA, Cash App Taxes). Create your account now.</p>
+      <p><strong>Mini-lab:</strong> Decide your route and bookmark your chosen provider’s sign-in page.</p>
+    `,
+    resources:[
+      {name:"IRS Free File", url:"https://www.irs.gov/filing/free-file-do-your-federal-taxes-for-free"},
+      {name:"VITA/TCE Finder", url:"https://irs.treasury.gov/freetaxprep"},
+      {name:"AARP Tax-Aide", url:"https://www.aarp.org/money/taxes/aarp_taxaide/"},
+      {name:"MyFreeTaxes (United Way)", url:"https://www.myfreetaxes.com/"},
+      {name:"TaxAct", url:"https://www.taxact.com/"},
+      {name:"FreeTaxUSA", url:"https://www.freetaxusa.com/"},
+      {name:"Cash App Taxes", url:"https://cash.app/taxes"}
+    ],
+    checklist:[
+      "Create your chosen filing account",
+      "Enable MFA/security on that account"
+    ],
+    quiz:[
+      {q:"VITA/TCE provides:", a:1, choices:["State refunds only","Free in-person prep for eligible filers","Only tax loans"]},
+      {q:"Free File is:", a:0, choices:["An IRS program via partners","Only for amendments","Only for business returns"]},
+      {q:"Low-cost software example:", a:2, choices:["Bank wires","Property app","TaxAct"]},
+    ]
+  },
+  { // Day 5
+    day:5, week:1, title:"Build Your Return Skeleton",
+    contentHtml: `
+      <p>Enter filing status, dependents, W-2, and one 1099 in your chosen software. Stop before submitting—this is a draft to flush out missing items or errors.</p>
+      <p><strong>Mini-lab:</strong> Save draft, list any missing documents the software flags.</p>
+    `,
+    resources:[],
+    checklist:[
+      "Enter core info (status, dependents)",
+      "Enter W-2 and one 1099",
+      "List missing docs flagged by software"
+    ],
+    quiz:[
+      {q:"A good step before filing is to:", a:0, choices:["Save a draft return","Skip error checks","Ignore missing forms"]},
+      {q:"If a form is missing:", a:1, choices:["File anyway","Pause and obtain it","Invent values"]},
+      {q:"Entering one 1099 helps:", a:2, choices:["Finalize refund now","Bypass identity checks","Reveal any software prompts for similar forms"]},
+    ]
+  },
+  { // Day 6
+    day:6, week:2, title:"Self-Employment & Side Income",
+    contentHtml: `
+      <p>Schedule C covers business income/expenses. Track mileage or actual vehicle expenses; consider quarterly estimated taxes if you owe each year. 1099-K may report payment-processor transactions.</p>
+      <p><strong>Mini-lab:</strong> List your 2025 gross income and top 5 expense categories with rough totals.</p>
+    `,
+    resources:[
+      {name:"IRS: Schedule C", url:"https://www.irs.gov/forms-pubs/about-schedule-c-form-1040"},
+      {name:"Estimated Taxes (Form 1040-ES)", url:"https://www.irs.gov/forms-pubs/about-form-1040-es"}
+    ],
+    checklist:[
+      "Summarize income & expenses",
+      "Decide mileage vs actual expenses",
+      "Check if estimates apply this year"
+    ],
+    quiz:[
+      {q:"Schedule C reports:", a:2, choices:["Itemized deductions","W-2 wages","Business income/expenses"]},
+      {q:"Quarterly estimates help:", a:0, choices:["Avoid large underpayment at year-end","Increase refunds by default","Skip recordkeeping"]},
+      {q:"1099-K is issued by:", a:1, choices:["Your employer","Payment platforms","Mortgage lender"]},
+    ]
+  },
+  { // Day 7
+    day:7, week:2, title:"State Taxes & Add-Ons",
+    contentHtml: `
+      <p>State returns usually mirror the federal. Some states offer specific credits (renter’s, education, 529 adjustments). Review your software’s state module, cost, and e-file steps.</p>
+      <p><strong>Mini-lab:</strong> Note any state-specific credits you may qualify for.</p>
+    `,
+    resources:[
+      {name:"Your State Revenue Dept", url:"https://www.taxadmin.org/state-tax-agencies"}
+    ],
+    checklist:[
+      "Confirm state module steps/cost",
+      "List state credits to check"
+    ],
+    quiz:[
+      {q:"State returns often:", a:0, choices:["Follow the federal with adjustments","Ignore federal entirely","Are optional in all states"]},
+      {q:"A common state-only item is:", a:2, choices:["IP PIN","Where’s My Refund?","529 deduction/adjustment"]},
+      {q:"Before e-filing state, you should:", a:1, choices:["Submit federal refund first","Review state guidance and fees","Skip federal entirely"]},
+    ]
+  },
+  { // Day 8
+    day:8, week:2, title:"Review & Quality Check",
+    contentHtml: `
+      <p>Compare this year’s draft against last year’s transcript (AGI, withholding). Use your software’s review tool and clear each warning or document why it doesn’t apply.</p>
+      <p><strong>Mini-lab:</strong> Make a short list of warnings and your resolution for each.</p>
+    `,
+    resources:[
+      {name:"Get Transcript", url:"https://www.irs.gov/individuals/get-transcript"}
+    ],
+    checklist:[
+      "Run the software’s review",
+      "Compare to last year’s AGI/withholding",
+      "Resolve/document each warning"
+    ],
+    quiz:[
+      {q:"Software warnings should be:", a:2, choices:["Ignored if long","Always fatal","Resolved or explained"]},
+      {q:"Comparing to last year helps:", a:0, choices:["Catch mismatches","Increase refund automatically","Replace this year’s forms"]},
+      {q:"Transcripts provide:", a:1, choices:["Only refund date","AGI and account info","State filing status"]},
+    ]
+  },
+  { // Day 9
+    day:9, week:2, title:"File (or Extend) & Track",
+    contentHtml: `
+      <p>E-file with direct deposit for fastest refunds. Track with <em>Where’s My Refund?</em> If you need time, file Form 4868 for an automatic extension to file — but you must still pay any expected tax by the April deadline.</p>
+      <p><strong>Mini-lab:</strong> Submit your e-file or complete your extension steps in the software.</p>
+    `,
+    resources:[
+      {name:"Where’s My Refund?", url:"https://www.irs.gov/refunds/where-is-my-refund"},
+      {name:"Form 4868 (Extension)", url:"https://www.irs.gov/forms-pubs/about-form-4868"}
+    ],
+    checklist:[
+      "Select direct deposit (verify routing/account)",
+      "Note your filing/extension confirmation",
+      "Save a PDF of return + confirm page"
+    ],
+    quiz:[
+      {q:"An extension to file:", a:1, choices:["Extends time to pay","Extends filing only (payment still due)","Eliminates penalties forever"]},
+      {q:"Fastest refunds usually via:", a:0, choices:["E-file + direct deposit","Paper filing + check","In-person pick-up"]},
+      {q:"Where’s My Refund? updates:", a:2, choices:["Hourly","Monthly","Daily"],},
+    ]
+  },
+  { // Day 10
+    day:10, week:2, title:"After-Filing Hygiene & Next Year",
+    contentHtml: `
+      <p>Store your PDF return, confirmations, and IP PIN record. Adjust your W-4 or plan quarterlies. Create a “Tax 2026” folder now (cloud + local) with a receipt bin and a list of credits to track.</p>
+      <p><strong>Mini-lab:</strong> Set calendar nudges (quarterly or mid-year check-in) and note any expected life changes (marriage, child, move) that affect taxes.</p>
+    `,
+    resources:[
+      {name:"IRS: Tax Withholding Estimator", url:"https://www.irs.gov/individuals/tax-withholding-estimator"}
+    ],
+    checklist:[
+      "Save PDFs (return, confirm)",
+      "Adjust W-4 or plan estimates",
+      "Create next-year folder and reminders"
+    ],
+    quiz:[
+      {q:"Keeping a PDF copy of your return:", a:0, choices:["Is smart for records","Is optional but illegal","Prevents audits"],},
+      {q:"W-4 adjustments can:", a:2, choices:["Change state only","Change credits","Tune withholding for next year"]},
+      {q:"Setting reminders helps:", a:1, choices:["Skip estimates","Stay on track for quarterlies","Eliminate state filing"]},
+    ]
+  }
+];
+
+/* =============== State =============== */
+const state = {
+  name:"",
+  currentDay:1,
+  completed:[],       // [1..10]
+  quizScores:{},      // {day: pct}
+  checklist:{},       // {day: {idx:true/false}}
+  notes:{}            // {day: "text"}
+};
+
+/* =============== Helpers =============== */
+const $ = id => document.getElementById(id);
+const save = ()=> localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+function load(){
+  try{ Object.assign(state, JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}")); }catch{}
+  $("learnerName").value = state.name||"";
+  buildDays();
+  openDay(state.currentDay||1);
+  updateProgress();
+}
+function toggleSection(box, caret){
+  const shown = box.classList.toggle("show");
+  caret.textContent = shown ? "Hide ▾" : "Show ▸";
+}
+function updateProgress(){
+  const done = state.completed.length;
+  const total = course.length;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  $("progressBar").style.width = pct+"%";
+  $("progressPct").textContent = pct+"%";
+}
+
+/* =============== UI Builders =============== */
+function buildDays(){
+  const list = $("daysList"); list.innerHTML = "";
+  course.forEach(d=>{
+    const row = document.createElement("div");
+    const done = state.completed.includes(d.day);
+    row.style.margin = "6px 0";
+    row.innerHTML = `<button class="light" style="width:100%;justify-content:flex-start;display:flex;gap:8px">
+      <span class="pill">Day ${d.day}</span> ${d.title} ${done?'<span class="badge">Done</span>':''}
+    </button>`;
+    row.querySelector("button").onclick = ()=> openDay(d.day);
+    list.appendChild(row);
+  });
+}
+
+function openDay(dayNum){
+  const d = course.find(x=>x.day===dayNum)||course[0];
+  state.currentDay = d.day; save();
+
+  $("dayTitle").textContent = `Day ${d.day} — ${d.title}`;
+  $("dayBody").innerHTML = d.contentHtml;
+  
+  function openDay(dayNum){
+  const d = course.find(x=>x.day===dayNum)||course[0];
+  state.currentDay = d.day; save();
+
+  $("dayTitle").textContent = `Day ${d.day} — ${d.title}`;
+  $("dayBody").innerHTML = d.contentHtml;
+
+  // Notes
+  const notesBox = $("dayNotes");
+  if(notesBox){
+    notesBox.value = state.notes[d.day] || "";
+    notesBox.oninput = () => {
+      state.notes[d.day] = notesBox.value;
+      save();
+    };
+  }
+
+  // Resources ...
+  // (rest of your existing openDay code here)
+}
+
+
+  // Resources
+  const res = $("resources"); res.innerHTML = d.resources && d.resources.length
+    ? `<ul class="small">` + d.resources.map(o=>`<li><a target="_blank" href="${o.url}">${o.name}</a></li>`).join("") + `</ul>`
+    : `<div class="small muted">No external links for this day.</div>`;
+  $("resources").classList.remove("show"); $("resCaret").textContent = "Show ▸";
+
+  // Checklist
+  const chk = $("checklist"); chk.innerHTML = "";
+  const dayChecks = state.checklist[d.day] || {};
+  (d.checklist||[]).forEach((txt, i)=>{
+    const wrap = document.createElement("label"); wrap.className="check";
+    const box = document.createElement("input"); box.type="checkbox"; box.checked = !!dayChecks[i];
+    const span = document.createElement("span"); span.textContent = txt;
+    box.onchange = ()=>{
+      state.checklist[d.day] = state.checklist[d.day]||{};
+      state.checklist[d.day][i] = box.checked;
+      save();
+    };
+    wrap.appendChild(box); wrap.appendChild(span); chk.appendChild(wrap);
+  });
+  $("checklist").classList.remove("show"); $("chkCaret").textContent = "Show ▸";
+
+  // Quiz
+  buildQuiz(d);
+  $("quizBox").classList.remove("show"); $("quizCaret").textContent = "Show ▸";
+
+  // Mark complete button
+  $("markComplete").onclick = ()=>{
+    if(!state.completed.includes(d.day)){ state.completed.push(d.day); save(); buildDays(); updateProgress(); }
+  };
+
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* =============== Quiz =============== */
+function buildQuiz(d){
+  const box = $("quizQ"); const fb = $("quizFeedback");
+  box.innerHTML = ""; fb.textContent = "";
+  const qs = (d.quiz||[]).slice(0,3);
+  qs.forEach((q,qi)=>{
+    const div = document.createElement("div"); div.className="q";
+    div.innerHTML = `<div><strong>Q${qi+1}.</strong> ${q.q}</div>` +
+      q.choices.map((c,i)=> `<label class="small"><input type="radio" name="q${d.day}_${qi}" value="${i}"> ${c}</label>`).join("<br>");
+    box.appendChild(div);
+  });
+  $("submitQuiz").onclick = ()=>{
+    let correct = 0;
+    qs.forEach((q,qi)=>{
+      const sel = document.querySelector(`input[name="q${d.day}_${qi}"]:checked`);
+      if(sel && +sel.value===q.a) correct++;
+    });
+    const pct = Math.round((correct/qs.length)*100);
+    fb.textContent = `Score: ${pct}% (${correct}/${qs.length})`;
+    state.quizScores[d.day] = pct;
+    if(!state.completed.includes(d.day)) state.completed.push(d.day);
+    save(); buildDays(); updateProgress();
+  };
+  $("closeQuiz").onclick = ()=> { $("quizBox").classList.remove("show"); $("quizCaret").textContent = "Show ▸"; };
+}
+
+/* =============== Export/Reset/Events =============== */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href=url;
+  a.download = (state.name||"participant")+"_tax_workshop.json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+/* =============== Wiring =============== */
+window.addEventListener("load", ()=>{
+  load();
+
+  $("startBtn").onclick = ()=> openDay(1);
+  $("saveBtn").onclick = save;
+  $("exportBtn").onclick = exportJSON;
+  $("resetBtn").onclick = ()=> { localStorage.removeItem(STORAGE_KEY); location.reload(); };
+
+  $("learnerName").addEventListener("input", e=>{ state.name = e.target.value.trim(); save(); });
+
+  $("resToggle").onclick = ()=> toggleSection($("resources"), $("resCaret"));
+  $("chkToggle").onclick = ()=> toggleSection($("checklist"), $("chkCaret"));
+  $("quizToggle").onclick = ()=> toggleSection($("quizBox"), $("quizCaret"));
+});
+</script>
+</body>
+</html>
