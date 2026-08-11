@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Khaemaegis Financial Academy — Master Resource Library</title>
+<style>
+  :root{
+    --bg:#071229; --card:#0f1a33; --ink:#eaf2ff; --muted:#cdd7ef;
+    --accent:#7dd3fc; --accent2:#60a5fa; --glass:rgba(255,255,255,.05);
+  }
+  html,body{margin:0;min-height:100%;background:linear-gradient(180deg,#071229 0%,#0a1022 60%);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Arial}
+  .wrap{max-width:1111px;margin:24px auto;padding:16px}
+  h1{font-size:28px;margin:0 0 8px}
+  .sub{color:var(--muted);font-size:14px;margin-bottom:12px}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 16px}
+  .search{flex:1;min-width:240px}
+  input[type=text]{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:transparent;color:var(--ink)}
+  .pill{padding:6px 10px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:transparent;color:var(--ink);cursor:pointer;font-size:13px}
+  .pill.active{background:var(--accent);color:#05213a;border:none}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.55)}
+  details{background:var(--glass);border-radius:10px;padding:10px}
+  summary{cursor:pointer;list-style:none;font-weight:600}
+  summary::-webkit-details-marker{display:none}
+  .item{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:10px;border-radius:10px}
+  .item:hover{background:rgba(255,255,255,.04)}
+  .meta{font-size:12px;color:var(--muted)}
+  a.link{color:#bfe1ff;text-decoration:underline}
+  .fav{border:none;background:transparent;cursor:pointer;font-size:18px;line-height:1;color:#ffd56e}
+  .fav[aria-pressed="false"]{opacity:.5}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .tag{font-size:11px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.08);color:#d9e7ff}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .copy{border:1px dashed rgba(255,255,255,.25);padding:2px 6px;border-radius:6px;cursor:pointer;font-size:12px;color:#bfe1ff;background:transparent}
+  .muted{color:var(--muted)}
+  #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:50;display:none}
+  .footer{margin-top:14px;color:var(--muted);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <h1>Master Resource Library</h1>
+  <div class="sub">Trusted, official links for budgeting, credit, banking safety, investing, retirement, Social Security, and educator toolkits. Favorites save locally.</div>
+
+  <div class="toolbar">
+    <div class="search"><input id="q" type="text" placeholder="Search title, description, tags…  (Press / to focus)"/></div>
+    <button class="pill active" data-filter="all">All</button>
+    <button class="pill" data-filter="Budgeting">Budgeting</button>
+    <button class="pill" data-filter="Credit & Debt">Credit & Debt</button>
+    <button class="pill" data-filter="Banking Safety">Banking Safety</button>
+    <button class="pill" data-filter="Investing">Investing</button>
+    <button class="pill" data-filter="Retirement">Retirement</button>
+    <button class="pill" data-filter="Social Security">Social Security</button>
+    <button class="pill" data-filter="Calculators">Calculators</button>
+    <button class="pill" data-filter="Educator">Educator</button>
+    <button class="pill" data-filter="Fraud & Protection">Fraud</button>
+    <button class="pill" id="showFavs">⭐ Favorites</button>
+    <button class="pill" id="exportFavs">Export Favorites (JSON)</button>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="footer">Local-only • No trackers • Last curated: Jan 2, 2026</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ---------- Data: curated official links ---------- */
+const RESOURCES = [
+  /* Budgeting / Educator (CFPB) */
+  {
+    title:"CFPB — Adult Financial Education: Tools & Resources",
+    url:"https://www.consumerfinance.gov/consumer-tools/educator-tools/adult-financial-education/tools-and-resources/",
+    cat:["Budgeting","Educator"],
+    desc:"Downloadable worksheets, handouts, and topic guides for adult learners.",
+    tags:["worksheets","lessons","adult"],
+    source:"CFPB", updated:"Dec 17, 2025"
+  },
+  {
+    title:"CFPB — Financial Education for Adults (approaches & practices)",
+    url:"https://www.consumerfinance.gov/consumer-tools/educator-tools/adult-financial-education/",
+    cat:["Educator","Budgeting"],
+    desc:"Best practices for adult financial education; behavior insights and teaching strategies.",
+    tags:["teaching","adult-ed"],
+    source:"CFPB", updated:"Dec 18, 2024"
+  },
+
+  /* Credit & Debt (FINRA, SEC) */
+  {
+    title:"FINRA — BrokerCheck (verify firms & professionals)",
+    url:"https://brokercheck.finra.org/",
+    cat:["Investing","Fraud & Protection"],
+    desc:"Backgrounds, licenses, disclosures for brokers and adviser firms.",
+    tags:["verify","advisor","broker"],
+    source:"FINRA"
+  },
+  {
+    title:"About BrokerCheck (what it shows & how to use it)",
+    url:"https://www.finra.org/investors/investing/working-with-investment-professional/about-brokercheck",
+    cat:["Investing","Fraud & Protection"],
+    desc:"Overview of BrokerCheck and what information you can review.",
+    tags:["due-diligence"],
+    source:"FINRA"
+  },
+
+  /* Banking safety (FDIC, NCUA) */
+  {
+    title:"FDIC — EDIE Calculator (deposit insurance estimator)",
+    url:"https://edie.fdic.gov/",
+    cat:["Banking Safety","Calculators"],
+    desc:"Calculate FDIC coverage across ownership categories and accounts.",
+    tags:["FDIC","coverage","accounts"],
+    source:"FDIC"
+  },
+  {
+    title:"FDIC — EDIE: Calculator (direct link)",
+    url:"https://edie.fdic.gov/calculator.html",
+    cat:["Banking Safety","Calculators"],
+    desc:"Launch the interactive EDIE insurance calculator.",
+    tags:["checker","limits"],
+    source:"FDIC"
+  },
+  {
+    title:"FDIC — EDIE FAQs",
+    url:"https://edie.fdic.gov/fdic_info.html",
+    cat:["Banking Safety"],
+    desc:"Frequently asked questions about deposit insurance coverage.",
+    tags:["faq"],
+    source:"FDIC"
+  },
+  {
+    title:"NCUA — Share Insurance Coverage (credit unions)",
+    url:"https://ncua.gov/consumers/share-insurance-coverage",
+    cat:["Banking Safety"],
+    desc:"Coverage rules and categories for federally insured credit unions.",
+    tags:["NCUA","limits","credit-unions"],
+    source:"NCUA", updated:"May 20, 2025"
+  },
+  {
+    title:"NCUA — Share Insurance Resources (brochure & guides)",
+    url:"https://mycreditunion.gov/protect-your-money/share-insurance/share-insurance-resources",
+    cat:["Banking Safety"],
+    desc:"Downloadable materials on how your accounts are insured.",
+    tags:["brochure","guide"],
+    source:"NCUA", updated:"Dec 3, 2024"
+  },
+  {
+    title:"NCUA — How Your Accounts Are Federally Insured (PDF)",
+    url:"https://ncua.gov/files/publications/guides-manuals/NCUAHowYourAcctInsured.pdf",
+    cat:["Banking Safety"],
+    desc:"Detailed booklet explaining NCUA coverage categories and examples.",
+    tags:["PDF"],
+    source:"NCUA"
+  },
+
+  /* Investing (SEC Investor.gov, FINRA) */
+  {
+    title:"Investor.gov — Compound Interest Calculator",
+    url:"https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator",
+    cat:["Investing","Calculators"],
+    desc:"See growth over time with compounding; compare contribution schedules.",
+    tags:["calculator","growth"],
+    source:"SEC"
+  },
+  {
+    title:"Investor.gov — Free Financial Planning Tools",
+    url:"https://www.investor.gov/free-financial-planning-tools",
+    cat:["Investing","Calculators"],
+    desc:"Calculators for compound interest, savings goals, RMDs and more.",
+    tags:["planning","tools"],
+    source:"SEC"
+  },
+  {
+    title:"Investor.gov — Glossary: Compound Interest",
+    url:"https://www.investor.gov/introduction-investing/investing-basics/glossary/compound-interest",
+    cat:["Investing"],
+    desc:"Plain-English explainer of compounding and related calculators.",
+    tags:["glossary"],
+    source:"SEC"
+  },
+  {
+    title:"FINRA — Investor Education & Tools",
+    url:"https://www.finra.org/about/finra-360/progress-report/investor-education-tools",
+    cat:["Investing","Educator"],
+    desc:"Investor education hub with tools, courses, and alerts.",
+    tags:["education"],
+    source:"FINRA"
+  },
+
+  /* Retirement (IRS, DOL EBSA) */
+  {
+    title:"IRS — About Publication 590-A (IRA contributions)",
+    url:"https://www.irs.gov/forms-pubs/about-publication-590-a",
+    cat:["Retirement"],
+    desc:"What 590-A covers, latest revisions, and where to find the PDF.",
+    tags:["IRA","rules"],
+    source:"IRS", updated:"Oct 15, 2025"
+  },
+  {
+    title:"IRS — Publication 590-A (PDF)",
+    url:"https://www.irs.gov/pub/irs-pdf/p590a.pdf",
+    cat:["Retirement"],
+    desc:"Official PDF for IRA contribution rules and worksheets.",
+    tags:["PDF","IRA"],
+    source:"IRS", updated:"2024 edition"
+  },
+  {
+    title:"DOL EBSA — Preparing for Retirement (portal)",
+    url:"https://www.dol.gov/agencies/ebsa/workers-and-families/preparing-for-retirement",
+    cat:["Retirement"],
+    desc:"Fee guides, diversification tips, fiduciary guidance, and checklists.",
+    tags:["401k","fees"],
+    source:"U.S. Dept. of Labor"
+  },
+  {
+    title:"DOL EBSA — Top 10 Ways to Prepare for Retirement (PDF)",
+    url:"https://www.dol.gov/sites/dolgov/files/ebsa/about-ebsa/our-activities/resource-center/publications/dol-top-10-ways-to-prepare-for-retirement-booklet-2023.pdf",
+    cat:["Retirement"],
+    desc:"Actionable booklet: contributions, fees, planning steps, checklists.",
+    tags:["PDF","checklist"],
+    source:"U.S. Dept. of Labor"
+  },
+
+  /* Social Security (SSA) */
+  {
+    title:"SSA — Benefit Calculators (list)",
+    url:"https://www.ssa.gov/benefits/calculators/",
+    cat:["Social Security","Calculators"],
+    desc:"Central page linking to retirement, disability, and survivor calculators.",
+    tags:["planning","benefits"],
+    source:"SSA"
+  },
+  {
+    title:"SSA — Quick Calculator",
+    url:"https://www.ssa.gov/OACT/quickcalc/",
+    cat:["Social Security","Calculators"],
+    desc:"Estimate benefits at different claiming ages in today’s or inflated dollars.",
+    tags:["estimate","retirement"],
+    source:"SSA"
+  }
+];
+
+/* ---------- State ---------- */
+const KEY="khaemaegis_finlib_favs_v1";
+let favs = new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
+let filter = "all";
+let searchQ = "";
+
+/* ---------- Helpers ---------- */
+const $ = sel => document.querySelector(sel);
+function saveFavs(){ localStorage.setItem(KEY, JSON.stringify([...favs])); }
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display="none",1800); }
+function copy(text){ navigator.clipboard.writeText(text).then(()=>toast("Link copied")); }
+
+/* ---------- Render ---------- */
+function match(r){
+  if(filter!=="all" && !r.cat.includes(filter)) return false;
+  if(!searchQ) return true;
+  const blob = (r.title+" "+r.desc+" "+(r.tags||[]).join(" ")+" "+r.cat.join(" ")).toLowerCase();
+  return blob.includes(searchQ);
+}
+
+function render(){
+  const grid=$("#grid"); grid.innerHTML="";
+  // Group by category (collapsible)
+  const catsOrder = ["Budgeting","Credit & Debt","Banking Safety","Investing","Retirement","Social Security","Calculators","Educator","Fraud & Protection"];
+  const grouped = {};
+  RESOURCES.forEach(r=>{
+    if(!match(r)) return;
+    (r.cat||[]).forEach(c=>{
+      grouped[c] = grouped[c] || [];
+      if(!grouped[c].includes(r)) grouped[c].push(r);
+    });
+  });
+
+  catsOrder.forEach(cat=>{
+    const items = grouped[cat]; if(!items||!items.length) return;
+    const card = document.createElement("div"); card.className="card";
+    const det = document.createElement("details"); det.open = true;
+    const sum = document.createElement("summary");
+    sum.textContent = cat + "  ("+items.length+")";
+    det.appendChild(sum);
+
+    items.forEach(r=>{
+      const row = document.createElement("div"); row.className="item";
+      const left = document.createElement("div");
+      left.innerHTML = `
+        <div><a class="link" href="${r.url}" target="_blank" rel="noopener">${r.title}</a></div>
+        <div class="meta">${r.source || ""}${r.updated?` • Updated: ${r.updated}`:""}</div>
+        <div class="muted" style="margin-top:6px">${r.desc}</div>
+        <div class="tags">${(r.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+        <div class="row" style="margin-top:6px">
+          <button class="copy" data-url="${r.url}">Copy URL</button>
+        </div>
+      `;
+      const right = document.createElement("div");
+      const btn = document.createElement("button");
+      btn.className="fav";
+      btn.setAttribute("aria-pressed", favs.has(r.url) ? "true":"false");
+      btn.title = "Toggle Favorite";
+      btn.textContent = "⭐";
+      btn.onclick = ()=>{
+        if(favs.has(r.url)){ favs.delete(r.url); btn.setAttribute("aria-pressed","false"); }
+        else{ favs.add(r.url); btn.setAttribute("aria-pressed","true"); }
+        saveFavs();
+      };
+      right.appendChild(btn);
+
+      row.appendChild(left); row.appendChild(right);
+      det.appendChild(row);
+    });
+
+    card.appendChild(det);
+    grid.appendChild(card);
+  });
+
+  // Wire copy buttons
+  grid.querySelectorAll(".copy").forEach(b=>{
+    b.onclick = () => copy(b.getAttribute("data-url"));
+  });
+}
+
+/* ---------- Events ---------- */
+window.addEventListener("load", ()=>{
+  render();
+
+  // Search
+  const q=$("#q");
+  q.addEventListener("input", ()=>{ searchQ = q.value.trim().toLowerCase(); render(); });
+  document.addEventListener("keydown", (e)=>{ if(e.key==="/"){ e.preventDefault(); q.focus(); } });
+
+  // Filter pills
+  document.querySelectorAll(".pill[data-filter]").forEach(p=>{
+    p.onclick = ()=>{
+      document.querySelectorAll(".pill[data-filter]").forEach(x=>x.classList.remove("active"));
+      p.classList.add("active");
+      filter = p.getAttribute("data-filter");
+      render();
+    };
+  });
+
+  // Favorites view
+  $("#showFavs").onclick = ()=>{
+    // Toggle: when active, filter to favs in all categories with current text search
+    if($("#showFavs").classList.contains("active")){
+      $("#showFavs").classList.remove("active");
+      render();
+      toast("Showing: all resources");
+    }else{
+      $("#showFavs").classList.add("active");
+      const grid=$("#grid"); grid.innerHTML="";
+      const favLinks = new Set(favs);
+      const favItems = RESOURCES.filter(r=>favLinks.has(r.url)).filter(match);
+      if(!favItems.length){
+        const empty = document.createElement("div");
+        empty.className="card";
+        empty.innerHTML = "<strong>No favorites saved yet.</strong> Click ⭐ beside any resource to add it.";
+        grid.appendChild(empty);
+      }else{
+        const card = document.createElement("div"); card.className="card";
+        const det = document.createElement("details"); det.open = true;
+        const sum = document.createElement("summary"); sum.textContent = "⭐ Favorites ("+favItems.length+")";
+        det.appendChild(sum);
+        favItems.forEach(r=>{
+          const row=document.createElement("div"); row.className="item";
+          row.innerHTML = `
+            <div>
+              <div><a class="link" href="${r.url}" target="_blank" rel="noopener">${r.title}</a></div>
+              <div class="meta">${r.source||""}</div>
+              <div class="muted" style="margin-top:6px">${r.desc}</div>
+              <div class="tags">${(r.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}</div>
+              <div class="row" style="margin-top:6px"><button class="copy" data-url="${r.url}">Copy URL</button></div>
+            </div>
+            <div><button class="fav" aria-pressed="true" title="Toggle Favorite">⭐</button></div>
+          `;
+          // Favorite toggle
+          row.querySelector(".fav").onclick = ()=>{
+            if(favs.has(r.url)){ favs.delete(r.url); saveFavs(); row.remove(); toast("Removed from favorites"); }
+          };
+          // Copy wiring
+          row.querySelector(".copy").onclick = ()=>copy(r.url);
+          det.appendChild(row);
+        });
+        card.appendChild(det);
+        grid.appendChild(card);
+      }
+    }
+  };
+
+  // Export favorites
+  $("#exportFavs").onclick = ()=>{
+    const selected = RESOURCES.filter(r=>favs.has(r.url));
+    const data = JSON.stringify(selected, null, 2);
+    const blob = new Blob([data], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "khaemaegis_favorites.json";
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  };
+});
+</script>
+</body>
+</html>
