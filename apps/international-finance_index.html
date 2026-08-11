@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Universal International Finance Workshop — 8 Weeks</title>
+<style>
+  :root{
+    --bg:#071229;
+    --card:#0b1220;
+    --ink:#fffeff;
+    --muted:rgba(255,255,255,.75);
+    --accent:#7dd3fc;
+    --accent2:#60a5fa;
+    --glass:rgba(255,255,255,0.04);
+  }
+  html,body{margin:0;background:linear-gradient(180deg,#061025 0%, #08162f 60%);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Arial}
+  .wrap{max-width:1100px;margin:28px auto;padding:16px}
+  header{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+  header img{width:40px;height:40px;border-radius:12px}
+  h1{margin:0;font-size:34px;line-height:1.1}
+  .muted{color:var(--muted);font-size:14px}
+  .grid{display:grid;grid-template-columns:320px 1fr;gap:14px}
+  @media (max-width:860px){.grid{grid-template-columns:1fr}}
+  aside{background:var(--card);border-radius:14px;padding:14px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  main{background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);border-radius:14px;padding:16px;min-height:360px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  button{background:var(--accent);border:none;color:#03131f;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,.15)}
+  button.pill{border-radius:999px;padding:6px 12px}
+  .bar{height:12px;background:#0a1926;border-radius:10px;overflow:hidden}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  .card{background:var(--glass);border-radius:12px;padding:14px;margin-bottom:12px}
+  .card h2,.card h3{text-align:center;margin-top:6px}
+  .card .body{line-height:1.5}
+  input[type=text],textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--ink);border-radius:10px;padding:8px}
+  textarea{min-height:80px}
+  .small{font-size:13px}
+  .hidden{display:none}
+  .resources{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;margin-top:10px}
+  .res-head{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+  .res-list{margin-top:10px}
+  .res-list a{color:#eaf6ff}
+  /* Quiz modal */
+  #quizModal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:50}
+  #quizModal.show{display:flex}
+  #quizBox{max-width:420px;width:100%}
+  /* Week test */
+  .qblock{margin:10px 0;padding:10px;border-radius:10px;background:rgba(0,0,0,.15)}
+  footer{margin-top:14px;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <img alt="logo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48'><rect rx='12' width='48' height='48' fill='%237dd3fc'/><text x='50%25' y='58%25' font-family='Arial' font-size='22' text-anchor='middle' fill='%23021b2c'>$</text></svg>">
+    <div>
+      <h1>Universal International Finance Workshop</h1>
+      <div class="muted">8 weeks • Global sources • Local-only saves</div>
+    </div>
+    <div style="margin-left:auto;min-width:220px">
+      <div class="muted">Participant</div>
+      <input id="participantName" placeholder="Type your name…" />
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside>
+      <div class="row" style="justify-content:space-between">
+        <div><strong>Progress</strong> <span id="pct" class="muted">0%</span></div>
+        <button id="saveBtn" class="pill">Save</button>
+      </div>
+      <div class="bar" style="margin:8px 0 10px"><i id="bar" style="width:0%"></i></div>
+      <div class="row">
+        <button id="resetBtn" class="ghost">Reset</button>
+        <button id="exportBtn" class="ghost">Export JSON</button>
+        <button id="certBtn" class="ghost">Certificate</button>
+      </div>
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:12px 0" />
+      <div><strong>Weeks</strong></div>
+      <div id="weekList" class="small" style="max-height:50vh;overflow:auto;margin-top:6px"></div>
+      <hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:12px 0" />
+      <div class="small">
+        <strong>Global References</strong>
+        <ul style="margin:6px 0 0 16px">
+          <li><a href="https://www.oecd.org/en/networks/infe.html" target="_blank">OECD/INFE</a></li>
+          <li><a href="https://www.iosco.org/v2/investor_protection/?subsection=investor_education_gateway" target="_blank">IOSCO Investor Ed</a></li>
+          <li><a href="https://www.worldbank.org/en/topic/financialinclusion/overview" target="_blank">World Bank—Financial Inclusion</a></li>
+          <li><a href="https://www.bis.org/" target="_blank">BIS</a></li>
+          <li><a href="https://www.investor.gov/..." target="_blank">SEC Investor.gov—ETFs</a></li>
+          <li><a href="https://www.iopsweb.org/" target="_blank">IOPS—Pensions</a></li>
+          <li><a href="https://www.iais.org/" target="_blank">IAIS—Insurance ICPs</a></li>
+          <li><a href="https://www.unepfi.org/" target="_blank">UNEP FI</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main>
+      <div id="lessonView" class="card">
+        <h2 id="lessonTitle">Welcome</h2>
+        <div id="lessonBody" class="body">
+          <p>This 8-week international workshop introduces the major parts of modern finance with globally recognized references. Each week includes two mini-lessons, a pop-quiz, resources you can expand/collapse, and a 10-question test.</p>
+          <div class="row" style="margin-top:8px">
+            <button id="startBtn">Start Week 1</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- collapsible resources container -->
+      <div id="resWrap" class="resources hidden">
+        <div id="resHead" class="res-head">
+          <strong>Resources</strong>
+          <button id="toggleRes" class="pill ghost" aria-expanded="true">Hide</button>
+        </div>
+        <div id="resList" class="res-list"></div>
+      </div>
+
+      <!-- pop quiz modal -->
+      <div id="quizModal">
+        <div id="quizBox" class="card">
+          <h3 id="quizTitle">Pop Quiz</h3>
+          <div id="quizQ" class="body"></div>
+          <div id="quizA" style="margin-top:8px"></div>
+          <div class="row" style="margin-top:10px">
+            <button id="quizSubmit">Submit</button>
+            <button id="quizSkip" class="ghost">Skip</button>
+          </div>
+          <div id="quizFb" class="small muted" style="margin-top:6px"></div>
+        </div>
+      </div>
+
+      <!-- week test -->
+      <div id="testWrap" class="card hidden">
+        <h3 id="testTitle">Week Test</h3>
+        <div id="testBody"></div>
+        <div class="row" style="margin-top:10px">
+          <button id="testSubmit">Submit Test</button>
+          <button id="testClose" class="ghost">Close</button>
+        </div>
+        <div id="testResult" class="small muted" style="margin-top:6px"></div>
+      </div>
+
+      <!-- certificate -->
+      <div id="certWrap" class="card hidden">
+        <h3>Completion Certificate</h3>
+        <div id="certBody" class="body"></div>
+        <div class="row" style="margin-top:8px">
+          <button onclick="window.print()" class="ghost">Print / Save</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer>
+    Local-only save. You can extend questions/links in the code.
+  </footer>
+</div>
+
+<script>
+/* ========= Helpers & Storage ========= */
+const $ = (id)=>document.getElementById(id);
+const STORE = "uifw_v1";
+const state = {
+  name:"",
+  week:1, lesson:0, // indexes
+  notes:{}, // keyed by "W-L"
+  quizzes:[], // {w,l,ok}
+  tests:{}, // {"w1":pct,...}
+  doneWeeks:[] // [1..8]
+};
+function load(){
+  try{ Object.assign(state, JSON.parse(localStorage.getItem(STORE)||"{}")); }catch{}
+  $("participantName").value = state.name||"";
+  progressUI();
+}
+function save(silent=false){
+  state.name = $("participantName").value.trim()||"Participant";
+  try{ localStorage.setItem(STORE, JSON.stringify(state)); if(!silent) alert("Saved locally."); }catch(e){ if(!silent) alert("Save failed (storage blocked)."); }
+}
+function resetAll(){
+  if(!confirm("Reset all local progress?")) return;
+  localStorage.removeItem(STORE); location.reload();
+}
+
+/* ========= Curriculum Data =========
+Each week has 2 mini-lessons. contentHtml is short + an activity.
+Pop-quiz: 3 questions per lesson. Week test: 10 Q.
+Resources per lesson (array of {label,url}).
+All links are public, global references.
+*/
+const curriculum = [
+  {
+    week:1, title:"Foundations & Consumer Protection",
+    lessons:[
+      {
+        title:"Financial Literacy & Why It Matters",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Around the world, public institutions promote financial literacy so people can make informed choices, compare products, and protect themselves. The OECD International Network on Financial Education (INFE) coordinates global policies and good practices.</p>
+          <p><em>Activity.</em> Write three money decisions you or your family make (e.g., payments, saving, insurance). For each, list one question you should ask before choosing a product.</p>`,
+        resources:[
+          {label:"OECD/INFE overview",url:"https://www.oecd.org/en/networks/infe.html"},
+          {label:"OECD Financial education topic",url:"https://www.oecd.org/en/topics/sub-issues/financial-education.html"},
+          {label:"IOSCO Investor Education gateway",url:"https://www.iosco.org/v2/investor_protection/?subsection=investor_education_gateway"}
+        ],
+        quiz:[
+          {q:"A key goal of financial literacy is to help people…",choices:["speculate more","compare and choose appropriate products","avoid all finance"],a:1},
+          {q:"Which group coordinates international financial education work?",choices:["OECD/INFE","NATO","FIFA"],a:0},
+          {q:"Investor education materials from securities regulators are often shared via…",choices:["IOSCO","WHO","UNESCO only"],a:0}
+        ]
+      },
+      {
+        title:"Households, Balance Sheets & Risk Basics",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> A household balance sheet lists what you own (assets) and owe (liabilities). The IMF highlights how saving, debt, and housing interact with economic conditions. Managing risk starts with an emergency fund and avoiding over-borrowing.</p>
+          <p><em>Activity.</em> Draw a simple two-column balance sheet. Add at least three assets and three liabilities for a typical household in your country.</p>`,
+        resources:[
+          {label:"IMF: Household balance sheets (primer chapter PDF)",url:"https://www.elibrary.imf.org/downloadpdf/display/book/9781589064188/ch003.pdf"}
+        ],
+        quiz:[
+          {q:"Assets are generally…",choices:["things you own","only cash","always debts"],a:0},
+          {q:"A common first risk-management step is…",choices:["max credit cards","emergency savings","ignore bills"],a:1},
+          {q:"Household debt interacts with the economy via…",choices:["magic only","income and housing cycles","sports results"],a:1}
+        ]
+      }
+    ],
+    test:[
+      {q:"INFE is hosted by…",choices:["OECD","World Bank","BIS"],a:0},
+      {q:"Investor education coordination for securities regulators is via…",choices:["IAEA","IOSCO","IAIS"],a:1},
+      {q:"A balance sheet compares assets and…",choices:["taxes","liabilities","wishes"],a:1},
+      {q:"Emergency funds help with…",choices:["speculation","liquidity shocks","lowering prices"],a:1},
+      {q:"Good consumer protection encourages…",choices:["opaque fees","clear information and fair treatment","hidden risks"],a:1},
+      {q:"Financial literacy helps people…",choices:["avoid all financial services","choose suitable products","guarantee profits"],a:1},
+      {q:"A liability is…",choices:["an investment","an obligation you owe","a dividend"],a:1},
+      {q:"Over-borrowing increases…",choices:["resilience","vulnerability","inflation targeting"],a:1},
+      {q:"International bodies often publish free resources to…",choices:["confuse users","support education","sell products"],a:1},
+      {q:"Which document summarizes financial education policy work globally?",choices:["novels","OECD topic pages","sports pages"],a:1}
+    ]
+  },
+  {
+    week:2, title:"Equities & ETFs (Public Markets)",
+    lessons:[
+      {
+        title:"Stocks & Market Indexes",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Equity (stock) represents ownership in a company. Indexes track groups of stocks to show market performance. Diversification reduces single-company risk.</p>
+          <p><em>Activity.</em> Pick a broad market index in your region. List three sectors it includes and why sector mix matters.</p>`,
+        resources:[
+          {label:"IOSCO Investor Education gateway",url:"https://www.iosco.org/v2/investor_protection/?subsection=investor_education_gateway"}
+        ],
+        quiz:[
+          {q:"A stock is…",choices:["a loan to a company","ownership share","a savings account"],a:1},
+          {q:"An index…",choices:["tracks a group of securities","is a tax form","only covers bonds"],a:0},
+          {q:"Diversification helps…",choices:["increase single-stock risk","reduce idiosyncratic risk","guarantee returns"],a:1}
+        ]
+      },
+      {
+        title:"ETFs & Funds — Basics",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Exchange-Traded Funds (ETFs) pool investors’ money to hold a portfolio and trade on exchanges. In the U.S., ETFs register with the SEC; globally, rules vary by jurisdiction, but the core idea is similar.</p>
+          <p><em>Activity.</em> Find an ETF that tracks your chosen index. Read its factsheet: What is its objective and fee?</p>`,
+        resources:[
+          {label:"SEC Investor.gov — What is an ETF?",url:"https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-2"},
+          {label:"ETF glossary entry (Investor.gov)",url:"https://www.investor.gov/introduction-investing/investing-basics/glossary/exchange-traded-fund-etf"}
+        ],
+        quiz:[
+          {q:"ETFs are typically…",choices:["single stocks","pooled funds trading on exchanges","bank accounts"],a:1},
+          {q:"An ETF’s holdings and fees are described in…",choices:["a factsheet/prospectus","a restaurant menu","a passport"],a:0},
+          {q:"ETF rules are…",choices:["identical worldwide","jurisdiction-specific","set by sports leagues"],a:1}
+        ]
+      }
+    ],
+    test:[
+      {q:"Equity represents…",choices:["ownership","debt","rent"],a:0},
+      {q:"Indexes are used to…",choices:["price groceries","track market segments","set traffic laws"],a:1},
+      {q:"ETFs pool investor money and…",choices:["cannot trade","trade on exchanges","are only for banks"],a:1},
+      {q:"Fund costs are often called…",choices:["expense ratios","tax brackets","credit scores"],a:0},
+      {q:"Diversification is achieved by…",choices:["one stock","holding many assets","not investing"],a:1},
+      {q:"Prospectus/factsheet typically explains…",choices:["movie times","strategy & risks","postal rates"],a:1},
+      {q:"Jurisdictions regulate ETFs via…",choices:["securities regulators","weather agencies","tourism boards"],a:0},
+      {q:"Passive funds usually aim to…",choices:["track an index","outguess every trade","sell insurance"],a:0},
+      {q:"Active funds aim to…",choices:["never trade","outperform a benchmark","eliminate risk"],a:1},
+      {q:"Liquidity in ETFs refers to…",choices:["how tasty it is","ease of trading shares","water supply"],a:1}
+    ]
+  },
+  {
+    week:3, title:"Bonds & Fixed Income",
+    lessons:[
+      {
+        title:"Government & Corporate Bonds",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Bonds are loans from investors to issuers (governments or companies). The BIS provides global debt statistics to assess size, currency, and maturity risks.</p>
+          <p><em>Activity.</em> Compare government vs. corporate bonds: list two risk differences (credit, duration, currency).</p>`,
+        resources:[
+          {label:"BIS: Using debt securities statistics (primer)",url:"https://www.bis.org/publ/qtrpdf/r_qt2509e.htm"},
+          {label:"Intro guide: Investing in bonds (public primer)",url:"https://dfi.wa.gov/sites/default/files/publications/bonds-2015_0.pdf"}
+        ],
+        quiz:[
+          {q:"A bond is…",choices:["equity","a loan to an issuer","a deposit insurance"],a:1},
+          {q:"Credit risk is typically higher for…",choices:["AAA sovereigns than corporates","many corporates than prime sovereigns","all the same"],a:1},
+          {q:"Duration risk relates to…",choices:["maturity & rate sensitivity","brand logos","stock tickers"],a:0}
+        ]
+      },
+      {
+        title:"Market Structure & Innovations",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Bond markets vary by currency and structure. New topics include tokenisation pilots and leverage in non-bank intermediaries, which supervisors monitor for stability.</p>
+          <p><em>Activity.</em> In news sources, find one stability topic (eg, leverage in bond trades). Summarize why supervisors care.</p>`,
+        resources:[
+          {label:"BIS Bulletin — Tokenisation of government bonds",url:"https://www.bis.org/publ/bisbull107.htm"}
+        ],
+        quiz:[
+          {q:"Supervisors track leverage because it can…",choices:["lower all risks","amplify instability","print money"],a:1},
+          {q:"Tokenisation aims to…",choices:["digitally represent assets","ban bonds","replace regulators"],a:0},
+          {q:"BIS publishes…",choices:["recipes","global financial statistics/analysis","sports stats"],a:1}
+        ]
+      }
+    ],
+    test:[
+      {q:"Bond = investor lends to…",choices:["issuer","broker","consumer only"],a:0},
+      {q:"Credit risk concerns the issuer’s…",choices:["taste","repayment ability","website"],a:1},
+      {q:"Duration risk relates to…",choices:["interest rate changes","election results only","weather"],a:0},
+      {q:"BIS data help compare bonds by…",choices:["sector & currency","shoe size","flag color"],a:0},
+      {q:"Corporate bonds usually offer…",choices:["lower yields than bills","credit spread over sovereigns","no coupons"],a:1},
+      {q:"Tokenisation experiments are…",choices:["illegal globally","being studied by central banks","only in gaming"],a:1},
+      {q:"Non-bank leverage can affect…",choices:["financial stability","movie ratings","tourism"],a:0},
+      {q:"Sovereign bonds are issued by…",choices:["governments","shops","schools"],a:0},
+      {q:"Bond price rises when yields…",choices:["rise","fall","do nothing"],a:1},
+      {q:"Callable bonds allow issuer to…",choices:["buy back early","raise taxes","vote"],a:0}
+    ]
+  },
+  {
+    week:4, title:"Banking, Payments & Financial Inclusion",
+    lessons:[
+      {
+        title:"Bank Accounts, Deposits & Consumer Basics",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Bank accounts provide payments, safekeeping, and often deposit protection depending on the jurisdiction. Inclusion means access to useful, affordable services delivered responsibly.</p>
+          <p><em>Activity.</em> List three reasons to use an account vs. cash only (eg, safety, records, payments).</p>`,
+        resources:[
+          {label:"World Bank — Financial Inclusion (overview)",url:"https://www.worldbank.org/en/topic/financialinclusion/overview"}
+        ],
+        quiz:[
+          {q:"Financial inclusion means…",choices:["access & use of suitable services","only cash usage","mandatory loans"],a:0},
+          {q:"Deposit accounts support…",choices:["transactions & savings","medical care","weather"],a:0},
+          {q:"Consumer protection focuses on…",choices:["clear info & fair treatment","hiding fees","lotteries"],a:0}
+        ]
+      },
+      {
+        title:"Digital Finance & Public Platforms",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Digital financial inclusion uses cost-saving technologies (like real-time payment rails) to reach underserved users. Design must address risks (fraud, data protection).</p>
+          <p><em>Activity.</em> Sketch a flow for a low-fee digital payment in your country. Mark potential risk controls (2FA, alerts).</p>`,
+        resources:[
+          {label:"World Bank — Digital Financial Inclusion",url:"https://www.worldbank.org/en/topic/financialinclusion/publication/digital-financial-inclusion"}
+        ],
+        quiz:[
+          {q:"A benefit of digital rails is…",choices:["higher fixed costs only","lower marginal cost & reach","no audit trails"],a:1},
+          {q:"Key risks to manage include…",choices:["fraud & data protection","gravity","traffic lights"],a:0},
+          {q:"Interoperability helps…",choices:["fragment access","wider usage","ban payments"],a:1}
+        ]
+      }
+    ],
+    test:[
+      {q:"Inclusion emphasizes…",choices:["useful & affordable services","only luxury banking","unlimited credit"],a:0},
+      {q:"Payments accounts enable…",choices:["transactions","vaccinations","visas"],a:0},
+      {q:"Digital platforms must address…",choices:["security risks","astrology","mining"],a:0},
+      {q:"Low fees & instant payments can…",choices:["hinder access","support inclusion","ban savings"],a:1},
+      {q:"Responsible delivery means…",choices:["transparent, fair, safe","secretive","random"],a:0},
+      {q:"Remittances benefit from…",choices:["slow, expensive methods","efficient rails","handwritten IOUs only"],a:1},
+      {q:"KYC/AML controls relate to…",choices:["identification & misuse risks","internet memes","sports"],a:0},
+      {q:"Financial diaries can help understand…",choices:["household use patterns","galaxies","weather"],a:0},
+      {q:"Interoperability is…",choices:["systems working together","a tax code","a virus"],a:0},
+      {q:"Agent networks matter for…",choices:["last-mile access","astronomy","theatre"],a:0}
+    ]
+  },
+  {
+    week:5, title:"Pensions & Retirement Systems",
+    lessons:[
+      {
+        title:"Pension Pillars & Governance",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Countries mix public pay-as-you-go and private funded pensions. IOPS/OECD set supervisory principles for stability, security and member protection.</p>
+          <p><em>Activity.</em> Identify the main retirement pillars in your country. Who supervises private pensions?</p>`,
+        resources:[
+          {label:"IOPS Principles (supervision)",url:"https://www.oecd.org/content/dam/iops/en/iops-principles-and-guidelines/IOPS-principles-private-pension-supervision.pdf"},
+          {label:"IOPS Guidelines (2025 update)",url:"https://www.oecd.org/content/dam/iops/en/iops-principles-and-guidelines/Revised-IOPS-Guidelines-Supervisory-Assessment-of-PFs-November-2025.pdf"}
+        ],
+        quiz:[
+          {q:"Public pensions often operate on…",choices:["pay-as-you-go","blockchain only","commodity swaps"],a:0},
+          {q:"IOPS work focuses on…",choices:["pension supervision","space travel","sugar exports"],a:0},
+          {q:"Governance helps protect…",choices:["members & beneficiaries","only sponsors","nobody"],a:0}
+        ]
+      },
+      {
+        title:"Funded Savings & Fees",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> In funded systems, contributions are invested in diversified portfolios. Fees and long-term compounding heavily affect outcomes.</p>
+          <p><em>Activity.</em> Use a simple calculator: if fees drop from 1.0% to 0.3% annually over 30 years, what could that mean for balances? (Qualitative answer is fine.)</p>`,
+        resources:[
+          {label:"OECD consumer protection & education hub",url:"https://www.oecd.org/en/topics/financial-consumer-protection-and-education.html"}
+        ],
+        quiz:[
+          {q:"Lower fees over decades…",choices:["don’t matter","can materially raise balances","guarantee losses"],a:1},
+          {q:"Diversification in pensions…",choices:["is forbidden","reduces single-asset risk","means only cash"],a:1},
+          {q:"Disclosure should be…",choices:["clear & comparable","hidden","irregular"],a:0}
+        ]
+      }
+    ],
+    test:[
+      {q:"Pension ‘pillars’ describe…",choices:["types of retirement provision","building codes","bond coupons"],a:0},
+      {q:"IOPS/OECD materials support…",choices:["supervision & governance","cooking","tourism"],a:0},
+      {q:"Fees compound…",choices:["to reduce net returns","to increase gross returns","not at all"],a:0},
+      {q:"Investment policy should consider…",choices:["risk/return & time horizon","astrology","lotteries"],a:0},
+      {q:"Members are protected by…",choices:["supervision & disclosure","silence","rumors"],a:0},
+      {q:"Default funds are often…",choices:["random","lifecycle/target-date","crypto only"],a:1},
+      {q:"Annuities provide…",choices:["lifetime income","movie tickets","internet"],a:0},
+      {q:"Portability concerns…",choices:["moving accounts/jobs","moving houses","moving planets"],a:0},
+      {q:"Vesting relates to…",choices:["ownership rights over time","sales taxes","airports"],a:0},
+      {q:"Adequacy depends on…",choices:["contributions, returns, fees, duration","moon phase only","nothing"],a:0}
+    ]
+  },
+  {
+    week:6, title:"Insurance & Risk Management",
+    lessons:[
+      {
+        title:"Insurance Core Principles",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> The IAIS sets Insurance Core Principles (ICPs) — the global framework for fair, safe and stable insurance markets to protect policyholders.</p>
+          <p><em>Activity.</em> List three types of retail insurance common in your country and one reason each protects households.</p>`,
+        resources:[
+          {label:"IAIS — ICPs & ComFrame",url:"https://www.iais.org/activities-topics/standard-setting/icps-and-comframe/"},
+          {label:"BIS FSI summary — ICPs",url:"https://www.bis.org/fsi/fsisummaries/icps.pdf"}
+        ],
+        quiz:[
+          {q:"ICPs aim to protect…",choices:["policyholders","only shareholders","sports fans"],a:0},
+          {q:"IAIS is the global standard-setter for…",choices:["insurance","bank capital","telecom"],a:0},
+          {q:"Market conduct supervision focuses on…",choices:["fair treatment of customers","printing money","space law"],a:0}
+        ]
+      },
+      {
+        title:"Personal Risk Toolkit",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Common covers: health, life, disability, motor, home. Deductibles, exclusions and claims processes matter. Compare offers by coverage, not price alone.</p>
+          <p><em>Activity.</em> Pick one cover (e.g., renter’s). List: key risks, typical exclusions, and how deductibles change premiums.</p>`,
+        resources:[
+          {label:"IAIS — Organization overview",url:"https://www.iais.org/"},
+          {label:"NAIC explainer on ICPs (context)",url:"https://content.naic.org/insurance-topics/insurance-core-principles"}
+        ],
+        quiz:[
+          {q:"A deductible is…",choices:["a tax","amount you pay before insurer","a coupon"],a:1},
+          {q:"Comparing policies should focus on…",choices:["coverage terms","colors","celebrity ads"],a:0},
+          {q:"Disclosures help consumers…",choices:["understand benefits/limits","get free money","skip reading"],a:0}
+        ]
+      }
+    ],
+    test:[
+      {q:"IAIS develops…",choices:["ICPs","Basel rules","index funds"],a:0},
+      {q:"ICPs aim for…",choices:["fair, safe, stable markets","higher taxes","no claims"],a:0},
+      {q:"Market conduct = …",choices:["treating customers fairly","trading stocks","building roads"],a:0},
+      {q:"Exclusion means…",choices:["a risk not covered","extra benefit","discount day"],a:0},
+      {q:"Premium reflects…",choices:["risk & coverage","fashion","weather only"],a:0},
+      {q:"Home insurance may cover…",choices:["liability & property","concerts","flights"],a:0},
+      {q:"Health policies vary by…",choices:["benefits, networks, deductibles","brand logo","font"],a:0},
+      {q:"Life insurance provides…",choices:["benefit to beneficiaries","gym access","lottery"],a:0},
+      {q:"Claims process requires…",choices:["documentation & timelines","no info","rumors"],a:0},
+      {q:"Insurance complements…",choices:["prevention & savings","gossip","luck only"],a:0}
+    ]
+  },
+  {
+    week:7, title:"Real Estate & Housing Finance",
+    lessons:[
+      {
+        title:"Mortgages, LTV & Rates",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Housing finance links household credit and home prices. Loan-to-value (LTV), interest rate type, and amortization schedule shape risks.</p>
+          <p><em>Activity.</em> Compare a fixed-rate vs. variable-rate mortgage scenario over 5 years. Who bears interest-rate risk?</p>`,
+        resources:[
+          {label:"IMF: Housing finance & stability (chapter)",url:"https://www.elibrary.imf.org/downloadpdf/display/book/9781616350604/ch003.pdf"}
+        ],
+        quiz:[
+          {q:"LTV compares loan to…",choices:["property value","salary","rent"],a:0},
+          {q:"Fixed loans place rate risk mainly on…",choices:["borrower","lender","insurer"],a:1},
+          {q:"Prepayment options affect…",choices:["cash flows & pricing","weather","tax brackets only"],a:0}
+        ]
+      },
+      {
+        title:"Household Risk in Property Cycles",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> When credit grows fast with rising prices, downturns can hurt households and banks. Policymakers use tools like LTV/DTI caps.</p>
+          <p><em>Activity.</em> Find a central bank note about housing measures in your region. Summarize one tool.</p>`,
+        resources:[
+          {label:"IMF working paper on household debt & macro effects",url:"https://www.imf.org/-/media/files/publications/wp/2018/wp1876.pdf"}
+        ],
+        quiz:[
+          {q:"DTI caps limit…",choices:["income taxes","debt relative to income","lawn height"],a:1},
+          {q:"Credit booms can raise…",choices:["vulnerability","gravity","gold supply"],a:0},
+          {q:"Macroprudential policy seeks to…",choices:["reduce systemic risk","pick stock winners","ban houses"],a:0}
+        ]
+      }
+    ],
+    test:[
+      {q:"Housing finance ties together…",choices:["credit & prices","weather & prices","fashion & GDP"],a:0},
+      {q:"LTV = loan divided by…",choices:["home value","taxes","rent"],a:0},
+      {q:"Variable rate risk sits more with…",choices:["borrower","insurer","real estate agent"],a:0},
+      {q:"Prepayment changes…",choices:["cash flows","the color","zoning"],a:0},
+      {q:"Rapid credit growth can…",choices:["raise vulnerabilities","guarantee stability","lower risk"],a:0},
+      {q:"DTI caps target…",choices:["affordability risks","property taxes","flood maps"],a:0},
+      {q:"Price declines with high leverage may lead to…",choices:["negative equity","higher wages","better weather"],a:0},
+      {q:"Banks manage mortgage risk with…",choices:["underwriting & capital","fortune tellers","hashtags"],a:0},
+      {q:"Default risk tends to rise when…",choices:["income falls or rates rise","sunny day","team wins"],a:0},
+      {q:"Amortization schedules describe…",choices:["repayment over time","paint colors","neighborhood vibes"],a:0}
+    ]
+  },
+  {
+    week:8, title:"Sustainable & Responsible Finance + Digital Trends",
+    lessons:[
+      {
+        title:"Sustainable Finance: What to Look For",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> UNEP FI supports banks/insurers/investors integrating climate and nature risks. Labels vary by country — always verify methodology, holdings and stewardship to avoid greenwashing.</p>
+          <p><em>Activity.</em> Pick a “sustainable” fund. Read its policy: Does it exclude high-emission sectors or engage for transition? Note one measurable KPI.</p>`,
+        resources:[
+          {label:"UNEP FI — Risk Centre overview",url:"https://www.unepfi.org/themes/climate-change/pioneering-holistic-sustainability-risk-management-for-financial-institutions/"},
+          {label:"IOSCO — Retail investor education in sustainable finance",url:"https://www.iosco.org/library/pubdocs/pdf/IOSCOPD711.pdf"}
+        ],
+        quiz:[
+          {q:"Sustainable finance focuses on…",choices:["environmental & social risks/opportunities","fashion only","marketing only"],a:0},
+          {q:"To assess a ‘green’ fund you should…",choices:["check methodology/holdings","trust label only","ignore disclosures"],a:0},
+          {q:"Engagement means…",choices:["active stewardship with companies","party planning","index deletion"],a:0}
+        ]
+      },
+      {
+        title:"Digital Payments & Public Infrastructure",
+        contentHtml:`
+          <p><strong>Mini-lesson.</strong> Many countries deploy fast-payment rails and digital public platforms to broaden inclusion (e.g., real-time account-to-account transfers). Design choices affect security and access.</p>
+          <p><em>Activity.</em> Map a real-time payment: payer → rail → payee. Mark where fraud checks and notifications occur.</p>`,
+        resources:[
+          {label:"World Bank — Digital financial inclusion (primer)",url:"https://www.worldbank.org/en/topic/financialinclusion/publication/digital-financial-inclusion"}
+        ],
+        quiz:[
+          {q:"Fast payment rails can…",choices:["improve access & speed","ban banking","guarantee yields"],a:0},
+          {q:"Key risks include…",choices:["fraud and data misuse","sunsets","weekends"],a:0},
+          {q:"Open standards & interoperability…",choices:["help scale access","cause fragmentation","ban transfers"],a:0}
+        ]
+      }
+    ],
+    test:[
+      {q:"UNEP FI works with…",choices:["financial institutions","football clubs","taxi unions"],a:0},
+      {q:"Greenwashing risk implies…",choices:["labels may not match holdings","no disclosures","free lunch"],a:0},
+      {q:"Reading fund documents helps assess…",choices:["strategy & KPIs","movie length","weather"],a:0},
+      {q:"Digital platforms can broaden…",choices:["financial inclusion","traffic jams","interest-only loans"],a:0},
+      {q:"Security controls include…",choices:["2FA & monitoring","wishful thinking","stickers"],a:0},
+      {q:"Real-time rails support…",choices:["instant transfers","paper mail only","barter"],a:0},
+      {q:"Sustainability risks include…",choices:["climate & nature","astrology","fashion cycles"],a:0},
+      {q:"Stewardship means…",choices:["active ownership & voting","ignoring companies","daydreaming"],a:0},
+      {q:"Disclosures should be…",choices:["clear, comparable","secret","variable"],a:0},
+      {q:"Interoperability aims for…",choices:["systems that connect","exclusive silos","single vendor lock-in"],a:0}
+    ]
+  }
+];
+
+/* ========= Rendering ========= */
+function buildWeekList(){
+  const box = $("weekList"); box.innerHTML="";
+  curriculum.forEach((w,wi)=>{
+    const wrap = document.createElement("div");
+    wrap.className="card";
+    wrap.style.background="rgba(255,255,255,.03)";
+    wrap.innerHTML = `
+      <div><strong>Week ${w.week}: ${w.title}</strong> ${state.doneWeeks.includes(w.week)?'<span class="small" style="padding:2px 8px;border:1px solid rgba(255,255,255,.2);border-radius:999px;margin-left:6px">✓ Done</span>':''}</div>
+      <div class="small muted">${w.lessons.length} lessons • Test included</div>
+      <div id="wk${w.week}Btns" class="row" style="margin-top:8px"></div>
+    `;
+    box.appendChild(wrap);
+    const btns = wrap.querySelector("#wk"+w.week+"Btns");
+    w.lessons.forEach((l,li)=>{
+      const b = document.createElement("button");
+      b.textContent = `W${w.week}: ${l.title}`;
+      b.onclick = ()=> startLesson(w.week, li);
+      btns.appendChild(b);
+    });
+    const t = document.createElement("button");
+    t.className="ghost";
+    t.textContent = `Week ${w.week} Test`;
+    t.onclick = ()=> openTest(w.week);
+    btns.appendChild(t);
+  });
+}
+function startLesson(week, li){
+  state.week = week; state.lesson = li; save(true);
+  const w = curriculum.find(x=>x.week===week);
+  const L = w.lessons[li];
+  $("lessonTitle").textContent = `Week ${week} — ${L.title}`;
+  $("lessonBody").innerHTML = `
+    ${L.contentHtml}
+    <div class="row" style="margin-top:10px">
+      <button id="startAct">Open Activities</button>
+      <button id="openRes" class="ghost">Resources</button>
+      <button id="takeTest" class="ghost">Week ${week} Test</button>
+    </div>
+    <div id="actBox" style="margin-top:8px"></div>
+  `;
+  // resources
+  renderResources(L.resources||[]);
+  $("resWrap").classList.add("hidden"); // collapsed by default
+  $("toggleRes").setAttribute("aria-expanded","false");
+  // buttons
+  $("startAct").onclick = ()=> renderActivities(week, li);
+  $("openRes").onclick = ()=> toggleResources(true);
+  $("takeTest").onclick = ()=> openTest(week);
+  // quiz pops once after activities open
+}
+function renderActivities(week, li){
+  const key = `W${week}-${li}`;
+  const box = $("actBox"); box.innerHTML = "";
+  box.innerHTML = `
+    <div class="card">
+      <h3>Notebook</h3>
+      <div class="small muted">Jot your ideas or activity results here.</div>
+      <textarea id="noteArea" placeholder="Your notes…"></textarea>
+      <div class="row" style="margin-top:8px">
+        <button id="saveNote" class="pill">Save Note</button>
+        <button id="popQuiz" class="ghost">Pop Quiz (3 Qs)</button>
+      </div>
+    </div>
+  `;
+  // load note
+  $("noteArea").value = state.notes[key]||"";
+  $("saveNote").onclick = ()=>{ state.notes[key]=$("noteArea").value; save(); };
+  $("popQuiz").onclick = ()=> launchQuiz(week, li);
+}
+function renderResources(arr){
+  const res = $("resList"); res.innerHTML="";
+  if(!arr || !arr.length){ res.innerHTML = `<div class="small muted">No links provided for this lesson.</div>`; return; }
+  const ul = document.createElement("ul"); ul.style.margin="0 0 0 18px";
+  arr.forEach(r=>{
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="${r.url}" target="_blank" rel="noopener">${r.label}</a>`;
+    ul.appendChild(li);
+  });
+  res.appendChild(ul);
+}
+function toggleResources(forceOpen){
+  const w = $("resWrap");
+  const btn = $("toggleRes");
+  const open = forceOpen ? false : !w.classList.contains("hidden");
+  if(open){ w.classList.add("hidden"); btn.textContent="Show"; btn.setAttribute("aria-expanded","false"); }
+  else { w.classList.remove("hidden"); btn.textContent="Hide"; btn.setAttribute("aria-expanded","true"); }
+}
+$("toggleRes").onclick = ()=> toggleResources();
+
+/* ========= Quiz ========= */
+function launchQuiz(week, li){
+  const L = curriculum.find(x=>x.week===week).lessons[li];
+  const qs = (L.quiz||[]).slice(0,3);
+  let idx = 0, correct=0;
+  const modal = $("quizModal"); modal.classList.add("show");
+  function showOne(){
+    const q = qs[idx];
+    $("quizTitle").textContent = `Pop Quiz — Week ${week} • Q${idx+1}/${qs.length}`;
+    $("quizQ").textContent = q.q;
+    const box = $("quizA"); box.innerHTML="";
+    q.choices.forEach((c,i)=>{
+      const id = `qa_${i}`;
+      const row = document.createElement("div");
+      row.innerHTML = `<label><input type="radio" name="qa" value="${i}"> ${c}</label>`;
+      box.appendChild(row);
+    });
+    $("quizFb").textContent="";
+  }
+  showOne();
+  $("quizSubmit").onclick = ()=>{
+    const sel = document.querySelector('input[name="qa"]:checked');
+    if(!sel){ $("quizFb").textContent="Choose an answer."; return; }
+    const q = qs[idx];
+    if(parseInt(sel.value,10)===q.a){ correct++; $("quizFb").textContent="Correct!"; } else { $("quizFb").textContent=`Answer: ${q.choices[q.a]}`; }
+    idx++;
+    if(idx<qs.length){ setTimeout(showOne,600); } else {
+      state.quizzes.push({w:week,l:li,ok:correct});
+      save(true);
+      setTimeout(()=>{ modal.classList.remove("show"); $("quizFb").textContent=""; },600);
+    }
+  };
+  $("quizSkip").onclick = ()=>{ modal.classList.remove("show"); };
+}
+
+/* ========= Tests ========= */
+function openTest(week){
+  $("testWrap").classList.remove("hidden");
+  $("certWrap").classList.add("hidden");
+  const W = curriculum.find(x=>x.week===week);
+  $("testTitle").textContent = `Week ${week} Test — ${W.title}`;
+  const body = $("testBody"); body.innerHTML="";
+  W.test.forEach((t,i)=>{
+    const b = document.createElement("div"); b.className="qblock";
+    b.innerHTML = `<div><strong>Q${i+1}.</strong> ${t.q}</div>`;
+    t.choices.forEach((c,ci)=>{
+      const r = document.createElement("div");
+      r.innerHTML = `<label><input type="radio" name="t${i}" value="${ci}"> ${c}</label>`;
+      b.appendChild(r);
+    });
+    body.appendChild(b);
+  });
+  $("testSubmit").onclick = ()=> submitTest(week);
+  $("testClose").onclick = ()=> $("testWrap").classList.add("hidden");
+}
+function submitTest(week){
+  const W = curriculum.find(x=>x.week===week);
+  let right=0;
+  W.test.forEach((t,i)=>{
+    const sel = document.querySelector(`input[name="t${i}"]:checked`);
+    if(sel && parseInt(sel.value,10)===t.a) right++;
+  });
+  const pct = Math.round((right/W.test.length)*100);
+  $("testResult").textContent = `Score: ${pct}% (${right}/${W.test.length})`;
+  state.tests["w"+week]=pct;
+  if(pct>=70 && !state.doneWeeks.includes(week)) state.doneWeeks.push(week);
+  save(true); progressUI(); buildWeekList();
+}
+
+/* ========= Progress & Certificate ========= */
+function progressUI(){
+  const total = curriculum.length;
+  const done = state.doneWeeks.length;
+  const pct = total? Math.round((done/total)*100):0;
+  $("pct").textContent = pct+"%";
+  $("bar").style.width = pct+"%";
+}
+function maybeCert(){
+  if(state.doneWeeks.length!==curriculum.length){ alert("Finish all week tests (≥70%) to unlock certificate."); return; }
+  const list = Object.entries(state.tests).map(([k,v])=>`${k.toUpperCase()}: ${v}%`).join(" · ");
+  $("certBody").innerHTML = `
+    <p><strong>Certificate of Completion</strong></p>
+    <p>This certifies that <strong>${state.name||"Participant"}</strong> has successfully completed all 8 weeks of the Universal International Finance Workshop.</p>
+    <p class="small">Scores — ${list}</p>
+    <p class="small">Educator/Coach signature: ___________________________</p>
+  `;
+  $("certWrap").classList.remove("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ========= Export ========= */
+function exportJSON(){
+  const data = JSON.stringify(state,null,2);
+  const blob = new Blob([data],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url; a.download=`${state.name||"participant"}_universal_finance_report.json`;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+
+/* ========= Wire Up ========= */
+window.addEventListener("load", ()=>{
+  load(); buildWeekList();
+  $("startBtn").onclick = ()=> startLesson(state.week||1, state.lesson||0);
+  $("saveBtn").onclick = ()=> save();
+  $("resetBtn").onclick = ()=> resetAll();
+  $("exportBtn").onclick = ()=> exportJSON();
+  $("certBtn").onclick = ()=> maybeCert();
+});
+</script>
+</body>
+</html>
