@@ -1,0 +1,49 @@
+name: Beta index coverage
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: beta-index-coverage-main
+  cancel-in-progress: true
+jobs:
+  ensure:
+    if: ${{ !contains(github.event.head_commit.message || '', '[skip beta-rollout]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - name: Ensure visible index coverage
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          tag='<script src="/assets/vnv-beta-link.js" defer></script>'
+          excluded={'.git','.github','node_modules','vendor','archive','archives','backup','backups','deprecated','private','admin','beta'}
+          changed=[];already=[];skipped=[]
+          for p in sorted(Path('.').rglob('*.html')):
+            if not re.search(r'in+dex\.html$',p.name.lower()): continue
+            if {x.lower() for x in p.parts}&excluded: skipped.append((str(p),'excluded-path'));continue
+            try:t=p.read_text(encoding='utf-8')
+            except UnicodeDecodeError: skipped.append((str(p),'non-utf8'));continue
+            if 'vnv-beta-link.js' in t: already.append(str(p));continue
+            c=re.search(r'<meta[^>]+http-equiv=["\']Content-Security-Policy["\'][^>]+content=["\']([^"\']*)',t,re.I)
+            if c and re.search(r"(?:^|;)\s*script-src\s+'none'\s*(?:;|$)",c.group(1),re.I): skipped.append((str(p),'csp-script-none'));continue
+            body=list(re.finditer(r'</body\s*>',t,re.I));html=list(re.finditer(r'</html\s*>',t,re.I))
+            if body:i=body[-1].start();u=t[:i].rstrip()+'\n'+tag+'\n'+t[i:]
+            elif html:i=html[-1].start();u=t[:i].rstrip()+'\n'+tag+'\n'+t[i:]
+            else:u=t.rstrip()+'\n'+tag+'\n'
+            p.write_text(u,encoding='utf-8');changed.append(str(p))
+          lines=['# Beta Index Coverage','',f'- Added in this run: **{len(changed)}**',f'- Already covered: **{len(already)}**',f'- Skipped: **{len(skipped)}**','', 'Rule: visible public HTML filenames ending in `index.html` (including `_index.html` and common `inndex.html` typos) receive `/assets/vnv-beta-link.js`. The widget reports only public hostname + pathname; never learner/family IDs, answers, form values, query/hash, storage, report text, or credentials.']
+          if changed:lines+=['','## Added','']+[f'- `{x}`' for x in changed]
+          if skipped:lines+=['','## Skipped','']+[f'- `{x}` — {y}' for x,y in skipped]
+          Path('BETA_INDEX_COVERAGE.md').write_text('\n'.join(lines)+'\n',encoding='utf-8')
+          PY
+      - name: Commit coverage
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name "Verve N Veda Beta Coverage"
+          git config user.email "actions@users.noreply.github.com"
+          git add --all && git commit -m "chore(beta): ensure visible index coverage [skip beta-rollout]" && git push
