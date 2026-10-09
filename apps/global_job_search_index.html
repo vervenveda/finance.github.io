@@ -78,7 +78,13 @@
         <select id="vacancyWork" aria-label="Work arrangement"><option value="">All arrangements</option><option value="onsite">On-site</option><option value="hybrid">Hybrid</option><option value="remote">Remote</option></select>
       </div>
       <div class="search-box">
+        <select id="vacancyFreshness" aria-label="Posted within"><option value="">Any posting date</option><option value="7">Past 7 days</option><option value="30">Past 30 days</option><option value="90">Past 90 days</option></select>
+        <select id="vacancySort" aria-label="Sort vacancies"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="title">Job title A–Z</option><option value="company">Employer A–Z</option></select>
+      </div>
+      <div class="search-box">
         <button type="button" id="vacancySearch">Search vacancies</button>
+        <button type="button" id="vacancyClear">Clear filters</button>
+        <button type="button" id="vacancyExport">Export matching CSV</button>
         <label style="flex:1">Import authorized vacancies (JSON) <input id="vacancyImport" type="file" accept=".json,application/json"></label>
       </div>
       <p id="vacancyStatus" role="status" aria-live="polite"></p>
@@ -225,20 +231,32 @@ document.getElementById('regionFilter').addEventListener('change', renderPortals
 // Geographic vacancy records are supplied by an authorized JSON export.
 // Schema: {jobs:[{id,title,company,city,state,country,postal_code,work_arrangement,apply_url,posted_at,source}]}
 let vacancyRecords = [];
+let visibleVacancies = [];
 const vacancyStatus = document.getElementById('vacancyStatus');
 function renderVacancies() {
   const keyword = document.getElementById('vacancyKeyword').value.trim().toLowerCase();
   const location = document.getElementById('vacancyLocation').value.trim().toLowerCase();
   const arrangement = document.getElementById('vacancyWork').value;
+  const freshness = Number(document.getElementById('vacancyFreshness').value);
+  const sort = document.getElementById('vacancySort').value;
   const results = document.getElementById('vacancyResults');
   results.replaceChildren();
+  const now = Date.now();
   const matches = vacancyRecords.filter(job => {
     const text = [job.title,job.company].join(' ').toLowerCase();
     const geography = [job.city,job.state,job.country,job.postal_code].join(' ').toLowerCase();
     return (!keyword || text.includes(keyword)) &&
       (!location || geography.includes(location) || (job.work_arrangement==='remote' && location==='remote')) &&
-      (!arrangement || job.work_arrangement===arrangement);
+      (!arrangement || job.work_arrangement===arrangement) &&
+      (!freshness || (Number.isFinite(Date.parse(job.posted_at)) && Date.parse(job.posted_at) <= now && now-Date.parse(job.posted_at) <= freshness*86400000));
   });
+  matches.sort((a,b) => {
+    if(sort==='title') return a.title.localeCompare(b.title);
+    if(sort==='company') return a.company.localeCompare(b.company);
+    const av=Date.parse(a.posted_at), bv=Date.parse(b.posted_at);
+    return sort==='oldest' ? av-bv : bv-av;
+  });
+  visibleVacancies = matches;
   vacancyStatus.textContent = vacancyRecords.length ?
     matches.length+' matching vacancies from '+vacancyRecords.length+' imported records. Confirm availability with the employer.' :
     'No vacancy dataset loaded. Import authorized JSON records to search actual postings.';
@@ -269,7 +287,8 @@ function validVacancy(job) {
   if (!job || typeof job!=='object') return false;
   const fields=['id','title','company','city','state','country','postal_code','work_arrangement','apply_url','posted_at','source'];
   if (!fields.every(k => typeof job[k]==='string' && job[k].length<=500)) return false;
-  if (!job.title || !job.company || !job.source || !job.apply_url) return false;
+  if (!job.id || !job.title || !job.company || !job.source || !job.apply_url) return false;
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(job.posted_at) || !Number.isFinite(Date.parse(job.posted_at))) return false;
   if (!['onsite','hybrid','remote'].includes(job.work_arrangement)) return false;
   try { return new URL(job.apply_url).protocol==='https:'; } catch { return false; }
 }
@@ -280,7 +299,13 @@ document.getElementById('vacancyImport').addEventListener('change', async event 
   try {
     const data=JSON.parse(await file.text());
     if(!data || !Array.isArray(data.jobs) || data.jobs.length>10000 || !data.jobs.every(validVacancy)) throw new Error('Invalid schema');
-    vacancyRecords=data.jobs;
+    const seen = new Set();
+    vacancyRecords=data.jobs.filter(job => {
+      const key=(job.id+'|'+job.source+'|'+job.apply_url).toLowerCase();
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
     renderVacancies();
   } catch {
     vacancyStatus.textContent='Import rejected. Use a valid authorized JSON vacancy export with required fields.';
@@ -288,6 +313,21 @@ document.getElementById('vacancyImport').addEventListener('change', async event 
 });
 ['vacancyKeyword','vacancyLocation'].forEach(id => document.getElementById(id).addEventListener('input',renderVacancies));
 document.getElementById('vacancyWork').addEventListener('change',renderVacancies);
+['vacancyFreshness','vacancySort'].forEach(id=>document.getElementById(id).addEventListener('change',renderVacancies));
+document.getElementById('vacancyClear').addEventListener('click',()=>{
+  ['vacancyKeyword','vacancyLocation','vacancyWork','vacancyFreshness'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('vacancySort').value='newest';
+  renderVacancies();
+});
+document.getElementById('vacancyExport').addEventListener('click',()=>{
+  if(!visibleVacancies.length){vacancyStatus.textContent='No matching vacancies to export.';return;}
+  const keys=['title','company','city','state','country','postal_code','work_arrangement','posted_at','source','apply_url'];
+  const escapeCSV=value=>'"'+String(value??'').replace(/"/g,'""').replace(/^[=+@-]/,m=>"'"+m)+'"';
+  const csv=[keys,...visibleVacancies.map(job=>keys.map(k=>job[k]))].map(row=>row.map(escapeCSV).join(',')).join('\\r\\n');
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.download='vacancy-search-results.csv';a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
 document.getElementById('vacancySearch').addEventListener('click',renderVacancies);
 renderVacancies();
 // Initial Render
