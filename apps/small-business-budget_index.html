@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Small Business Budget Engine</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  
+  
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,7 +19,7 @@
       color: #2e6e5f;
     }
     .container {
-      width: 80%;
+      width: min(900px, 100%);
       margin: 0 auto;
       background: white;
       padding: 20px;
@@ -108,7 +108,7 @@
     </div>
 
     <div id="businessDetails"></div>
-    <div id="businessChart"></div>
+    <div id="businessChart" role="img" aria-label="Budget allocation chart"></div>
 
     <div class="profit-loss">
       <span><strong>Net Profit:</strong> <span id="netProfitResult">-</span></span>
@@ -213,36 +213,35 @@
       });
     });
 
-    // Render Pie Chart for Business Budget
+    // Native chart works offline and avoids third-party runtimes.
     function renderBusinessPieChart(revenue, operatingExpenses, capitalExpenses) {
-      const ctx = document.getElementById('businessChart').getContext('2d');
-      const businessChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: ['Revenue', 'Operating Expenses', 'Capital Expenses'],
-          datasets: [{
-            data: [revenue, operatingExpenses, capitalExpenses],
-            backgroundColor: ['#4caf50', '#ff9800', '#2196f3'],
-            borderColor: ['#fff', '#fff', '#fff'],
-            borderWidth: 2
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top'
-            },
-            tooltip: {
-              callbacks: {
-                label: function(tooltipItem) {
-                  return `${tooltipItem.label}: $${tooltipItem.raw.toFixed(2)}`;
-                }
-              }
-            }
-          }
-        }
+      const chart = document.getElementById('businessChart');
+      chart.replaceChildren();
+      const amounts = [operatingExpenses, capitalExpenses, revenue-operatingExpenses-capitalExpenses];
+      const names = ['Operating expenses','Capital expenses','Remaining revenue'];
+      const colors = ['#b77443','#245b4b','#c5a45d'];
+      const bar = document.createElement('div');
+      bar.style.cssText = 'display:flex;width:100%;height:40px;margin:20px 0;border-radius:7px;overflow:hidden';
+      amounts.forEach((amount,i) => {
+        const segment = document.createElement('div');
+        segment.style.width = (amount/revenue*100)+'%';
+        segment.style.backgroundColor = colors[i];
+        segment.title = names[i]+': '+money(amount);
+        bar.appendChild(segment);
       });
+      chart.appendChild(bar);
+      amounts.forEach((amount,i) => {
+        const line = document.createElement('p');
+        line.textContent = names[i]+': '+money(amount);
+        line.style.borderLeft = '7px solid '+colors[i];
+        line.style.paddingLeft = '10px';
+        chart.appendChild(line);
+      });
+    }
+    function money(n) { return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n); }
+    function readyToExport() {
+      if (!Number.isFinite(revenue)) { alert('Calculate a budget before exporting.'); return false; }
+      return true;
     }
 
     // Add Custom Categories for Expenses
@@ -318,6 +317,7 @@
 
     // Export Budget to CSV
     document.getElementById("exportCSV").addEventListener("click", function() {
+      if (!readyToExport()) return;
       const data = [
         ['Category', 'Amount'],
         ['Revenue', revenue.toFixed(2)],
@@ -330,33 +330,44 @@
         data.push([cat.category, cat.amount.toFixed(2)]);
       });
 
-      let csvContent = "data:text/csv;charset=utf-8,";
-      data.forEach(function(rowArray) {
-        let row = rowArray.join(',');
-        csvContent += row + "\r\n";
-      });
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "business_budget.csv");
+      const csvContent = data.map(row => row.map(value => '"' + String(value).replaceAll('"','""') + '"').join(',')).join('\r\n');
+      const url = URL.createObjectURL(new Blob([csvContent],{type:'text/csv;charset=utf-8'}));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'business_budget.csv';
       link.click();
+      setTimeout(() => URL.revokeObjectURL(url),1000);
     });
 
-    // Export Budget to PDF (Simple Version)
-    document.getElementById("exportPDF").addEventListener("click", function() {
-      const doc = new jsPDF();
-      doc.text('Small Business Budget Report', 20, 20);
-      doc.text(`Revenue: $${revenue.toFixed(2)}`, 20, 30);
-      doc.text(`Operating Expenses: $${operatingExpenses.toFixed(2)}`, 20, 40);
-      doc.text(`Capital Expenses: $${capitalExpenses.toFixed(2)}`, 20, 50);
-      doc.text(`Net Profit: $${netProfit.toFixed(2)}`, 20, 60);
-
-      customCategories.forEach((cat, index) => {
-        doc.text(`${cat.category}: $${cat.amount.toFixed(2)}`, 20, 70 + (index * 10));
+    // Native browser print: choose "Save as PDF" in the print dialog.
+    document.getElementById('exportPDF').addEventListener('click', function() {
+      if (!readyToExport()) return;
+      const win = window.open('', '_blank');
+      if (!win) { alert('Please allow pop-ups to print or save as PDF.'); return; }
+      const doc = win.document;
+      doc.title = 'Small Business Budget Report';
+      const title = doc.createElement('h1');
+      title.textContent = doc.title;
+      doc.body.appendChild(title);
+      const table = doc.createElement('table');
+      table.style.cssText = 'border-collapse:collapse;width:100%;font:16px Arial';
+      const rows = [['Revenue',revenue],['Operating Expenses',operatingExpenses],['Capital Expenses',capitalExpenses],['Net Profit (before custom expenses)',netProfit],...customCategories.map(c=>[c.category,c.amount])];
+      rows.forEach(([label,value]) => {
+        const tr = doc.createElement('tr');
+        [label,money(value)].forEach(item => {
+          const td = doc.createElement('td');
+          td.textContent = item;
+          td.style.cssText = 'border:1px solid #bbb;padding:9px';
+          tr.appendChild(td);
+        });
+        table.appendChild(tr);
       });
-
-      doc.save("business_budget_report.pdf");
+      doc.body.appendChild(table);
+      const note = doc.createElement('p');
+      note.textContent = 'Illustrative allocations: 40% operating and 10% capital. Custom categories listed separately.';
+      doc.body.appendChild(note);
+      win.focus();
+      win.print();
     });
 
   </script>
