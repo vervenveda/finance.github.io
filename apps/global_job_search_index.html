@@ -291,7 +291,7 @@ function validVacancy(job) {
   if (!fields.every(k => typeof job[k]==='string' && job[k].length<=500)) return false;
   if (!job.id || !job.title || !job.company || !job.source || !job.apply_url) return false;
   if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(job.posted_at) || !Number.isFinite(Date.parse(job.posted_at))) return false;
-  if (!['onsite','hybrid','remote'].includes(job.work_arrangement)) return false;
+  if (!['onsite','hybrid','remote','unspecified'].includes(job.work_arrangement)) return false;
   try { return new URL(job.apply_url).protocol==='https:'; } catch { return false; }
 }
 document.getElementById('vacancyImport').addEventListener('change', async event => {
