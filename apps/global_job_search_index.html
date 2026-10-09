@@ -88,6 +88,7 @@
         <label style="flex:1">Import authorized vacancies (JSON) <input id="vacancyImport" type="file" accept=".json,application/json"></label>
       </div>
       <p id="vacancyStatus" role="status" aria-live="polite"></p>
+      <p id="vacancyDatasetInfo" class="small"></p>
       <div id="vacancyResults"></div>
     </section>
     <!-- Results -->
@@ -232,6 +233,7 @@ document.getElementById('regionFilter').addEventListener('change', renderPortals
 // Schema: {jobs:[{id,title,company,city,state,country,postal_code,work_arrangement,apply_url,posted_at,source}]}
 let vacancyRecords = [];
 let visibleVacancies = [];
+let vacancyDatasetDate = null;
 const vacancyStatus = document.getElementById('vacancyStatus');
 function renderVacancies() {
   const keyword = document.getElementById('vacancyKeyword').value.trim().toLowerCase();
@@ -259,7 +261,7 @@ function renderVacancies() {
   visibleVacancies = matches;
   vacancyStatus.textContent = vacancyRecords.length ?
     matches.length+' matching vacancies from '+vacancyRecords.length+' imported records. Confirm availability with the employer.' :
-    'No vacancy dataset loaded. Import authorized JSON records to search actual postings.';
+    'No published vacancy records available. You may import an authorized JSON dataset locally.';
   matches.slice(0,100).forEach(job => {
     const card = document.createElement('article');
     card.className = 'portal';
@@ -268,7 +270,7 @@ function renderVacancies() {
     const detail = document.createElement('p');
     detail.textContent = [job.city,job.state,job.country,job.postal_code,job.work_arrangement].filter(Boolean).join(' · ');
     const meta = document.createElement('small');
-    meta.textContent = 'Source: '+job.source+' · Posted: '+job.posted_at;
+    meta.textContent = 'Source: '+job.source+' · Listing date: '+job.posted_at;
     const link = document.createElement('a');
     link.href = job.apply_url;
     link.target = '_blank';
@@ -300,12 +302,14 @@ document.getElementById('vacancyImport').addEventListener('change', async event 
     const data=JSON.parse(await file.text());
     if(!data || !Array.isArray(data.jobs) || data.jobs.length>10000 || !data.jobs.every(validVacancy)) throw new Error('Invalid schema');
     const seen = new Set();
+    vacancyDatasetDate = null;
     vacancyRecords=data.jobs.filter(job => {
       const key=(job.id+'|'+job.source+'|'+job.apply_url).toLowerCase();
       if(seen.has(key)) return false;
       seen.add(key);
       return true;
     });
+    document.getElementById('vacancyDatasetInfo').textContent='Local file imported; not automatically refreshed.';
     renderVacancies();
   } catch {
     vacancyStatus.textContent='Import rejected. Use a valid authorized JSON vacancy export with required fields.';
@@ -330,6 +334,24 @@ document.getElementById('vacancyExport').addEventListener('click',()=>{
 });
 document.getElementById('vacancySearch').addEventListener('click',renderVacancies);
 renderVacancies();
+async function loadPublishedVacancies() {
+  try {
+    const response=await fetch('../data/vacancies.json',{cache:'no-store'});
+    if(!response.ok) throw new Error('Dataset unavailable');
+    const data=await response.json();
+    if(!data || !Array.isArray(data.jobs) || data.jobs.length>10000 || !data.jobs.every(validVacancy)) throw new Error('Dataset invalid');
+    vacancyRecords=data.jobs;
+    vacancyDatasetDate=typeof data.generated_at==='string' ? data.generated_at : null;
+    document.getElementById('vacancyDatasetInfo').textContent=vacancyDatasetDate ?
+      'Published vacancy dataset last refreshed: '+vacancyDatasetDate+'. Check availability at employer site.' :
+      'No published feed refresh has been completed yet.';
+    renderVacancies();
+  } catch {
+    document.getElementById('vacancyDatasetInfo').textContent='Published dataset unavailable; directory links remain accessible.';
+    renderVacancies();
+  }
+}
+loadPublishedVacancies();
 // Initial Render
 renderPortals();
 </script>
