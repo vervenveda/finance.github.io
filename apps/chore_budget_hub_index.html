@@ -265,7 +265,6 @@
    ========================= */
 const KEY = 'cb_hub_v3_multi';
 const DEF = {
-  pinHash:'', pinInit:false, mode:'parent',
   profiles:[
     {id:'parent', name:'Parent', role:'parent', color:'#70543b'},
     // kid example with own wallet/coins
@@ -282,18 +281,12 @@ let S = load();
 const $ = id => document.getElementById(id);
 const money = n => '$' + Number(n||0).toFixed(2);
 const todayISO = () => new Date().toISOString().slice(0,10);
-function hashPIN(pin){ let h=0; for(let i=0;i<pin.length;i++){h=(h<<5)-h+pin.charCodeAt(i);h|=0;} return String(h); }
-function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+function save(){ const record={...S}; delete record.pinHash; delete record.pinInit; delete record.mode; localStorage.setItem(KEY, JSON.stringify(record)); }
 function load(){
-  try{ const raw = localStorage.getItem(KEY); if(raw) return JSON.parse(raw); }catch(e){}
+  try{ const raw = localStorage.getItem(KEY); if(raw){ const data=JSON.parse(raw); delete data.pinHash; delete data.pinInit; delete data.mode; return data; } }catch(e){}
   const fresh = JSON.parse(JSON.stringify(DEF));
-  fresh.pinHash = '';
-  fresh.pinInit = false;
-  fresh.mode = 'kid';
   return fresh;
 }
-function isParent(){ return true; } // Academy owns access; this is a local practice workspace.
-function askPIN(){ alert('Family accounts and permissions are managed by Khaemenes Academy.'); }
 function kids(){ return S.profiles.filter(p=>p.role==='kid'); }
 function parent(){ return S.profiles.find(p=>p.role==='parent'); }
 function active(){ return S.profiles.find(p=>p.id===S.activeId && p.role==='kid') || kids()[0] || null; }
@@ -334,7 +327,7 @@ function renderAllowanceList(){
     </div>`;
     const right = document.createElement('div'); right.className='row';
     const inp = document.createElement('input'); inp.type='number'; inp.min='0'; inp.step='0.50'; inp.style.width='120px'; inp.value= k.weeklyAllowance || 0;
-    inp.onchange = ()=>{ if(!isParent()) return askPIN(); k.weeklyAllowance = parseFloat(inp.value||0); save(); log(`Set allowance for ${k.name}: ${money(k.weeklyAllowance)}`); };
+    inp.onchange = ()=>{ k.weeklyAllowance = parseFloat(inp.value||0); save(); log(`Set allowance for ${k.name}: ${money(k.weeklyAllowance)}`); };
     right.appendChild(inp);
     row.appendChild(right); box.appendChild(row);
   });
@@ -417,9 +410,9 @@ function renderChores(){
     }
     // edit/delete (parent)
     const edit = document.createElement('button'); edit.className='btn ghost'; edit.textContent='Edit';
-    edit.onclick = ()=>{ if(!isParent()) return askPIN(); openChoreModal(c); };
+    edit.onclick = ()=>{ openChoreModal(c); };
     const del = document.createElement('button'); del.className='btn ghost danger'; del.textContent='Delete';
-    del.onclick = ()=>{ if(!isParent()) return askPIN(); if(confirm('Delete chore?')){ S.chores=S.chores.filter(x=>x.id!==c.id); S.approvals=S.approvals.filter(id=>id!==c.id); save(); renderAll(); log(`Deleted chore: ${c.name}`);} };
+    del.onclick = ()=>{ if(confirm('Delete chore?')){ S.chores=S.chores.filter(x=>x.id!==c.id); S.approvals=S.approvals.filter(id=>id!==c.id); save(); renderAll(); log(`Deleted chore: ${c.name}`);} };
     actions.appendChild(edit); actions.appendChild(del);
     // flags
     if(c.paid){ const b=document.createElement('span'); b.className='pill'; b.textContent='Paid'; actions.appendChild(b); }
@@ -437,8 +430,8 @@ function renderApprovals(){
     const act = document.createElement('div'); act.className='row';
     const approve=document.createElement('button'); approve.className='btn ok'; approve.textContent='Approve';
     const deny=document.createElement('button'); deny.className='btn warn'; deny.textContent='Deny';
-    approve.onclick = ()=>{ if(!isParent()) return askPIN(); c.awaiting=false; c.approved=true; S.approvals=S.approvals.filter(x=>x!==id); save(); renderAll(); log(`Approved: ${c.name} (${money(c.amount)})`); };
-    deny.onclick = ()=>{ if(!isParent()) return askPIN(); c.awaiting=false; c.approved=false; S.approvals=S.approvals.filter(x=>x!==id); save(); renderAll(); log(`Denied: ${c.name}`); };
+    approve.onclick = ()=>{ c.awaiting=false; c.approved=true; S.approvals=S.approvals.filter(x=>x!==id); save(); renderAll(); log(`Approved: ${c.name} (${money(c.amount)})`); };
+    deny.onclick = ()=>{ c.awaiting=false; c.approved=false; S.approvals=S.approvals.filter(x=>x!==id); save(); renderAll(); log(`Denied: ${c.name}`); };
     act.appendChild(approve); act.appendChild(deny); row.appendChild(act); q.appendChild(row);
   });
 }
@@ -451,7 +444,7 @@ function renderStore(){
     const act = document.createElement('div'); act.className='row';
     const buy = document.createElement('button'); buy.className='btn'; buy.textContent='Redeem';
     buy.onclick = ()=>{
-      if(!isParent()) return askPIN();
+      
       const kid = active()?.role==='kid' ? active() : kids()[0];
       if(!kid) return alert('Select a kid.');
       ensureKidWallet(kid);
@@ -461,7 +454,7 @@ function renderStore(){
       }
     };
     const del = document.createElement('button'); del.className='btn ghost danger'; del.textContent='Remove';
-    del.onclick = ()=>{ if(!isParent()) return askPIN(); S.store=S.store.filter(x=>x.id!==s.id); save(); renderStore(); log(`Removed reward: ${s.title}`); };
+    del.onclick = ()=>{ S.store=S.store.filter(x=>x.id!==s.id); save(); renderStore(); log(`Removed reward: ${s.title}`); };
     act.appendChild(buy); act.appendChild(del); row.appendChild(act); list.appendChild(row);
   });
 }
@@ -483,16 +476,16 @@ function hide(id){ $(id).classList.remove('show'); }
    Actions
    ========================= */
 $('applySplit').onclick = ()=>{
-  if(!isParent()) return askPIN();
+  
   const a=parseInt($('splitSave').value||0,10), b=parseInt($('splitSpend').value||0,10), c=parseInt($('splitGive').value||0,10);
   if(a+b+c!==100) return alert('Split must total 100%');
   S.split={save:a,spend:b,give:c}; save(); renderAll(); log(`Split set to ${a}/${b}/${c}`);
 };
 
 /* Chores */
-$('newChoreBtn').onclick = ()=>{ if(!isParent()) return askPIN(); openChoreModal(); };
+$('newChoreBtn').onclick = ()=>{ openChoreModal(); };
 $('templatesBtn').onclick = ()=>{
-  if(!isParent()) return askPIN();
+  
   const kid = kids()[0]; if(!kid) return alert('Add a kid first.');
   [{name:'Make Bed',when:'morning',recurring:'daily',amount:0.5},
    {name:'Dishes',when:'evening',recurring:'daily',amount:1.0},
@@ -524,7 +517,7 @@ function openChoreModal(existing){
 
 /* Approvals + Pay Day */
 $('paydayBtn').onclick = ()=>{
-  if(!isParent()) return askPIN();
+  
   const payList = S.chores.filter(c=>c.approved && !c.paid);
   if(!payList.length) return alert('No approved chores to pay.');
   let total=0, count=0;
@@ -546,7 +539,7 @@ $('paydayBtn').onclick = ()=>{
 
 /* Weekly Allowance */
 $('runAllowanceBtn').onclick = ()=>{
-  if(!isParent()) return askPIN();
+  
   const s=S.split; let total=0, count=0;
   kids().forEach(k=>{
     ensureKidWallet(k);
@@ -565,7 +558,7 @@ $('runAllowanceBtn').onclick = ()=>{
 };
 
 /* Store */
-$('addStoreBtn').onclick = ()=>{ if(!isParent()) return askPIN(); show('storeModal'); };
+$('addStoreBtn').onclick = ()=>{ show('storeModal'); };
 $('storeCancel').onclick = ()=> hide('storeModal');
 $('storeSave').onclick = ()=>{
   const t=$('storeTitle').value.trim(), c=parseInt($('storeCost').value||'0',10);
@@ -586,13 +579,13 @@ $('importFile').onchange = e=>{
   r.readAsText(f);
 };
 $('resetBtn').onclick = ()=>{
-  if(!isParent()) return askPIN();
+  
   if(confirm('Reset all data? Export a backup first; this cannot be undone.')){ localStorage.removeItem(KEY); S=load(); save(); renderAll(); }
 };
 
 /* Pay Stubs */
 $('stubBtn').onclick = ()=>{
-  if(!isParent()) return askPIN();
+  
   const sel=$('stubKid'); sel.innerHTML='';
   kids().forEach(k=>{ const o=document.createElement('option'); o.value=k.id; o.textContent=k.name; sel.appendChild(o); });
   $('stubFrom').value = todayISO();
