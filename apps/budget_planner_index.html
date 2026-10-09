@@ -513,7 +513,16 @@ printBtn.addEventListener("click", ()=>{
 });
 
 resetBtn.addEventListener("click", ()=>{
-  const ok = confirm("Reset all local data for this planner?\n\nThis cannot be undone.");
+  const backup = confirm("Before resetting, export a backup of your local planner data? Choose OK to download a backup, or Cancel to continue to the reset confirmation.");
+  if(backup){
+    const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;a.download="budget-planner-backup.json";
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  const ok = confirm("Reset all local data for this planner?\\n\\nThis cannot be undone.");
   if(!ok) return;
   localStorage.removeItem(CONFIG.STORAGE_KEY);
   state = structuredClone(DEFAULT_STATE);
