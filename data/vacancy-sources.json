@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "notes": "Only add employer-operated Greenhouse board tokens after confirming reuse permission. No sources enabled by default.",
+  "greenhouse_boards": []
+}
