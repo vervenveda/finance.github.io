@@ -306,7 +306,9 @@ function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
 function load(){
   try{ const raw = localStorage.getItem(KEY); if(raw) return JSON.parse(raw); }catch(e){}
   const fresh = JSON.parse(JSON.stringify(DEF));
-  fresh.pinHash = hashPIN('1234');
+  fresh.pinHash = '';
+  fresh.pinInit = false;
+  fresh.mode = 'kid';
   return fresh;
 }
 function isParent(){ return S.mode === 'parent'; }
@@ -510,23 +512,40 @@ function hide(id){ $(id).classList.remove('show'); }
 /* =========================
    PIN flow
    ========================= */
-function askPIN(){ $('pinHint').textContent=''; $('pinInput').value=''; show('pinModal'); }
+// This is a local household convenience lock, not secure authentication.
+function validPIN(pin) { return /^[0-9]{4}$/.test(pin) && pin !== '1234' && pin !== '0000'; }
+function setupPIN() {
+  const first = prompt('Set a new 4-digit parent PIN (not 1234 or 0000). Cancel to stay in Kid view.');
+  if (first === null) return false;
+  if (!validPIN(first)) { alert('Choose four digits other than 1234 or 0000.'); return false; }
+  const again = prompt('Confirm the new parent PIN.');
+  if (again !== first) { alert('PINs did not match. Nothing changed.'); return false; }
+  S.pinHash = hashPIN(first);
+  S.pinInit = true;
+  S.mode = 'parent';
+  save();
+  renderAll();
+  return true;
+}
+function askPIN() {
+  if (!S.pinInit || !S.pinHash) { setupPIN(); return; }
+  $('pinHint').textContent='';
+  $('pinInput').value='';
+  show('pinModal');
+}
 $('pinCancel').onclick = ()=> hide('pinModal');
 $('pinSubmit').onclick = ()=>{
   const pin = $('pinInput').value.trim();
-  if(pin.length!==4) return $('pinHint').textContent='PIN must be 4 digits';
-  if(hashPIN(pin)===S.pinHash){ S.mode='parent'; save(); hide('pinModal'); renderAll(); } else { $('pinHint').textContent='Incorrect PIN'; }
+  if (!/^[0-9]{4}$/.test(pin)) return $('pinHint').textContent='PIN must be 4 digits';
+  if (hashPIN(pin) === S.pinHash) {
+    S.mode='parent'; save(); hide('pinModal'); renderAll();
+  } else { $('pinHint').textContent='Incorrect PIN'; }
 };
-// first run: set PIN
-if(!S.pinInit){
-  S.pinInit=true; save();
-  setTimeout(()=>{
-    alert('Default Parent PIN is 1234. Set your own now.');
-    const np = prompt('New 4-digit Parent PIN','1234') || '1234';
-    if(np.length===4){ S.pinHash=hashPIN(np); save(); log('Parent PIN updated'); }
-  }, 400);
+// Preserve existing family data and legacy PINs; require setup on new profiles.
+if (!S.pinInit || !S.pinHash) {
+  S.mode='kid';
+  save();
 }
-
 /* =========================
    Actions
    ========================= */
@@ -637,12 +656,12 @@ $('exportBtn').onclick = ()=>{
 $('importBtn').onclick = ()=> $('importFile').click();
 $('importFile').onchange = e=>{
   const f=e.target.files[0]; if(!f) return; const r=new FileReader();
-  r.onload=()=>{ try{ const obj=JSON.parse(r.result); obj.pinHash=S.pinHash; S=obj; save(); renderAll(); log('Imported backup'); }catch{ alert('Invalid file'); } };
+  r.onload=()=>{ try{ const obj=JSON.parse(r.result); if(!obj || !Array.isArray(obj.profiles) || !Array.isArray(obj.chores)) throw new Error('Invalid backup structure'); if(!confirm('Replace current family data with this backup? Export your current data first.')) return; obj.pinHash=S.pinHash; obj.pinInit=S.pinInit; obj.mode=S.mode; S=obj; save(); renderAll(); log('Imported backup'); }catch{ alert('Invalid file'); } };
   r.readAsText(f);
 };
 $('resetBtn').onclick = ()=>{
   if(!isParent()) return askPIN();
-  if(confirm('Reset all data?')){ localStorage.removeItem(KEY); S=load(); save(); renderAll(); log('Data reset'); }
+  if(confirm('Reset all data? Export a backup first; this cannot be undone.')){ localStorage.removeItem(KEY); S=load(); save(); renderAll(); }
 };
 
 /* Pay Stubs */
