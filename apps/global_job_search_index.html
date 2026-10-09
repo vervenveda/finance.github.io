@@ -69,6 +69,21 @@
         <button id="searchPortals" type="button">Search</button>
     </div>
 
+    <section aria-labelledby="vacancyTitle" style="border-top:1px solid #c9bda8;padding-top:18px;margin-top:18px">
+      <h2 id="vacancyTitle">Geographic Vacancy Search</h2>
+      <p>Search verified imported job records by location, postal code, job title, and work arrangement. Listings are not live until an authorized vacancy dataset is supplied.</p>
+      <div class="search-box">
+        <input id="vacancyKeyword" aria-label="Job title or keyword" placeholder="Job title or keyword">
+        <input id="vacancyLocation" aria-label="City, state, country, or postal code" placeholder="City, state, country, or ZIP / postal code">
+        <select id="vacancyWork" aria-label="Work arrangement"><option value="">All arrangements</option><option value="onsite">On-site</option><option value="hybrid">Hybrid</option><option value="remote">Remote</option></select>
+      </div>
+      <div class="search-box">
+        <button type="button" id="vacancySearch">Search vacancies</button>
+        <label style="flex:1">Import authorized vacancies (JSON) <input id="vacancyImport" type="file" accept=".json,application/json"></label>
+      </div>
+      <p id="vacancyStatus" role="status" aria-live="polite"></p>
+      <div id="vacancyResults"></div>
+    </section>
     <!-- Results -->
     <p id="resultCount" aria-live="polite"></p>
     <div id="portalList"></div>
@@ -207,6 +222,74 @@ function renderPortals() {
 document.getElementById('searchPortals').addEventListener('click', renderPortals);
 document.getElementById('zipSearch').addEventListener('input', renderPortals);
 document.getElementById('regionFilter').addEventListener('change', renderPortals);
+// Geographic vacancy records are supplied by an authorized JSON export.
+// Schema: {jobs:[{id,title,company,city,state,country,postal_code,work_arrangement,apply_url,posted_at,source}]}
+let vacancyRecords = [];
+const vacancyStatus = document.getElementById('vacancyStatus');
+function renderVacancies() {
+  const keyword = document.getElementById('vacancyKeyword').value.trim().toLowerCase();
+  const location = document.getElementById('vacancyLocation').value.trim().toLowerCase();
+  const arrangement = document.getElementById('vacancyWork').value;
+  const results = document.getElementById('vacancyResults');
+  results.replaceChildren();
+  const matches = vacancyRecords.filter(job => {
+    const text = [job.title,job.company].join(' ').toLowerCase();
+    const geography = [job.city,job.state,job.country,job.postal_code].join(' ').toLowerCase();
+    return (!keyword || text.includes(keyword)) &&
+      (!location || geography.includes(location) || (job.work_arrangement==='remote' && location==='remote')) &&
+      (!arrangement || job.work_arrangement===arrangement);
+  });
+  vacancyStatus.textContent = vacancyRecords.length ?
+    matches.length+' matching vacancies from '+vacancyRecords.length+' imported records. Confirm availability with the employer.' :
+    'No vacancy dataset loaded. Import authorized JSON records to search actual postings.';
+  matches.slice(0,100).forEach(job => {
+    const card = document.createElement('article');
+    card.className = 'portal';
+    const heading = document.createElement('h3');
+    heading.textContent = job.title+' — '+job.company;
+    const detail = document.createElement('p');
+    detail.textContent = [job.city,job.state,job.country,job.postal_code,job.work_arrangement].filter(Boolean).join(' · ');
+    const meta = document.createElement('small');
+    meta.textContent = 'Source: '+job.source+' · Posted: '+job.posted_at;
+    const link = document.createElement('a');
+    link.href = job.apply_url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'View original vacancy / Apply';
+    card.append(heading,detail,meta,link);
+    results.appendChild(card);
+  });
+  if(matches.length>100) {
+    const note=document.createElement('p');
+    note.textContent='Showing first 100 results. Refine your search.';
+    results.appendChild(note);
+  }
+}
+function validVacancy(job) {
+  if (!job || typeof job!=='object') return false;
+  const fields=['id','title','company','city','state','country','postal_code','work_arrangement','apply_url','posted_at','source'];
+  if (!fields.every(k => typeof job[k]==='string' && job[k].length<=500)) return false;
+  if (!job.title || !job.company || !job.source || !job.apply_url) return false;
+  if (!['onsite','hybrid','remote'].includes(job.work_arrangement)) return false;
+  try { return new URL(job.apply_url).protocol==='https:'; } catch { return false; }
+}
+document.getElementById('vacancyImport').addEventListener('change', async event => {
+  const file=event.target.files[0];
+  if(!file) return;
+  if(file.size>5*1024*1024){vacancyStatus.textContent='File exceeds 5 MB limit.';return;}
+  try {
+    const data=JSON.parse(await file.text());
+    if(!data || !Array.isArray(data.jobs) || data.jobs.length>10000 || !data.jobs.every(validVacancy)) throw new Error('Invalid schema');
+    vacancyRecords=data.jobs;
+    renderVacancies();
+  } catch {
+    vacancyStatus.textContent='Import rejected. Use a valid authorized JSON vacancy export with required fields.';
+  }
+});
+['vacancyKeyword','vacancyLocation'].forEach(id => document.getElementById(id).addEventListener('input',renderVacancies));
+document.getElementById('vacancyWork').addEventListener('change',renderVacancies);
+document.getElementById('vacancySearch').addEventListener('click',renderVacancies);
+renderVacancies();
 // Initial Render
 renderPortals();
 </script>
