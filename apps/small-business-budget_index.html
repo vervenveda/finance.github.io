@@ -281,19 +281,51 @@
         return;
       }
 
-      const monthlyInterestRate = (debtInterest / 100) / 12;
-      const remainingDebt = debtAmount;
-      const totalMonths = Math.ceil(remainingDebt / debtRepayment);
-
-      const monthlyInterest = debtAmount * monthlyInterestRate;
-      const totalRepayment = debtRepayment * totalMonths;
-
-      document.getElementById("debtResult").innerHTML = `
-        <strong>Remaining Debt:</strong> $${remainingDebt.toFixed(2)} <br>
-        <strong>Monthly Repayment:</strong> $${debtRepayment.toFixed(2)} <br>
-        <strong>Months to Pay Off:</strong> ${totalMonths} months <br>
-        <strong>Interest Per Month:</strong> $${monthlyInterest.toFixed(2)}
-      `;
+      if (debtInterest < 0 || !Number.isFinite(debtInterest)) {
+        alert("Interest rate must be zero or greater.");
+        return;
+      }
+      const monthlyRate = debtInterest / 1200;
+      const firstMonthInterest = debtAmount * monthlyRate;
+      if (debtRepayment <= firstMonthInterest + 1e-9 && monthlyRate > 0) {
+        document.getElementById("debtResult").textContent =
+          "Payment is too low: it does not cover the first month's interest. Increase the monthly payment.";
+        return;
+      }
+      let balance = debtAmount;
+      let totalInterest = 0;
+      let months = 0;
+      let finalPayment = 0;
+      // Iterative amortization avoids rounding errors and handles a smaller final payment.
+      while (balance > 0.005 && months < 12000) {
+        const interest = balance * monthlyRate;
+        const due = balance + interest;
+        finalPayment = Math.min(debtRepayment, due);
+        balance = Math.max(0, due - finalPayment);
+        totalInterest += interest;
+        months++;
+      }
+      if (balance > 0.005) {
+        document.getElementById("debtResult").textContent =
+          "The payoff exceeds the 1,000-year calculation limit. Increase the monthly payment.";
+        return;
+      }
+      const result = document.getElementById("debtResult");
+      result.replaceChildren();
+      [
+        ["Original Debt", money(debtAmount)],
+        ["Monthly Payment (maximum)", money(debtRepayment)],
+        ["Months to Pay Off", String(months)],
+        ["Total Interest", money(totalInterest)],
+        ["Total Repaid", money(debtAmount + totalInterest)],
+        ["Final Payment", money(finalPayment)]
+      ].forEach(([label, value]) => {
+        const row = document.createElement("p");
+        const strong = document.createElement("strong");
+        strong.textContent = label + ": ";
+        row.append(strong, document.createTextNode(value));
+        result.appendChild(row);
+      });
     });
 
     // Cash Flow Calculation
