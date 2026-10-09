@@ -71,7 +71,7 @@ def main():
                 "state": "",
                 "country": "",
                 "postal_code": "",
-                "work_arrangement": "remote" if "remote" in location.lower() else "onsite",
+                "work_arrangement": "remote" if "remote" in location.lower() else ("hybrid" if "hybrid" in location.lower() else "unspecified"),
                 "apply_url": link[:500],
                 "posted_at": updated,
                 "source": "Employer careers (Greenhouse)"
