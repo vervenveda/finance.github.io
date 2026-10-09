@@ -234,6 +234,7 @@ document.getElementById('regionFilter').addEventListener('change', renderPortals
 let vacancyRecords = [];
 let visibleVacancies = [];
 let vacancyDatasetDate = null;
+let manualDatasetSelected = false;
 const vacancyStatus = document.getElementById('vacancyStatus');
 function renderVacancies() {
   const keyword = document.getElementById('vacancyKeyword').value.trim().toLowerCase();
@@ -290,7 +291,8 @@ function validVacancy(job) {
   const fields=['id','title','company','city','state','country','postal_code','work_arrangement','apply_url','posted_at','source'];
   if (!fields.every(k => typeof job[k]==='string' && job[k].length<=500)) return false;
   if (!job.id || !job.title || !job.company || !job.source || !job.apply_url) return false;
-  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(job.posted_at) || !Number.isFinite(Date.parse(job.posted_at))) return false;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(job.posted_at) || !Number.isFinite(Date.parse(job.posted_at))) return false;
+  if (new Date(job.posted_at).toISOString().slice(0,10)!==job.posted_at || Date.parse(job.posted_at)>Date.now()+86400000) return false;
   if (!['onsite','hybrid','remote','unspecified'].includes(job.work_arrangement)) return false;
   try { return new URL(job.apply_url).protocol==='https:'; } catch { return false; }
 }
@@ -298,6 +300,7 @@ document.getElementById('vacancyImport').addEventListener('change', async event 
   const file=event.target.files[0];
   if(!file) return;
   if(file.size>5*1024*1024){vacancyStatus.textContent='File exceeds 5 MB limit.';return;}
+  manualDatasetSelected = true;
   try {
     const data=JSON.parse(await file.text());
     if(!data || !Array.isArray(data.jobs) || data.jobs.length>10000 || !data.jobs.every(validVacancy)) throw new Error('Invalid schema');
@@ -340,6 +343,7 @@ async function loadPublishedVacancies() {
     if(!response.ok) throw new Error('Dataset unavailable');
     const data=await response.json();
     if(!data || !Array.isArray(data.jobs) || data.jobs.length>10000 || !data.jobs.every(validVacancy)) throw new Error('Dataset invalid');
+    if(manualDatasetSelected) return;
     vacancyRecords=data.jobs;
     vacancyDatasetDate=typeof data.generated_at==='string' ? data.generated_at : null;
     document.getElementById('vacancyDatasetInfo').textContent=vacancyDatasetDate ?
