@@ -1,0 +1,31 @@
+name: Refresh approved vacancies
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 9 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: finance-vacancies-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+      - name: Refresh approved employer boards
+        run: python3 scripts/update_vacancies.py
+      - name: Commit validated changes
+        run: |
+          if git diff --quiet -- data/vacancies.json; then
+            echo "No vacancy changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/vacancies.json
+          git commit -m "data(finance): refresh approved employer vacancies"
+          git push origin HEAD:main
