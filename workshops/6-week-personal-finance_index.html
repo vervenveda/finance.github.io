@@ -438,7 +438,7 @@ function getLessonState(week,lesson){
   return state.answers[week][lesson];
 }
 
-function loadState(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw)Object.assign(state,JSON.parse(raw));}catch{}const n=document.getElementById("participantName");if(n)n.value=state.name||"";updateProgressUI();}
+function loadState(){try{const raw=localStorage.getItem(STORAGE_KEY);if(raw)Object.assign(state,JSON.parse(raw));}catch{}const n=document.getElementById("participantName");if(n)n.value=state.name||"";state.completedWeeks=curriculum.filter(w=>Number(state.tests?.["week"+w.week])>=80).map(w=>w.week);updateProgressUI();}
 function saveState(){const n=document.getElementById("participantName");state.name=(n&&n.value.trim())||"Participant";try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));toast("Saved locally.");}catch{toast("Storage blocked.");}}
 function saveSilently(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch{}}
 function resetState(){if(confirm("Reset all progress?")){localStorage.removeItem(STORAGE_KEY);location.reload();}}
@@ -512,7 +512,7 @@ function renderQuizQ(week,lessonIndex){
 /* ======= Tests ======= */
 function startTest(week){hideAll();collapseResources();state.week=week;const W=curriculum.find(w=>w.week===week);if(!W)return;const testArea=document.getElementById("testArea");const testTitle=document.getElementById("testTitle");const body=document.getElementById("testBody");const result=document.getElementById("testResult");if(testArea)testArea.classList.remove("hidden");if(testTitle)testTitle.textContent=`Week ${week} Test`;if(body){body.innerHTML="";W.test.forEach((t,idx)=>{const blk=document.createElement("div");const lab=document.createElement("label");lab.innerHTML=`<strong>Q${idx+1}.</strong> ${t.q}`;blk.appendChild(lab);t.choices.forEach((c,i)=>{const row=document.createElement("div");const L=document.createElement("label");const I=document.createElement("input");I.type="radio";I.name=`test_q${idx}`;I.value=String(i);L.appendChild(I);L.appendChild(document.createTextNode(" "+c));row.appendChild(L);blk.appendChild(row);});body.appendChild(blk);});}
   if(result)result.textContent="";const y=testArea.getBoundingClientRect().top+window.scrollY-40;window.scrollTo({top:y,behavior:"smooth"});}
-function submitTest(){const week=state.week;const W=curriculum.find(w=>w.week===week);if(!W)return;let score=0;W.test.forEach((t,idx)=>{const sel=document.querySelector(`input[name="test_q${idx}"]:checked`);if(sel&&parseInt(sel.value,10)===t.a)score++;});const pct=W.test.length?Math.round(100*score/W.test.length):0;const out=document.getElementById("testResult");if(out)out.textContent=`Score: ${pct}% (${score}/${W.test.length})`;state.tests["week"+week]=pct;if(pct>=70&&!state.completedWeeks.includes(week))state.completedWeeks.push(week);saveSilently();updateProgressUI();buildWeeks();}
+function submitTest(){const week=state.week;const W=curriculum.find(w=>w.week===week);if(!W)return;let score=0;W.test.forEach((t,idx)=>{const sel=document.querySelector(`input[name="test_q${idx}"]:checked`);if(sel&&parseInt(sel.value,10)===t.a)score++;});const pct=W.test.length?Math.round(100*score/W.test.length):0;const out=document.getElementById("testResult");if(out)out.textContent=`Score: ${pct}% (${score}/${W.test.length})`;state.tests["week"+week]=pct;state.completedWeeks=curriculum.filter(w=>Number(state.tests?.["week"+w.week])>=80).map(w=>w.week);saveSilently();updateProgressUI();buildWeeks();}
 
 /* ======= Utilities ======= */
 function hideAll(){const m=document.getElementById("quizModal"),t=document.getElementById("testArea"),c=document.getElementById("finalCertificate");if(m)m.classList.add("hidden");if(t)t.classList.add("hidden");if(c)c.classList.add("hidden");}
@@ -521,7 +521,7 @@ function updateProgressUI(){updateProgress();}
 
 /* ======= Export & Certificate ======= */
 function exportJSON(){const data=JSON.stringify(state,null,2);const blob=new Blob([data],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=(state.name||"participant")+"_adult_finance_report.json";document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
-function maybeShowCertificate(){const allDone=state.completedWeeks.length===curriculum.length;if(!allDone){toast("Finish all week tests (≥70%) to unlock the certificate.");return;}const certBody=document.getElementById("certBody");certBody.innerHTML=`<p><strong>Certificate of Completion</strong></p><p>This certifies that <strong>${state.name||"Participant"}</strong> completed all ${curriculum.length} weeks of the Adult Personal Finance Workshop.</p><p class="small">Scores: ${JSON.stringify(state.tests)}</p>`;document.getElementById("finalCertificate").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
+function maybeShowCertificate(){const allDone=state.completedWeeks.length===curriculum.length;if(!allDone){toast("Finish all week tests (≥80%) to unlock the certificate.");return;}const certBody=document.getElementById("certBody");certBody.innerHTML=`<p><strong>Certificate of Completion</strong></p><p>This certifies that <strong>${state.name||"Participant"}</strong> completed all ${curriculum.length} weeks of the Adult Personal Finance Workshop.</p><p class="small">Scores: ${JSON.stringify(state.tests)}</p>`;document.getElementById("finalCertificate").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"});}
 
 /* ======= Wire up ======= */
 window.addEventListener("load",()=>{
@@ -534,7 +534,7 @@ window.addEventListener("load",()=>{
   document.getElementById("checkCertBtn").onclick=maybeShowCertificate;
   const n=document.getElementById("participantName");if(n)n.addEventListener("input",()=>{state.name=n.value.trim();saveSilently();});
   const startBtn=document.getElementById("startButton");if(startBtn)startBtn.onclick=()=>startLesson(state.week||1,state.lessonIndex||0);
-  document.addEventListener("keydown",(e)=>{if(e.ctrlKey&&e.key==="c"){e.preventDefault();maybeShowCertificate();}});
+  // Keep normal keyboard shortcuts intact; use the visible certificate button.
 });
 </script>
 <script src="/assets/vnv-beta-link.js" defer></script>
