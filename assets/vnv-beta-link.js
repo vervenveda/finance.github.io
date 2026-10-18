@@ -6,7 +6,7 @@
 (()=>{try{
   if(document.getElementById("vnvEcosystemMenuButton")||document.querySelector('script[data-vnv-ecosystem-menu]'))return;
   const s=document.createElement("script");
-  s.src="/assets/vnv-ecosystem-menu.js";
+  s.src="https://vervenveda.com/assets/vnv-ecosystem-menu.js";
   s.defer=true;
   s.dataset.vnvEcosystemMenu="1";
   (document.head||document.documentElement).appendChild(s);
