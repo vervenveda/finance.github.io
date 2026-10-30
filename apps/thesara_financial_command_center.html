@@ -140,4 +140,5 @@ $("importFile").addEventListener("change",async e=>{const file=e.target.files[0]
 $("reset").addEventListener("click",()=>{if(!confirm("Permanently reset this command center? Export a backup first. Other Finance apps are not affected."))return;try{localStorage.removeItem(KEY);state=fresh();render();renderCashflow();drawBalances();renderHealth();renderAssets();$("status").textContent="Command center reset."}catch(e){$("status").textContent="Unable to clear browser storage."}});
 render();renderCashflow();drawBalances();renderHealth();renderAssets();
 })();
-</script></body></html>
+</script><script src="https://vervenveda.com/assets/vnv-ecosystem-toolbar.js"></script>
+</body></html>

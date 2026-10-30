@@ -35,4 +35,5 @@ document.getElementById("addAsset").addEventListener("click",()=>addRow());
 document.getElementById("print").addEventListener("click",()=>window.print());
 document.getElementById("clear").addEventListener("click",()=>{if(!confirm("Clear all unsaved entries from this page?"))return;fields.forEach(id=>document.getElementById(id).value="");entries.length=0;assetRows.replaceChildren();distribution.length=0;document.getElementById("distributionRows").replaceChildren();totals();status.textContent="Worksheet cleared."});
 totals();
-</script></body></html>
+</script><script src="https://vervenveda.com/assets/vnv-ecosystem-toolbar.js"></script>
+</body></html>
